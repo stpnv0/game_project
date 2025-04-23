@@ -196,3 +196,4 @@
 /Users/dmtr/Desktop/projects/game_project/game_project/obj/Debug/net9.0/ConnectD.BC9B1E59.Up2Date
 /Users/dmtr/Desktop/projects/game_project/game_project/obj/Debug/net9.0/ConnectDotsGame.genruntimeconfig.cache
 /Users/dmtr/Desktop/projects/game_project/game_project/obj/Debug/net9.0/ref/ConnectDotsGame.dll
+/Users/dmtr/Desktop/projects/game_project/game_project/obj/Debug/net9.0/ConnectDotsGame.sourcelink.json
