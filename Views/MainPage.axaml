@@ -1,0 +1,76 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ConnectDotsGame.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="ConnectDotsGame.Views.MainPage"
+             x:DataType="vm:MainPageViewModel">
+
+    <Design.DataContext>
+        <vm:MainPageViewModel/>
+    </Design.DataContext>
+    
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Color="#151515" Offset="0"/>
+                <GradientStop Color="#303030" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <Grid RowDefinitions="Auto,*,Auto">
+            <!-- Заголовок игры -->
+            <StackPanel Grid.Row="0" Margin="0,60,0,20">
+                <TextBlock Text="FLOW" 
+                          FontSize="72" 
+                          FontWeight="Bold" 
+                          HorizontalAlignment="Center"
+                          Foreground="#FFD700"/>
+                <TextBlock Text="Соедините точки одинаковых цветов" 
+                          FontSize="18" 
+                          HorizontalAlignment="Center"
+                          Foreground="White"
+                          Margin="0,10,0,0"/>
+            </StackPanel>
+
+            <!-- Кнопки меню -->
+            <StackPanel Grid.Row="1" 
+                      VerticalAlignment="Center" 
+                      Spacing="20"
+                      Width="280">
+                <Button Content="Играть" 
+                        Command="{Binding PlayCommand}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Height="60"
+                        FontSize="24"/>
+                <Button Content="Настройки" 
+                        Command="{Binding SettingsCommand}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Height="60"
+                        FontSize="24"/>
+                <Button Content="О игре" 
+                        Command="{Binding AboutCommand}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Height="60"
+                        FontSize="24"/>
+                <Button Content="Выход" 
+                        Command="{Binding ExitCommand}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Height="60"
+                        FontSize="24"/>
+            </StackPanel>
+
+            <!-- Нижняя информация -->
+            <TextBlock Grid.Row="2" 
+                      Text="© 2023 Flow Game" 
+                      HorizontalAlignment="Center"
+                      Margin="0,0,0,20"
+                      Foreground="Gray"/>
+        </Grid>
+    </Grid>
+</UserControl> 

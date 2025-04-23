@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ConnectDotsGame.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="ConnectDotsGame.Views.LevelSelectPage"
+             x:DataType="vm:LevelSelectViewModel">
+
+    <Design.DataContext>
+        <vm:LevelSelectViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- Заголовок -->
+        <TextBlock Grid.Row="0" Text="Выберите уровень" 
+                  HorizontalAlignment="Center" 
+                  VerticalAlignment="Center"
+                  FontSize="32" 
+                  Margin="0,20,0,30" 
+                  Foreground="White"/>
+
+        <!-- Сетка уровней -->
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" 
+                      VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Levels}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel HorizontalAlignment="Center"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:LevelInfo">
+                        <Button Command="{Binding $parent[UserControl].((vm:LevelSelectViewModel)DataContext).SelectLevelCommand}"
+                                CommandParameter="{Binding Id}"
+                                Width="150" Height="150" Margin="15"
+                                Background="{Binding IsLocked, Converter={StaticResource LockedToBrushConverter}, ConverterParameter=Inverse}"
+                                IsEnabled="{Binding !IsLocked}">
+                            <Grid RowDefinitions="2*,*">
+                                <TextBlock Grid.Row="0" 
+                                           Text="{Binding Id}" 
+                                           FontSize="48" 
+                                           HorizontalAlignment="Center" 
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Row="1" 
+                                           Text="{Binding Name}" 
+                                           HorizontalAlignment="Center" 
+                                           VerticalAlignment="Center"/>
+                                <!-- Иконка замка для заблокированных уровней -->
+                                <TextBlock Grid.Row="0" Grid.RowSpan="2"
+                                           Text="🔒" 
+                                           FontSize="64"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           IsVisible="{Binding IsLocked}"/>
+                                <!-- Галочка для завершенных уровней -->
+                                <TextBlock Grid.Row="0" Grid.RowSpan="2"
+                                           Text="✓" 
+                                           FontSize="64"
+                                           Foreground="White"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           IsVisible="{Binding IsCompleted}"/>
+                            </Grid>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Кнопка назад -->
+        <Button Grid.Row="2" Content="Назад" 
+                Command="{Binding BackToMainCommand}"
+                HorizontalAlignment="Center" 
+                Margin="0,20,0,20"/>
+
+    </Grid>
+</UserControl> 

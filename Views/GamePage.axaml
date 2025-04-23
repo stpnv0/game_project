@@ -1,0 +1,56 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ConnectDotsGame.ViewModels"
+             xmlns:views="using:ConnectDotsGame.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="ConnectDotsGame.Views.GamePage"
+             x:DataType="vm:GameViewModel">
+
+    <Design.DataContext>
+        <vm:GameViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- Верхняя панель с информацией -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" 
+              Background="#202020" Margin="0,0,0,0">
+            <Button Grid.Column="0" 
+                    Content="Меню" 
+                    Command="{Binding BackToMenuCommand}"
+                    Margin="15,15,15,15"/>
+            
+            <StackPanel Grid.Column="1" HorizontalAlignment="Center" Margin="15,15,15,15">
+                <TextBlock Text="{Binding LevelName}" 
+                           FontSize="24" 
+                           HorizontalAlignment="Center"
+                           Foreground="White"/>
+                
+                <TextBlock Text="{Binding StatusMessage}" 
+                           Margin="0,5,0,0"
+                           HorizontalAlignment="Center"
+                           Foreground="LightGray"/>
+            </StackPanel>
+            
+            <Button Grid.Column="2" 
+                    Content="Сброс" 
+                    Command="{Binding ResetLevelCommand}"
+                    Margin="15,15,15,15"/>
+        </Grid>
+
+        <!-- Игровое поле -->
+        <Border Grid.Row="1" Background="Black" Padding="10">
+            <views:GameCanvas x:Name="GameCanvas"/>
+        </Border>
+
+        <!-- Нижняя панель с кнопками -->
+        <Grid Grid.Row="2" Background="#202020" Margin="0,0,0,0">
+            <Button Content="Следующий уровень" 
+                    Command="{Binding NextLevelCommand}"
+                    IsVisible="{Binding IsLevelCompleted}"
+                    HorizontalAlignment="Center"
+                    Margin="15,15,15,15"/>
+        </Grid>
+    </Grid>
+</UserControl> 
