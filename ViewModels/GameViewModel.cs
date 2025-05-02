@@ -202,11 +202,20 @@ namespace ConnectDotsGame.ViewModels
                 
             // Проверка, не занята ли точка другим путем
             var targetPath = GameLogic.CheckForCrossingPath(CurrentLevel, point);
-            if (targetPath != null && !targetPath.StartsWith(colorKey))
+            if (targetPath != null)
             {
+                // Если пересекаем путь того же цвета, запрещаем ход
+                if (targetPath.StartsWith(colorKey))
+                {
+                    Console.WriteLine($"Недопустимый ход: Точка {point.Row},{point.Column} уже занята линией того же цвета.");
+                    return;
+                }
                 // Если пересекаем путь другого цвета, очищаем его
-                CurrentLevel.ClearPath(targetPath);
-                _currentPaths.Remove(targetPath.Replace("-path", ""));
+                else
+                {
+                    CurrentLevel.ClearPath(targetPath);
+                    _currentPaths.Remove(targetPath.Replace("-path", ""));
+                }
             }
             
             // Если это цветная точка и не того же цвета, нельзя проходить через неё
@@ -302,7 +311,7 @@ namespace ConnectDotsGame.ViewModels
                 var startPoint = pathPoints[i];
                 var endPoint = pathPoints[i + 1];
                 
-                var line = new Line(startPoint, endPoint, GetBrushByName(colorKey));
+                var line = new Line(startPoint, endPoint, GetBrushByName(colorKey), $"{colorKey}-path");
                 line.IsVisible = true;
                 line.PathId = $"{colorKey}-path";
                 
@@ -326,7 +335,7 @@ namespace ConnectDotsGame.ViewModels
                 var startPoint = pathPoints[i];
                 var endPoint = pathPoints[i + 1];
                 
-                var line = new Line(startPoint, endPoint, GetBrushByName(colorKey));
+                var line = new Line(startPoint, endPoint, GetBrushByName(colorKey), $"{colorKey}-path");
                 line.IsVisible = true;
                 line.PathId = $"{colorKey}-path";
                 

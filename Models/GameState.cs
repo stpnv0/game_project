@@ -13,6 +13,7 @@ namespace ConnectDotsGame.Models
     {
         private readonly GameStorage _gameStorage;
         
+        public string? CurrentPathId { get; private set; } // Сделаем private set
         public List<Level> Levels { get; set; }
         public int CurrentLevelIndex { get; set; }
         public ModelPoint? LastSelectedPoint { get; set; }
@@ -175,6 +176,7 @@ namespace ConnectDotsGame.Models
             LastSelectedPoint = null;
             CurrentPathColor = null;
             CurrentPath.Clear();
+            CurrentPathId = null; // Сбрасываем ID
         }
         
         public void StartNewPath(ModelPoint point)
@@ -182,8 +184,11 @@ namespace ConnectDotsGame.Models
             ResetPathState();
             LastSelectedPoint = point;
             CurrentPathColor = point.Color;
+            // Генерируем УНИКАЛЬНЫЙ PathId
+            CurrentPathId = $"{point.Color}-{point.Row}-{point.Column}-path"; // Пример уникального ID
             point.IsConnected = true;
             CurrentPath.Add(point);
+            Console.WriteLine($"Started new path with ID: {CurrentPathId}"); // Для отладки
         }
         
         public bool IsPointInCurrentPath(ModelPoint point)
