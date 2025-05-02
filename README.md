@@ -53,7 +53,7 @@
 
 3. Запустите приложение:
    ```
-   cd ConnectDotsGame
+   cd game_project
    dotnet run
    ```
 
