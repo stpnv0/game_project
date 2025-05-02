@@ -202,11 +202,20 @@ namespace ConnectDotsGame.ViewModels
                 
             // Проверка, не занята ли точка другим путем
             var targetPath = GameLogic.CheckForCrossingPath(CurrentLevel, point);
-            if (targetPath != null && !targetPath.StartsWith(colorKey))
+            if (targetPath != null)
             {
+                // Если пересекаем путь того же цвета, запрещаем ход
+                if (targetPath.StartsWith(colorKey))
+                {
+                    Console.WriteLine($"Недопустимый ход: Точка {point.Row},{point.Column} уже занята линией того же цвета.");
+                    return;
+                }
                 // Если пересекаем путь другого цвета, очищаем его
-                CurrentLevel.ClearPath(targetPath);
-                _currentPaths.Remove(targetPath.Replace("-path", ""));
+                else
+                {
+                    CurrentLevel.ClearPath(targetPath);
+                    _currentPaths.Remove(targetPath.Replace("-path", ""));
+                }
             }
             
             // Если это цветная точка и не того же цвета, нельзя проходить через неё
@@ -302,7 +311,7 @@ namespace ConnectDotsGame.ViewModels
                 var startPoint = pathPoints[i];
                 var endPoint = pathPoints[i + 1];
                 
-                var line = new Line(startPoint, endPoint, GetBrushByName(colorKey));
+                var line = new Line(startPoint, endPoint, GetBrushByName(colorKey), $"{colorKey}-path");
                 line.IsVisible = true;
                 line.PathId = $"{colorKey}-path";
                 
@@ -326,7 +335,7 @@ namespace ConnectDotsGame.ViewModels
                 var startPoint = pathPoints[i];
                 var endPoint = pathPoints[i + 1];
                 
-                var line = new Line(startPoint, endPoint, GetBrushByName(colorKey));
+                var line = new Line(startPoint, endPoint, GetBrushByName(colorKey), $"{colorKey}-path");
                 line.IsVisible = true;
                 line.PathId = $"{colorKey}-path";
                 
@@ -465,10 +474,32 @@ namespace ConnectDotsGame.ViewModels
         // Завершение пути
         public void EndPath()
         {
+            EndPath(null);
+        }
+        
+        // Завершение пути на указанной точке
+        public void EndPath(ModelPoint? endPoint)
+        {
             if (!IsDrawingPath) return;
             
             var colorKey = _activeColor?.ToString() ?? "";
             var currentPath = _currentPaths.ContainsKey(colorKey) ? _currentPaths[colorKey] : new List<ModelPoint>();
+            
+            // Если указана конечная точка, добавляем её в путь
+            if (endPoint != null && _activePoint != endPoint && 
+                endPoint.HasColor && endPoint.Color != null && 
+                endPoint.Color.Equals(_activeColor))
+            {
+                // Проверим, что точка имеет тот же цвет и не находится уже в пути
+                if (!currentPath.Contains(endPoint))
+                {
+                    currentPath.Add(endPoint);
+                    if (_currentPaths.ContainsKey(colorKey))
+                    {
+                        _currentPaths[colorKey] = currentPath;
+                    }
+                }
+            }
             
             if (currentPath.Count > 1)
             {
@@ -478,7 +509,8 @@ namespace ConnectDotsGame.ViewModels
                 // Отмечаем ВСЕ точки в пути как соединенные
                 foreach (var pathPoint in currentPath)
                 {
-                    if (pathPoint.HasColor && pathPoint.Color == _activeColor)
+                    if (pathPoint.HasColor && pathPoint.Color != null && 
+                        pathPoint.Color.Equals(_activeColor))
                     {
                         pathPoint.IsConnected = true;
                     }

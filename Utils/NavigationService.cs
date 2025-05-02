@@ -28,8 +28,11 @@ namespace ConnectDotsGame.Utils
 
         public void NavigateTo<TViewModel>(object? parameter = null)
         {
-            var viewModelType = typeof(TViewModel);
-            
+            NavigateToViewModel(typeof(TViewModel), parameter);
+        }
+        
+        private void NavigateToViewModel(Type viewModelType, object? parameter = null)
+        {
             if (!_viewModelViewMappings.TryGetValue(viewModelType, out var viewType))
             {
                 throw new InvalidOperationException($"Представление для {viewModelType.Name} не зарегистрировано.");
@@ -82,15 +85,15 @@ namespace ConnectDotsGame.Utils
             {
                 // Если стек навигации пуст, но у нас есть GameState, 
                 // то идем на главную страницу
-                var mainViewModel = new MainPageViewModel(this);
-                var mainView = (Control)Activator.CreateInstance(_viewModelViewMappings[typeof(MainPageViewModel)])!;
-                mainView.DataContext = mainViewModel;
-                _contentControl.Content = mainView;
+                NavigateToViewModel(typeof(MainPageViewModel), _gameState);
             }
         }
 
         private object CreateViewModel(Type viewModelType, object? parameter)
         {
+            if (viewModelType == null)
+                throw new ArgumentNullException(nameof(viewModelType));
+                
             // Ищем конструктор, который принимает INavigation
             var constructor = viewModelType.GetConstructors()
                 .FirstOrDefault(c => 
@@ -113,13 +116,27 @@ namespace ConnectDotsGame.Utils
                 }
                 else if (parameters.Length == 2 && parameters[1].ParameterType == typeof(GameState))
                 {
+                    // Проверяем, что есть GameState
+                    var gameState = _gameState ?? parameter as GameState;
+                    if (gameState == null)
+                    {
+                        throw new InvalidOperationException($"Для создания {viewModelType.Name} требуется GameState, но он не был предоставлен.");
+                    }
+                    
                     // Конструктор принимает INavigation и GameState
-                    return Activator.CreateInstance(viewModelType, this, _gameState ?? parameter)!;
+                    return Activator.CreateInstance(viewModelType, this, gameState)!;
                 }
             }
 
             // Если не нашли подходящий конструктор, пробуем создать по умолчанию
-            return Activator.CreateInstance(viewModelType)!;
+            try
+            {
+                return Activator.CreateInstance(viewModelType)!;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Не удалось создать экземпляр {viewModelType.Name}: {ex.Message}", ex);
+            }
         }
     }
 } 

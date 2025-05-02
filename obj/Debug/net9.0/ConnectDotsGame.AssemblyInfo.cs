@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ConnectDotsGame")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e4b2f07e8d7d4caf39955cf29e2af8aae5c55905")]
 [assembly: System.Reflection.AssemblyProductAttribute("ConnectDotsGame")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ConnectDotsGame")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

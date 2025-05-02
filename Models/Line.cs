@@ -11,29 +11,30 @@ namespace ConnectDotsGame.Models
         public IBrush Color { get; set; }
         public string PathId { get; set; } = string.Empty;
         
-        public Line(Point startPoint, Point endPoint, IBrush color)
+        public Line(Point startPoint, Point endPoint, IBrush color, string pathId) // Добавляем pathId
         {
             StartPoint = startPoint;
             EndPoint = endPoint;
-            IsVisible = false;
+            IsVisible = false; // По умолчанию невидима? Или true?
             Color = color;
-            PathId = $"{startPoint.Color}-path";
+            PathId = pathId; // Присваиваем переданный ID
         }
-        
-        public Line() 
+                
+        public Line()
         {
-            Color = Brushes.Black;
+            Color = Brushes.Black; // Значение по умолчанию
+            PathId = string.Empty; // Значение по умолчанию
         }
         
         public Line Clone()
         {
             return new Line
             {
-                    StartPoint = this.StartPoint != null ? this.StartPoint.Clone() : null!,
-                    EndPoint = this.EndPoint != null ? this.EndPoint.Clone() : null!,
-                    IsVisible = this.IsVisible,
-                    Color = this.Color,
-                    PathId = this.PathId
+                StartPoint = this.StartPoint?.Clone(), // Используем null-conditional оператор
+                EndPoint = this.EndPoint?.Clone(),   // Используем null-conditional оператор
+                IsVisible = this.IsVisible,
+                Color = this.Color, // Кисти обычно не клонируют, если они неизменяемые
+                PathId = this.PathId // Копируем ID
             };
         }
     }

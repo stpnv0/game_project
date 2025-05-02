@@ -22,12 +22,12 @@
         <Grid RowDefinitions="Auto,*,Auto">
             <!-- Заголовок игры -->
             <StackPanel Grid.Row="0" Margin="0,60,0,20">
-                <TextBlock Text="FLOW" 
+                <TextBlock Text="ТРУБОЧИСТ" 
                           FontSize="72" 
                           FontWeight="Bold" 
                           HorizontalAlignment="Center"
                           Foreground="#FFD700"/>
-                <TextBlock Text="Соедините точки одинаковых цветов" 
+                <TextBlock Text="Чини трубы и кайфуй" 
                           FontSize="18" 
                           HorizontalAlignment="Center"
                           Foreground="White"
@@ -57,7 +57,7 @@
                         HorizontalContentAlignment="Center"
                         Height="60"
                         FontSize="24"/>
-                <Button Content="Выход" 
+                <Button Content="Обратный Вход" 
                         Command="{Binding ExitCommand}"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"

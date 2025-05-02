@@ -53,14 +53,21 @@ namespace ConnectDotsGame.Models
             return Points.FirstOrDefault(p => p.Row == row && p.Column == column);
         }
         
-        public bool IsPathComplete(IBrush color)
+        public bool IsPathComplete(IBrush? color)
         {
+            if (color == null)
+                return false;
+                
             string pathId = $"{color}-path";
             if (!Paths.ContainsKey(pathId))
                 return false;
                 
-            var colorPoints = Points.Where(p => p.Color == color).ToList();
-            return colorPoints.All(p => p.IsConnected) && colorPoints.Count >= 2;
+            var colorPoints = Points.Where(p => p.Color != null && p.Color.Equals(color)).ToList();
+            
+            if (colorPoints.Count < 2)
+                return false;
+                
+            return colorPoints.All(p => p.IsConnected);
         }
         
         public void AddLineToPaths(Line line)
@@ -107,7 +114,8 @@ namespace ConnectDotsGame.Models
                 
                 // Сброс статуса соединения для точек этого цвета
                 var color = pathId.Replace("-path", "");
-                var colorPoints = Points.Where(p => p.Color.ToString() == color).ToList();
+                var colorPoints = Points.Where(p => p.HasColor && p.Color != null && 
+                                                p.Color.ToString() == color).ToList();
                 foreach (var point in colorPoints)
                 {
                     point.IsConnected = false;
