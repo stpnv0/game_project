@@ -147,30 +147,45 @@ namespace ConnectDotsGame.Models
             CurrentPathId = null;
         }
 
+        public bool RemoveLastPointFromPath()
+        {
+            if (CurrentPath.Count <= 1)
+                return false;
+
+            CurrentPath.RemoveAt(CurrentPath.Count - 1);
+            LastSelectedPoint = CurrentPath.LastOrDefault();
+            return true;
+        }
+
         public void CheckCompletedPaths()
         {
             if (CurrentLevel == null) return;
 
-            bool allCompleted = CurrentLevel.Points
+            // Проверка завершения всех путей текущего уровня
+            bool allPathsCompleted = CurrentLevel.Points
                 .Where(p => p.HasColor)
                 .GroupBy(p => p.Color.ToString())
                 .All(group => CurrentLevel.IsPathComplete(group.First().Color));
 
-            bool wasCompleted = CurrentLevel.IsCompleted;
-            CurrentLevel.IsCompleted = allCompleted;
+            bool previousState = CurrentLevel.IsCompleted;
+            CurrentLevel.IsCompleted = allPathsCompleted;
 
-            if (allCompleted && !wasCompleted)
+            // Если уровень завершён впервые, разблокировать следующий уровень
+            if (allPathsCompleted && !previousState)
             {
-                if (HasNextLevel && !Levels[CurrentLevelIndex + 1].IsCompleted)
+                Console.WriteLine($"Уровень {CurrentLevelIndex + 1} завершён. Разблокировка следующего уровня.");
+                if (HasNextLevel)
                 {
-                    Levels[CurrentLevelIndex + 1].IsCompleted = false; // Ensure next level remains unlocked
+                    Levels[CurrentLevelIndex + 1].IsCompleted = false; // Следующий уровень разблокирован
                 }
                 SaveProgress();
             }
-            else if (!allCompleted && HasNextLevel)
+
+            // Убедиться, что следующий уровень остаётся разблокированным
+            if (!allPathsCompleted && HasNextLevel)
             {
-                // Do not lock the next level even if the current level is incomplete after reset
-                Levels[CurrentLevelIndex + 1].IsCompleted = true;
+                Console.WriteLine($"Уровень {CurrentLevelIndex + 1} не завершён. Убедимся, что следующий уровень остаётся разблокированным.");
+                Levels[CurrentLevelIndex + 1].IsCompleted = Levels[CurrentLevelIndex + 1].IsCompleted || false;
             }
         }
 
@@ -189,17 +204,6 @@ namespace ConnectDotsGame.Models
         public bool IsPointInCurrentPath(ModelPoint point)
         {
             return CurrentPath.Any(p => p.Row == point.Row && p.Column == point.Column);
-        }
-
-        public bool RemoveLastPointFromPath()
-        {
-            if (CurrentPath.Count <= 1)
-                return false;
-
-            CurrentPath.RemoveAt(CurrentPath.Count - 1);
-            LastSelectedPoint = CurrentPath.LastOrDefault();
-
-            return true;
         }
     }
 }

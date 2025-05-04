@@ -36,36 +36,35 @@ namespace ConnectDotsGame.ViewModels
         // Обновляет список уровней на основе текущего состояния игры
         public void UpdateLevels()
         {
-            // Очищаем текущий список
             Levels.Clear();
 
-            // Заполняем список уровней заново
+            // Найти максимальный разблокированный уровень
+            int maxUnlocked = 0;
+            for (int i = 0; i < _gameState.Levels.Count; i++)
+            {
+                if (_gameState.Levels[i].IsCompleted)
+                {
+                    maxUnlocked = i + 1; // Разблокирован следующий
+                }
+            }
+
             for (int i = 0; i < _gameState.Levels.Count; i++)
             {
                 var level = _gameState.Levels[i];
-                
-                // Определяем, заблокирован ли уровень
-                bool isLocked = i > 0;
-                
-                // Проверяем предыдущий уровень - разблокируем текущий только если пройден предыдущий
-                if (i > 0 && _gameState.Levels[i - 1].IsCompleted)
-                {
-                    isLocked = false;
-                }
-                
-                // Первый уровень всегда разблокирован
+                bool isLocked = i > maxUnlocked;
+
+                // Первый уровень всегда открыт
                 if (i == 0) isLocked = false;
-                
-                Levels.Add(new LevelInfo 
+
+                Levels.Add(new LevelInfo
                 {
-                    Id = i + 1, 
+                    Id = i + 1,
                     Name = level.Name,
                     IsCompleted = level.IsCompleted,
                     IsLocked = isLocked
                 });
             }
         }
-
         // Конструктор для режима дизайна
         public LevelSelectViewModel() : this(new DummyNavigation(), new GameState()) 
         {
