@@ -16,13 +16,13 @@
             
             <!-- Преобразование IsCompleted в цвет -->
             <converter:BoolToColorConverter x:Key="CompletedToBrushConverter" 
-                                           TrueValue="#4CAF50" 
-                                           FalseValue="#3F51B5"/>
+                                           TrueValue="#a3079d" 
+                                           FalseValue="#a3079d"/>
                                            
             <!-- Преобразование IsLocked в цвет -->
             <converter:BoolToColorConverter x:Key="LockedToBrushConverter" 
-                                           TrueValue="#757575" 
-                                           FalseValue="#3F51B5"/>
+                                           TrueValue="#A3079D" 
+                                           FalseValue="#A3079D"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
