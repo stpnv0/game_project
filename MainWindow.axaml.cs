@@ -1,17 +1,21 @@
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
+using ConnectDotsGame.Utils;
+using System;
 
-namespace ConnectDotsGame;
-
-public partial class MainWindow : Window
+namespace ConnectDotsGame
 {
-    public MainWindow()
+    public partial class MainWindow : Window
     {
-        InitializeComponent();
-    }
+        public MainWindow()
+        {
+            InitializeComponent();
+            AudioService.Instance.PlayBackgroundMusic("Resources/Audio/background_music.wav");
+        }
 
-    private void InitializeComponent()
-    {
-        AvaloniaXamlLoader.Load(this);
+        protected override void OnClosed(EventArgs e)
+        {
+            AudioService.Instance.Dispose();
+            base.OnClosed(e);
+        }
     }
 }

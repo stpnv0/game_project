@@ -14,14 +14,13 @@ namespace ConnectDotsGame;
 public partial class App : Application
 {
     private NavigationService? _navigationService;
-    private readonly AudioService _audioService = new AudioService(); // Сервис для управления музыкой
 
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
 
         // Запуск фоновой музыки
-        _audioService.PlayBackgroundMusic("Resources/Audio/background_music.wav");
+        AudioService.Instance.PlayBackgroundMusic("Resources/Audio/background_music.wav");
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -71,6 +70,6 @@ public partial class App : Application
     private void OnExit(object? sender, ControlledApplicationLifetimeExitEventArgs e)
     {
         // Останавливаем музыку перед выходом
-        _audioService.StopBackgroundMusic();
+        AudioService.Instance.StopBackgroundMusic();
     }
 }

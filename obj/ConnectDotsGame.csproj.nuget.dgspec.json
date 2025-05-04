@@ -60,9 +60,13 @@
               "target": "Package",
               "version": "[11.2.1, )"
             },
-            "System.Windows.Extensions": {
+            "LibVLCSharp": {
               "target": "Package",
-              "version": "[4.7.0, )"
+              "version": "[3.8.4, )"
+            },
+            "VideoLAN.LibVLC.Windows": {
+              "target": "Package",
+              "version": "[3.0.20, )"
             }
           },
           "imports": [
