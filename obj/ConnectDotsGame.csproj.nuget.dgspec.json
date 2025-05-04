@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/Users/dmtr/Desktop/projects/game_project/game_project/ConnectDotsGame.csproj": {}
+    "C:\\Users\\choko\\RiderProjects\\game_project\\ConnectDotsGame.csproj": {}
   },
   "projects": {
-    "/Users/dmtr/Desktop/projects/game_project/game_project/ConnectDotsGame.csproj": {
+    "C:\\Users\\choko\\RiderProjects\\game_project\\ConnectDotsGame.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/dmtr/Desktop/projects/game_project/game_project/ConnectDotsGame.csproj",
+        "projectUniqueName": "C:\\Users\\choko\\RiderProjects\\game_project\\ConnectDotsGame.csproj",
         "projectName": "ConnectDotsGame",
-        "projectPath": "/Users/dmtr/Desktop/projects/game_project/game_project/ConnectDotsGame.csproj",
-        "packagesPath": "/Users/dmtr/.nuget/packages/",
-        "outputPath": "/Users/dmtr/Desktop/projects/game_project/game_project/obj/",
+        "projectPath": "C:\\Users\\choko\\RiderProjects\\game_project\\ConnectDotsGame.csproj",
+        "packagesPath": "C:\\Users\\choko\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\choko\\RiderProjects\\game_project\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/dmtr/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\choko\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -38,7 +38,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.200"
+        "SdkAnalysisLevel": "9.0.100"
       },
       "frameworks": {
         "net9.0": {
@@ -52,10 +52,6 @@
               "target": "Package",
               "version": "[11.2.1, )"
             },
-            "Avalonia.Diagnostics": {
-              "target": "Package",
-              "version": "[11.2.1, )"
-            },
             "Avalonia.Fonts.Inter": {
               "target": "Package",
               "version": "[11.2.1, )"
@@ -63,6 +59,10 @@
             "Avalonia.Themes.Fluent": {
               "target": "Package",
               "version": "[11.2.1, )"
+            },
+            "System.Windows.Extensions": {
+              "target": "Package",
+              "version": "[4.7.0, )"
             }
           },
           "imports": [
@@ -81,7 +81,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.105/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
