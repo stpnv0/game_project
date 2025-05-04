@@ -1,32 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\йф\\Desktop\\oaip_labs\\game_project\\ConnectDotsGame.csproj": {}
+    "C:\\Users\\choko\\RiderProjects\\game_project\\ConnectDotsGame.csproj": {}
   },
   "projects": {
-    "C:\\Users\\йф\\Desktop\\oaip_labs\\game_project\\ConnectDotsGame.csproj": {
+    "C:\\Users\\choko\\RiderProjects\\game_project\\ConnectDotsGame.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\йф\\Desktop\\oaip_labs\\game_project\\ConnectDotsGame.csproj",
+        "projectUniqueName": "C:\\Users\\choko\\RiderProjects\\game_project\\ConnectDotsGame.csproj",
         "projectName": "ConnectDotsGame",
-        "projectPath": "C:\\Users\\йф\\Desktop\\oaip_labs\\game_project\\ConnectDotsGame.csproj",
-        "packagesPath": "C:\\Users\\йф\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\йф\\Desktop\\oaip_labs\\game_project\\obj\\",
+        "projectPath": "C:\\Users\\choko\\RiderProjects\\game_project\\ConnectDotsGame.csproj",
+        "packagesPath": "C:\\Users\\choko\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\choko\\RiderProjects\\game_project\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\йф\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\choko\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -45,7 +38,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.200"
+        "SdkAnalysisLevel": "9.0.100"
       },
       "frameworks": {
         "net9.0": {
@@ -59,10 +52,6 @@
               "target": "Package",
               "version": "[11.2.1, )"
             },
-            "Avalonia.Diagnostics": {
-              "target": "Package",
-              "version": "[11.2.1, )"
-            },
             "Avalonia.Fonts.Inter": {
               "target": "Package",
               "version": "[11.2.1, )"
@@ -70,6 +59,10 @@
             "Avalonia.Themes.Fluent": {
               "target": "Package",
               "version": "[11.2.1, )"
+            },
+            "System.Windows.Extensions": {
+              "target": "Package",
+              "version": "[4.7.0, )"
             }
           },
           "imports": [
@@ -88,7 +81,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.105/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
