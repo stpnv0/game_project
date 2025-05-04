@@ -22,11 +22,11 @@
         <Grid RowDefinitions="Auto,*,Auto">
             <!-- Заголовок игры -->
             <StackPanel Grid.Row="0" Margin="0,60,0,20">
-                <TextBlock Text="ТРУБОЧИСТ" 
+                <TextBlock Text="ЭМО ТРУБОЧИСТЫ" 
                           FontSize="72" 
                           FontWeight="Bold" 
                           HorizontalAlignment="Center"
-                          Foreground="#FFD700"/>
+                          Foreground="#E106D9"/>
                 <TextBlock Text="Чини трубы и кайфуй" 
                           FontSize="18" 
                           HorizontalAlignment="Center"
@@ -45,12 +45,6 @@
                         HorizontalContentAlignment="Center"
                         Height="60"
                         FontSize="24"/>
-                <Button Content="Настройки" 
-                        Command="{Binding SettingsCommand}"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Center"
-                        Height="60"
-                        FontSize="24"/>
                 <Button Content="О игре" 
                         Command="{Binding AboutCommand}"
                         HorizontalAlignment="Stretch"
@@ -64,13 +58,6 @@
                         Height="60"
                         FontSize="24"/>
             </StackPanel>
-
-            <!-- Нижняя информация -->
-            <TextBlock Grid.Row="2" 
-                      Text="© 2023 Flow Game" 
-                      HorizontalAlignment="Center"
-                      Margin="0,0,0,20"
-                      Foreground="Gray"/>
         </Grid>
     </Grid>
 </UserControl> 

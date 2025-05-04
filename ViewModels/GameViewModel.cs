@@ -359,6 +359,7 @@ namespace ConnectDotsGame.ViewModels
                 case "Orange": return Brushes.Orange;
                 case "Purple": return Brushes.Purple;
                 case "Cyan": return Brushes.Cyan;
+                case "Pink": return Brushes.Pink;
                 default: return Brushes.Gray;
             }
         }

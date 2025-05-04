@@ -264,7 +264,7 @@ namespace ConnectDotsGame.Views
                 if (hoveredPoint != null)
                 {
                     Console.WriteLine($"Continuing path to point {hoveredPoint.Row},{hoveredPoint.Column}");
-                    UpdateDebugText($"Продолжение пути через точку [{hoveredPoint.Row},{hoveredPoint.Column}]");
+                    UpdateDebugText($"Continuing path to point [{hoveredPoint.Row},{hoveredPoint.Column}]");
                     
                     try
                     {
@@ -327,7 +327,7 @@ namespace ConnectDotsGame.Views
                 if (releasedPoint != null && releasedPoint.HasColor)
                 {
                     Console.WriteLine($"Ending path at colored point {releasedPoint.Row},{releasedPoint.Column}");
-                    UpdateDebugText($"Завершение пути на точке [{releasedPoint.Row},{releasedPoint.Column}]");
+                    UpdateDebugText($"Ending path at colored point [{releasedPoint.Row},{releasedPoint.Column}]");
                     
                     try
                     {
@@ -487,7 +487,7 @@ namespace ConnectDotsGame.Views
                             StartPoint = new Point(startX, startY),
                             EndPoint = new Point(endX, endY),
                             Stroke = line.Color,
-                            StrokeThickness = 10,
+                            StrokeThickness = 20,
                             StrokeLineCap = PenLineCap.Round
                         };
                         
@@ -533,7 +533,7 @@ namespace ConnectDotsGame.Views
                                         StartPoint = new Point(startX, startY),
                                         EndPoint = new Point(endX, endY),
                                         Stroke = pathColor,
-                                        StrokeThickness = 10,
+                                        StrokeThickness = 20,
                                         StrokeLineCap = PenLineCap.Round
                                     };
                                     
@@ -587,7 +587,6 @@ namespace ConnectDotsGame.Views
                         _drawingCanvas.Children.Add(innerCircle);
                         
                         pointsDrawn++;
-                        Console.WriteLine($"Drew point at {point.Row},{point.Column} with color {point.Color}");
                     }
                 }
                 
