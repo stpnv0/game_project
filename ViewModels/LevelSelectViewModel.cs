@@ -43,19 +43,10 @@ namespace ConnectDotsGame.ViewModels
             for (int i = 0; i < _gameState.Levels.Count; i++)
             {
                 var level = _gameState.Levels[i];
-                
-                // Определяем, заблокирован ли уровень
-                bool isLocked = i > 0;
-                
-                // Проверяем предыдущий уровень - разблокируем текущий только если пройден предыдущий
-                if (i > 0 && _gameState.Levels[i - 1].IsCompleted)
-                {
-                    isLocked = false;
-                }
-                
-                // Первый уровень всегда разблокирован
-                if (i == 0) isLocked = false;
-                
+
+                // Используем сохраненное состояние, чтобы не закрывать уже разблокированные уровни
+                bool isLocked = i > 0 && !_gameState.Levels[i - 1].IsCompleted;
+
                 Levels.Add(new LevelInfo 
                 {
                     Id = i + 1, 

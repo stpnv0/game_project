@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.Json;
 using System.Collections.Generic;
 using ConnectDotsGame.Models;
+using System.Linq;
 
 namespace ConnectDotsGame.Utils
 {
@@ -31,27 +32,23 @@ namespace ConnectDotsGame.Utils
         {
             try
             {
-                // Создаем упрощенную версию прогресса для сохранения
-                var progressData = new List<LevelProgressData>();
-                
-                foreach (var level in levels)
+                // Формируем список данных о прогрессе для сохранения.
+                var progressData = levels.Select(level => new LevelProgressData
                 {
-                    progressData.Add(new LevelProgressData
-                    {
-                        Id = level.Id,
-                        IsCompleted = level.IsCompleted
-                    });
-                }
-                
-                // Сериализуем и сохраняем
+                    Id = level.Id, // ID уровня.
+                    IsCompleted = level.IsCompleted // Завершенность уровня.
+                }).ToList();
+
+                // Сериализуем данные прогресса в формат JSON.
                 string json = JsonSerializer.Serialize(progressData);
+
+                // Сохраняем данные в файл.
                 File.WriteAllText(_savePath, json);
-                
-                Console.WriteLine($"Прогресс успешно сохранен: {_savePath}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка при сохранении прогресса: {ex.Message}");
+                // Логируем ошибку в случае возникновения исключения.
+                Console.WriteLine($"Ошибка сохранения прогресса: {ex.Message}");
             }
         }
         
@@ -73,18 +70,18 @@ namespace ConnectDotsGame.Utils
                     Console.WriteLine("Ошибка десериализации. Используем начальное состояние.");
                     return;
                 }
-                
+
                 // Применяем сохраненное состояние к уровням
-                foreach (var levelProgress in progressData)
+                // Применяем загруженные данные прогресса к текущему состоянию уровней.
+                foreach (var progress in progressData)
                 {
-                    var level = levels.Find(l => l.Id == levelProgress.Id);
+                    var level = levels.FirstOrDefault(l => l.Id == progress.Id);
                     if (level != null)
                     {
-                        level.IsCompleted = levelProgress.IsCompleted;
-                        Console.WriteLine($"Загружен прогресс для уровня {level.Id}: пройден = {level.IsCompleted}");
+                        level.IsCompleted = progress.IsCompleted; // Восстанавливаем завершенность уровня.
                     }
                 }
-                
+
                 Console.WriteLine($"Прогресс успешно загружен из {_savePath}");
             }
             catch (Exception ex)

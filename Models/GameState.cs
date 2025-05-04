@@ -217,8 +217,7 @@ namespace ConnectDotsGame.Models
                 
             foreach (var group in colorGroups)
             {
-                bool colorCompleted = CurrentLevel.IsPathComplete(group.First().Color);
-                if (!colorCompleted)
+                if (!CurrentLevel.IsPathComplete(group.First().Color))
                 {
                     allCompleted = false;
                 }

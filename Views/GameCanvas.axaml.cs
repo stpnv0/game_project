@@ -35,41 +35,40 @@ namespace ConnectDotsGame.Views
             InitializeComponent();
             InitializeControls();
         }
-        
+
         private void InitializeControls()
         {
             try
             {
                 _drawingCanvas = this.FindControl<Canvas>("DrawingCanvas");
                 _debugText = this.FindControl<TextBlock>("DebugText");
-                
+
                 if (_debugText != null)
                 {
                     _debugText.Text = "Инициализация GameCanvas...";
                 }
-                
-                // Подписываемся на событие PointerCaptureLost через код
-                if (_drawingCanvas != null)
+
+                // Проверяем, найден ли DrawingCanvas
+                if (_drawingCanvas == null)
                 {
-                    _drawingCanvas.PointerCaptureLost += Canvas_PointerCaptureLost;
-                    Console.WriteLine("Подписались на PointerCaptureLost");
+                    Console.WriteLine("ERROR: DrawingCanvas not found during initialization!");
+                    UpdateDebugText("ОШИБКА: DrawingCanvas не найден!");
+                    return;
                 }
-                
-                // Инициализируем тестовый уровень в отладочном режиме
+
+                _drawingCanvas.PointerCaptureLost += Canvas_PointerCaptureLost;
+                Console.WriteLine("Подписались на PointerCaptureLost");
+
+                // Логика для отладочного режима
                 if (_debugModeEnabled)
                 {
                     Console.WriteLine("Creating debug level for testing");
                     CreateDebugLevel();
                 }
-                
-                _canvasInitialized = _drawingCanvas != null;
-                if (!_canvasInitialized)
-                {
-                    Console.WriteLine("ERROR: DrawingCanvas not found during initialization!");
-                    UpdateDebugText("ОШИБКА: DrawingCanvas не найден!");
-                }
-                
-                // Принудительно вызываем обновление после полной инициализации
+
+                _canvasInitialized = true;
+
+                // Принудительное обновление интерфейса
                 Dispatcher.UIThread.Post(() => {
                     Console.WriteLine("GameCanvas initialized, forcing update");
                     UpdateDebugText("GameCanvas инициализирован");
@@ -82,7 +81,7 @@ namespace ConnectDotsGame.Views
                 UpdateDebugText($"Ошибка инициализации: {ex.Message}");
             }
         }
-        
+
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
