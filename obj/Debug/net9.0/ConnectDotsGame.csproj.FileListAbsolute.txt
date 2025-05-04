@@ -196,6 +196,7 @@
 /Users/dmtr/Desktop/projects/game_project/game_project/obj/Debug/net9.0/ConnectD.BC9B1E59.Up2Date
 /Users/dmtr/Desktop/projects/game_project/game_project/obj/Debug/net9.0/ConnectDotsGame.genruntimeconfig.cache
 /Users/dmtr/Desktop/projects/game_project/game_project/obj/Debug/net9.0/ref/ConnectDotsGame.dll
+<<<<<<< HEAD
 C:\Users\йф\Desktop\oaip_labs\game_project\bin\Debug\net9.0\ConnectDotsGame.exe
 C:\Users\йф\Desktop\oaip_labs\game_project\bin\Debug\net9.0\ConnectDotsGame.deps.json
 C:\Users\йф\Desktop\oaip_labs\game_project\bin\Debug\net9.0\ConnectDotsGame.runtimeconfig.json
@@ -263,3 +264,6 @@ C:\Users\йф\Desktop\oaip_labs\game_project\obj\Debug\net9.0\refint\Avalonia\Co
 C:\Users\йф\Desktop\oaip_labs\game_project\obj\Debug\net9.0\ConnectD.BC9B1E59.Up2Date
 C:\Users\йф\Desktop\oaip_labs\game_project\obj\Debug\net9.0\ConnectDotsGame.genruntimeconfig.cache
 C:\Users\йф\Desktop\oaip_labs\game_project\obj\Debug\net9.0\ref\ConnectDotsGame.dll
+=======
+/Users/dmtr/Desktop/projects/game_project/game_project/obj/Debug/net9.0/ConnectDotsGame.sourcelink.json
+>>>>>>> origin/dev

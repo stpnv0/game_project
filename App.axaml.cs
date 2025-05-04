@@ -36,6 +36,10 @@ public partial class App : Application
             
             // Теперь находим ContentArea
             var contentArea = mainWindow.FindControl<ContentControl>("ContentArea");
+            if (contentArea == null)
+            {
+                throw new InvalidOperationException("ContentArea не найден в MainWindow");
+            }
             
             // Инициализация навигационной службы
             _navigationService = new NavigationService(contentArea);
@@ -46,7 +50,6 @@ public partial class App : Application
             _navigationService.RegisterView<GameViewModel, GamePage>();
             
             // Задать начальное представление
-            var viewModel = new MainPageViewModel(_navigationService);
             _navigationService.NavigateTo<MainPageViewModel>(gameState);
             
             desktop.MainWindow = mainWindow;

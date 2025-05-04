@@ -11,7 +11,7 @@
 
     <Window.Styles>
         <Style Selector="Button">
-            <Setter Property="Background" Value="#3F51B5"/>
+            <Setter Property="Background" Value="#E106D9"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="CornerRadius" Value="4"/>
             <Setter Property="Padding" Value="15,10"/>
@@ -19,7 +19,7 @@
         </Style>
         
         <Style Selector="Button:pointerover">
-            <Setter Property="Background" Value="#5C6BC0"/>
+            <Setter Property="Background" Value="#000000"/>
         </Style>
         
         <Style Selector="Button:pressed">

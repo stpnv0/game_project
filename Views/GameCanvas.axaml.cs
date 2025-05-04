@@ -21,7 +21,7 @@ namespace ConnectDotsGame.Views
     public partial class GameCanvas : UserControl
     {
         private Canvas? _drawingCanvas;
-        private dynamic? _viewModel;
+        private GameViewModel? _viewModel;
         private const double CellSize = 60; // Размер ячейки сетки
         private bool _isDrawing = false;
         private bool _debugModeEnabled = false; // Отключаем отладочный режим по умолчанию
@@ -94,10 +94,10 @@ namespace ConnectDotsGame.Views
             Console.WriteLine($"OnDataContextChanged: {DataContext?.GetType().Name ?? "null"}");
             UpdateDebugText($"DataContext изменен: {DataContext?.GetType().Name ?? "null"}");
             
-            // Сохраняем ViewModel напрямую
-            if (DataContext != null)
+            // Сохраняем ViewModel
+            if (DataContext is GameViewModel viewModel)
             {
-                _viewModel = DataContext;
+                _viewModel = viewModel;
                 _viewModelType = _viewModel.GetType().Name;
                 Console.WriteLine($"ViewModel set: {_viewModelType}");
                 UpdateDebugText($"ViewModel установлен: {_viewModelType}");
@@ -110,11 +110,7 @@ namespace ConnectDotsGame.Views
                     UpdateDebugText($"Уровень: {level?.Name ?? "null"}");
                     
                     // Подписываемся на изменения свойств
-                    ((INotifyPropertyChanged)_viewModel).PropertyChanged += (s, args) =>
-                    {
-                        Console.WriteLine($"Property changed: {args.PropertyName}");
-                        DrawLevel();
-                    };
+                    _viewModel.PropertyChanged += ViewModel_PropertyChanged;
                     
                     // Принудительно вызываем отрисовку после смены контекста
                     DrawLevel();
@@ -127,8 +123,22 @@ namespace ConnectDotsGame.Views
             }
             else
             {
-                Console.WriteLine("ERROR: DataContext is null");
-                UpdateDebugText("Ошибка: DataContext отсутствует");
+                _viewModel = null;
+                Console.WriteLine("ERROR: DataContext is not GameViewModel");
+                UpdateDebugText("Ошибка: DataContext - не GameViewModel");
+            }
+        }
+        
+        private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs args)
+        {
+            Console.WriteLine($"Property changed: {args.PropertyName}");
+            
+            // Перерисовываем канвас при изменении свойств
+            if (args.PropertyName == "CurrentLevel" || 
+                args.PropertyName == "IsLevelCompleted" ||
+                args.PropertyName == "CurrentPath")
+            {
+                DrawLevel();
             }
         }
         
@@ -157,10 +167,11 @@ namespace ConnectDotsGame.Views
                 var position = e.GetPosition(_drawingCanvas);
                 
                 // Ограничиваем координаты размером игрового поля
-                if (position.X < 0 || position.X > _drawingCanvas.Width || 
+                if (_drawingCanvas == null || 
+                    position.X < 0 || position.X > _drawingCanvas.Width || 
                     position.Y < 0 || position.Y > _drawingCanvas.Height)
                 {
-                    Console.WriteLine($"Click outside game field: {position.X},{position.Y}, canvas size: {_drawingCanvas.Width}x{_drawingCanvas.Height}");
+                    Console.WriteLine($"Click outside game field: {position.X},{position.Y}, canvas size: {_drawingCanvas?.Width}x{_drawingCanvas?.Height}");
                     UpdateDebugText($"Клик вне игрового поля: {position.X:F1},{position.Y:F1}");
                     return;
                 }
@@ -168,7 +179,7 @@ namespace ConnectDotsGame.Views
                 Console.WriteLine($"Pointer pressed at position {position.X},{position.Y}");
                 
                 // Проверяем, есть ли уровень 
-                var level = _viewModel.CurrentLevel ?? _debugLevel;
+                var level = _viewModel?.CurrentLevel ?? _debugLevel;
                 if (level == null)
                 {
                     Console.WriteLine("ERROR: level is null");
@@ -177,8 +188,7 @@ namespace ConnectDotsGame.Views
                 }
                     
                 // Проверяем, завершен ли уровень
-                bool isCompleted = false;
-                try { isCompleted = _viewModel.IsLevelCompleted; } catch { }
+                bool isCompleted = _viewModel?.IsLevelCompleted ?? false;
                 
                 if (isCompleted)
                 {
@@ -196,39 +206,28 @@ namespace ConnectDotsGame.Views
                     UpdateDebugText($"Нажатие на точку [{clickedPoint.Row},{clickedPoint.Column}], HasColor: {clickedPoint.HasColor}");
                     
                     // Начинаем рисование, если кликнули на цветную точку
-                    if (clickedPoint.HasColor)
+                    if (clickedPoint.HasColor && _viewModel != null)
                     {
+                        _viewModel.StartPath(clickedPoint);
                         _isDrawing = true;
-                        
-                        // Вызываем StartPath на ViewModel
-                        try
-                        {
-                            _viewModel.StartPath(clickedPoint);
-                            Console.WriteLine($"Starting path from point {clickedPoint.Row},{clickedPoint.Column}");
-                            UpdateDebugText($"Начало пути от точки [{clickedPoint.Row},{clickedPoint.Column}]");
-                            DrawLevel();
-                        }
-                        catch (Exception ex)
-                        {
-                            _isDrawing = false; // Сбрасываем флаг при ошибке
-                            Console.WriteLine($"Error starting path: {ex.Message}");
-                            Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                            UpdateDebugText($"Ошибка StartPath: {ex.Message}");
-                        }
                     }
                 }
                 else
                 {
-                    Console.WriteLine("No point found at click position");
-                    UpdateDebugText("Точка не найдена по координатам клика");
+                    Console.WriteLine("No point was clicked");
+                    UpdateDebugText("Не найдена точка под курсором");
                 }
             }
             catch (Exception ex)
             {
-                _isDrawing = false; // Сбрасываем флаг при ошибке
                 Console.WriteLine($"Error in PointerPressed: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                UpdateDebugText($"Ошибка PointerPressed: {ex.Message}");
+                UpdateDebugText($"Ошибка: {ex.Message}");
+            }
+            
+            // Сохраняем захват указателя для обработки движения
+            if (_isDrawing && _drawingCanvas != null)
+            {
+                e.Pointer.Capture(_drawingCanvas);
             }
         }
         
@@ -250,7 +249,7 @@ namespace ConnectDotsGame.Views
                 var position = e.GetPosition(_drawingCanvas);
                 Console.WriteLine($"Pointer moved to position {position.X},{position.Y}");
                 
-                var level = _viewModel.CurrentLevel ?? _debugLevel;
+                var level = _viewModel?.CurrentLevel ?? _debugLevel;
                 if (level == null)
                 {
                     Console.WriteLine("ERROR in PointerMoved: level is null");
@@ -264,12 +263,12 @@ namespace ConnectDotsGame.Views
                 if (hoveredPoint != null)
                 {
                     Console.WriteLine($"Continuing path to point {hoveredPoint.Row},{hoveredPoint.Column}");
-                    UpdateDebugText($"Продолжение пути через точку [{hoveredPoint.Row},{hoveredPoint.Column}]");
+                    UpdateDebugText($"Continuing path to point [{hoveredPoint.Row},{hoveredPoint.Column}]");
                     
                     try
                     {
                         // Продолжаем путь
-                        _viewModel.ContinuePath(hoveredPoint);
+                        _viewModel?.ContinuePath(hoveredPoint);
                         DrawLevel();
                     }
                     catch (Exception ex)
@@ -313,7 +312,7 @@ namespace ConnectDotsGame.Views
                 // Сбрасываем флаг рисования
                 _isDrawing = false;
                 
-                var level = _viewModel.CurrentLevel ?? _debugLevel;
+                var level = _viewModel?.CurrentLevel ?? _debugLevel;
                 if (level == null)
                 {
                     Console.WriteLine("ERROR in PointerReleased: level is null");
@@ -327,12 +326,12 @@ namespace ConnectDotsGame.Views
                 if (releasedPoint != null && releasedPoint.HasColor)
                 {
                     Console.WriteLine($"Ending path at colored point {releasedPoint.Row},{releasedPoint.Column}");
-                    UpdateDebugText($"Завершение пути на точке [{releasedPoint.Row},{releasedPoint.Column}]");
+                    UpdateDebugText($"Ending path at colored point [{releasedPoint.Row},{releasedPoint.Column}]");
                     
                     try
                     {
                         // Завершаем путь
-                        _viewModel.EndPath(releasedPoint);
+                        _viewModel?.EndPath(releasedPoint);
                     }
                     catch (Exception ex)
                     {
@@ -349,7 +348,7 @@ namespace ConnectDotsGame.Views
                     try
                     {
                         // Отменяем путь
-                        _viewModel.CancelPath();
+                        _viewModel?.CancelPath();
                     }
                     catch (Exception ex)
                     {
@@ -387,7 +386,7 @@ namespace ConnectDotsGame.Views
                         UpdateDebugText("Отмена пути - потеря захвата указателя");
                         
                         // Отменяем текущий путь
-                        _viewModel.CancelPath();
+                        _viewModel?.CancelPath();
                         DrawLevel();
                     }
                     catch (Exception ex)
@@ -413,8 +412,8 @@ namespace ConnectDotsGame.Views
             // Проверка и восстановление ViewModel
             if (_viewModel == null && DataContext != null)
             {
-                _viewModel = DataContext;
-                _viewModelType = _viewModel.GetType().Name;
+                _viewModel = DataContext as GameViewModel;
+                _viewModelType = _viewModel?.GetType().Name ?? "unknown";
                 Console.WriteLine($"Восстановлено ViewModel из DataContext: {_viewModelType}");
                 UpdateDebugText($"Восстановлен ViewModel: {_viewModelType}");
             }
@@ -487,7 +486,7 @@ namespace ConnectDotsGame.Views
                             StartPoint = new Point(startX, startY),
                             EndPoint = new Point(endX, endY),
                             Stroke = line.Color,
-                            StrokeThickness = 10,
+                            StrokeThickness = 20,
                             StrokeLineCap = PenLineCap.Round
                         };
                         
@@ -533,7 +532,7 @@ namespace ConnectDotsGame.Views
                                         StartPoint = new Point(startX, startY),
                                         EndPoint = new Point(endX, endY),
                                         Stroke = pathColor,
-                                        StrokeThickness = 10,
+                                        StrokeThickness = 20,
                                         StrokeLineCap = PenLineCap.Round
                                     };
                                     
@@ -587,7 +586,6 @@ namespace ConnectDotsGame.Views
                         _drawingCanvas.Children.Add(innerCircle);
                         
                         pointsDrawn++;
-                        Console.WriteLine($"Drew point at {point.Row},{point.Column} with color {point.Color}");
                     }
                 }
                 
@@ -737,6 +735,24 @@ namespace ConnectDotsGame.Views
             }
             
             return true;
+        }
+        
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+            
+            Console.WriteLine("GameCanvas detached from visual tree");
+            
+            // Отписываемся от событий для предотвращения утечек памяти
+            if (_viewModel != null)
+            {
+                _viewModel.PropertyChanged -= ViewModel_PropertyChanged;
+            }
+            
+            if (_drawingCanvas != null)
+            {
+                _drawingCanvas.PointerCaptureLost -= Canvas_PointerCaptureLost;
+            }
         }
     }
 } 

@@ -223,7 +223,7 @@ namespace ConnectDotsGame.ViewModels
                 var startPoint = _gameState.CurrentPath[i];
                 var nextPoint = _gameState.CurrentPath[i + 1];
                 
-                var line = new Line(startPoint, nextPoint, _gameState.CurrentPathColor);
+                var line = new Line(startPoint, nextPoint, _gameState.CurrentPathColor, _gameState.CurrentPathId);
                 line.IsVisible = true;
                 
                 _gameState.CurrentLevel.Lines.Add(line);

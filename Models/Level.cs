@@ -4,18 +4,59 @@ using Avalonia.Media;
 
 namespace ConnectDotsGame.Models
 {
+    /// <summary>
+    /// Представляет уровень игры.
+    /// </summary>
     public class Level
     {
+        /// <summary>
+        /// Уникальный идентификатор уровня.
+        /// </summary>
         public int Id { get; set; }
+        
+        /// <summary>
+        /// Название уровня.
+        /// </summary>
         public string Name { get; set; } = string.Empty;
+        
+        /// <summary>
+        /// Количество строк в сетке уровня.
+        /// </summary>
         public int Rows { get; set; }
+        
+        /// <summary>
+        /// Количество столбцов в сетке уровня.
+        /// </summary>
         public int Columns { get; set; }
+        
+        /// <summary>
+        /// Список всех точек на уровне.
+        /// </summary>
         public List<Point> Points { get; set; }
+        
+        /// <summary>
+        /// Список всех линий на уровне.
+        /// </summary>
         public List<Line> Lines { get; set; }
+        
+        /// <summary>
+        /// Словарь путей, где ключ - идентификатор пути, а значение - список линий пути.
+        /// </summary>
         public Dictionary<string, List<Line>> Paths { get; set; } = new Dictionary<string, List<Line>>();
+        
+        /// <summary>
+        /// Путь к изображению фона уровня.
+        /// </summary>
         public string ImagePath { get; set; } = string.Empty;
+        
+        /// <summary>
+        /// Указывает, завершен ли уровень.
+        /// </summary>
         public bool IsCompleted { get; set; }
         
+        /// <summary>
+        /// Создает новый уровень с параметрами по умолчанию.
+        /// </summary>
         public Level()
         {
             Points = new List<Point>();
@@ -23,6 +64,10 @@ namespace ConnectDotsGame.Models
             IsCompleted = false;
         }
         
+        /// <summary>
+        /// Создает копию текущего уровня.
+        /// </summary>
+        /// <returns>Новый экземпляр уровня с теми же свойствами.</returns>
         public Level Clone()
         {
             return new Level
@@ -42,27 +87,52 @@ namespace ConnectDotsGame.Models
             };
         }
         
+        /// <summary>
+        /// Проверяет, завершен ли уровень.
+        /// </summary>
+        /// <returns>True, если все цветные точки соединены; иначе false.</returns>
         public bool CheckCompletion()
         {
-            // Проверяем, все ли цветные точки соединены
             return Points.Where(p => p.HasColor).All(p => p.IsConnected);
         }
         
+        /// <summary>
+        /// Получает точку по её позиции в сетке.
+        /// </summary>
+        /// <param name="row">Номер строки.</param>
+        /// <param name="column">Номер столбца.</param>
+        /// <returns>Точка с указанными координатами или null, если точка не найдена.</returns>
         public Point? GetPointByPosition(int row, int column)
         {
             return Points.FirstOrDefault(p => p.Row == row && p.Column == column);
         }
         
-        public bool IsPathComplete(IBrush color)
+        /// <summary>
+        /// Проверяет, завершен ли путь указанного цвета.
+        /// </summary>
+        /// <param name="color">Цвет пути.</param>
+        /// <returns>True, если путь завершен; иначе false.</returns>
+        public bool IsPathComplete(IBrush? color)
         {
+            if (color == null)
+                return false;
+                
             string pathId = $"{color}-path";
             if (!Paths.ContainsKey(pathId))
                 return false;
                 
-            var colorPoints = Points.Where(p => p.Color == color).ToList();
-            return colorPoints.All(p => p.IsConnected) && colorPoints.Count >= 2;
+            var colorPoints = Points.Where(p => p.Color != null && p.Color.Equals(color)).ToList();
+            
+            if (colorPoints.Count < 2)
+                return false;
+                
+            return colorPoints.All(p => p.IsConnected);
         }
         
+        /// <summary>
+        /// Добавляет линию в словарь путей.
+        /// </summary>
+        /// <param name="line">Линия для добавления.</param>
         public void AddLineToPaths(Line line)
         {
             if (!Paths.ContainsKey(line.PathId))
@@ -73,6 +143,10 @@ namespace ConnectDotsGame.Models
             Paths[line.PathId].Add(line);
         }
         
+        /// <summary>
+        /// Добавляет последнюю линию с указанным идентификатором пути в словарь путей.
+        /// </summary>
+        /// <param name="pathId">Идентификатор пути.</param>
         public void AddLineToPaths(string pathId)
         {
             if (!Paths.ContainsKey(pathId))
@@ -88,6 +162,10 @@ namespace ConnectDotsGame.Models
             }
         }
         
+        /// <summary>
+        /// Очищает путь с указанным идентификатором.
+        /// </summary>
+        /// <param name="pathId">Идентификатор пути для очистки.</param>
         public void ClearPath(string pathId)
         {
             if (Paths.ContainsKey(pathId))
@@ -107,7 +185,8 @@ namespace ConnectDotsGame.Models
                 
                 // Сброс статуса соединения для точек этого цвета
                 var color = pathId.Replace("-path", "");
-                var colorPoints = Points.Where(p => p.Color.ToString() == color).ToList();
+                var colorPoints = Points.Where(p => p.HasColor && p.Color != null && 
+                                                p.Color.ToString() == color).ToList();
                 foreach (var point in colorPoints)
                 {
                     point.IsConnected = false;
