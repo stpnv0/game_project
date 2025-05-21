@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using Avalonia.Media;
-using ConnectDotsGame.Utils;
 using ModelPoint = ConnectDotsGame.Models.Point;
 
 namespace ConnectDotsGame.Models
@@ -75,7 +74,8 @@ namespace ConnectDotsGame.Models
                         progressData.Add(new LevelProgressData
                         {
                             Id = level.Id,
-                            IsCompleted = level.IsCompleted
+                            IsCompleted = level.IsCompleted,
+                            WasEverCompleted = level.WasEverCompleted
                         });
                     }
                     
@@ -117,7 +117,8 @@ namespace ConnectDotsGame.Models
                         if (level != null)
                         {
                             level.IsCompleted = levelProgress.IsCompleted;
-                            Console.WriteLine($"Загружен прогресс для уровня {level.Id}: пройден = {level.IsCompleted}");
+                            level.WasEverCompleted = levelProgress.WasEverCompleted;
+                            Console.WriteLine($"Загружен прогресс для уровня {level.Id}: пройден = {level.IsCompleted}, был пройден = {level.WasEverCompleted}");
                         }
                     }
                     
@@ -134,6 +135,7 @@ namespace ConnectDotsGame.Models
             {
                 public int Id { get; set; }
                 public bool IsCompleted { get; set; }
+                public bool WasEverCompleted { get; set; }
             }
         }
         
@@ -232,10 +234,15 @@ namespace ConnectDotsGame.Models
             bool wasCompleted = CurrentLevel.IsCompleted;
             CurrentLevel.IsCompleted = allCompleted;
             
-            // Если уровень был завершен, сохраняем прогресс
-            if (allCompleted && !wasCompleted)
+            // Если уровень завершен, отмечаем его как пройденный хотя бы раз
+            if (allCompleted)
             {
-                SaveProgress();
+                CurrentLevel.WasEverCompleted = true;
+                // Сохраняем прогресс только если это первое завершение
+                if (!wasCompleted)
+                {
+                    SaveProgress();
+                }
             }
         }
     }

@@ -10,7 +10,7 @@ namespace ConnectDotsGame.Converters
         public IBrush TrueValue { get; set; } = Brushes.Green;
         public IBrush FalseValue { get; set; } = Brushes.Blue;
 
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is bool boolValue)
             {
@@ -20,9 +20,9 @@ namespace ConnectDotsGame.Converters
             return FalseValue;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }
     }
-} 
+}

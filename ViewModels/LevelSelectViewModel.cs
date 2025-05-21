@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using ConnectDotsGame.Commands;
 using ConnectDotsGame.Models;
 using ConnectDotsGame.Navigation;
-using ConnectDotsGame.Utils;
 
 namespace ConnectDotsGame.ViewModels
 {
@@ -34,21 +30,17 @@ namespace ConnectDotsGame.ViewModels
         }
 
         // Обновляет список уровней на основе текущего состояния игры
-        public void UpdateLevels()
-        {
-            // Очищаем текущий список
-            Levels.Clear();
-
-            // Заполняем список уровней заново
+    public void UpdateLevels()
+    {
+        Levels.Clear();
+            
             for (int i = 0; i < _gameState.Levels.Count; i++)
             {
                 var level = _gameState.Levels[i];
-                
-                // Определяем, заблокирован ли уровень
                 bool isLocked = i > 0;
                 
-                // Проверяем предыдущий уровень - разблокируем текущий только если пройден предыдущий
-                if (i > 0 && _gameState.Levels[i - 1].IsCompleted)
+                // Проверяем, был ли когда-либо пройден предыдущий уровень
+                if (i > 0 && _gameState.Levels[i - 1].WasEverCompleted)
                 {
                     isLocked = false;
                 }
@@ -58,25 +50,10 @@ namespace ConnectDotsGame.ViewModels
                 
                 Levels.Add(new LevelInfo 
                 {
-                    Id = i + 1, 
+                    Id = i + 1,
                     Name = level.Name,
-                    IsCompleted = level.IsCompleted,
                     IsLocked = isLocked
                 });
-            }
-        }
-
-        // Конструктор для режима дизайна
-        public LevelSelectViewModel() : this(new DummyNavigation(), new GameState()) 
-        {
-            // Добавляем несколько тестовых уровней для режима дизайна
-            if (Levels.Count == 0)
-            {
-                Levels.Add(new LevelInfo { Id = 1, Name = "Простой", IsCompleted = true, IsLocked = false });
-                Levels.Add(new LevelInfo { Id = 2, Name = "Лёгкий", IsCompleted = false, IsLocked = false });
-                Levels.Add(new LevelInfo { Id = 3, Name = "Средний", IsCompleted = false, IsLocked = true });
-                Levels.Add(new LevelInfo { Id = 4, Name = "Сложный", IsCompleted = false, IsLocked = true });
-                Levels.Add(new LevelInfo { Id = 5, Name = "Эксперт", IsCompleted = false, IsLocked = true });
             }
         }
 
@@ -116,7 +93,6 @@ namespace ConnectDotsGame.ViewModels
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public bool IsCompleted { get; set; }
         public bool IsLocked { get; set; }
     }
-} 
+}

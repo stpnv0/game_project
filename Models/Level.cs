@@ -55,6 +55,11 @@ namespace ConnectDotsGame.Models
         public bool IsCompleted { get; set; }
         
         /// <summary>
+        /// Указывает, был ли уровень когда-либо пройден.
+        /// </summary>
+        public bool WasEverCompleted { get; set; }
+        
+        /// <summary>
         /// Создает новый уровень с параметрами по умолчанию.
         /// </summary>
         public Level()
@@ -62,6 +67,7 @@ namespace ConnectDotsGame.Models
             Points = new List<Point>();
             Lines = new List<Line>();
             IsCompleted = false;
+            WasEverCompleted = false;
         }
         
         /// <summary>
@@ -194,4 +200,4 @@ namespace ConnectDotsGame.Models
             }
         }
     }
-} 
+}

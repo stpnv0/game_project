@@ -67,7 +67,7 @@ namespace ConnectDotsGame.Models
         /// Удаляет последнюю точку из пути
         /// </summary>
         /// <returns>Удаленная точка или null</returns>
-        public Point RemoveLastPoint()
+        public Point? RemoveLastPoint()
         {
             if (Points.Count == 0)
             {
@@ -119,5 +119,7 @@ namespace ConnectDotsGame.Models
             
             return clonedPath;
         }
+        
+        // Метод GetLastLine удален, так как линии теперь хранятся в Level
     }
-} 
+}

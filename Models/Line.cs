@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Media;
 
@@ -40,13 +41,13 @@ namespace ConnectDotsGame.Models
         /// <param name="endPoint">Конечная точка.</param>
         /// <param name="color">Цвет линии.</param>
         /// <param name="pathId">Идентификатор пути.</param>
-        public Line(Point startPoint, Point endPoint, IBrush color, string pathId)
+        public Line(Point startPoint, Point endPoint, IBrush? color, string? pathId)
         {
-            StartPoint = startPoint;
-            EndPoint = endPoint;
+            StartPoint = startPoint ?? throw new ArgumentNullException(nameof(startPoint));
+            EndPoint = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
             IsVisible = false;
-            Color = color;
-            PathId = pathId;
+            Color = color ?? Brushes.Black;
+            PathId = pathId ?? string.Empty;
         }
         
         /// <summary>
@@ -65,8 +66,8 @@ namespace ConnectDotsGame.Models
         {
             return new Line
             {
-                StartPoint = this.StartPoint?.Clone(),
-                EndPoint = this.EndPoint?.Clone(),
+                StartPoint = this.StartPoint,
+                EndPoint = this.EndPoint,
                 IsVisible = this.IsVisible,
                 Color = this.Color,
                 PathId = this.PathId

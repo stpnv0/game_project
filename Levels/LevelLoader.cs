@@ -249,7 +249,7 @@ namespace ConnectDotsGame.Levels
             GetPointAt(level, 8, 6).Color = Brushes.Purple;
             
             // Бирюзовые - по центру
-            GetPointAt(level, 4, 4).Color = Brushes.Cyan;
+            GetPointAt(level, 4, 3).Color = Brushes.Cyan;
             GetPointAt(level, 4, 5).Color = Brushes.Cyan;
             
             return level;

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Avalonia.Media;
-using ConnectDotsGame.Commands;
 using ConnectDotsGame.Models;
 using ConnectDotsGame.Navigation;
 using ConnectDotsGame.Utils;
@@ -87,15 +86,22 @@ namespace ConnectDotsGame.ViewModels
         
         public IBrush? ActiveColor => _activeColor;
         
+        private string GetColorKey(IBrush? brush)
+        {
+            return brush?.ToString() ?? string.Empty;
+        }
+        
         public List<ModelPoint> CurrentPath 
         { 
             get 
             {
-                if (_activeColor != null && _currentPaths.TryGetValue(_activeColor.ToString(), out var path))
+                string colorKey = GetColorKey(_activeColor);
+                if (string.IsNullOrEmpty(colorKey))
                 {
-                    return path;
+                    return new List<ModelPoint>();
                 }
-                return new List<ModelPoint>();
+
+                return _currentPaths.TryGetValue(colorKey, out var path) ? path : new List<ModelPoint>();
             }
         }
         
@@ -126,11 +132,13 @@ namespace ConnectDotsGame.ViewModels
         // Начало пути от точки
         public void StartPath(ModelPoint point)
         {
-            if (CurrentLevel == null || IsLevelCompleted || !point.HasColor)
+            if (CurrentLevel == null || IsLevelCompleted || !point.HasColor || point.Color == null)
                 return;
                 
-            string colorKey = point.Color.ToString();
-                
+            string colorKey = GetColorKey(point.Color);
+            if (string.IsNullOrEmpty(colorKey))
+                return;
+            
             // Сбрасываем предыдущий незавершенный путь того же цвета
             if (_currentPaths.ContainsKey(colorKey))
             {
@@ -162,8 +170,11 @@ namespace ConnectDotsGame.ViewModels
         {
             if (CurrentLevel == null || !IsDrawingPath || _activePoint == null || _activeColor == null)
                 return;
-                
-            string colorKey = _activeColor.ToString();
+
+            string colorKey = GetColorKey(_activeColor);
+            if (string.IsNullOrEmpty(colorKey))
+                return;
+
             if (!_currentPaths.TryGetValue(colorKey, out var currentPath) || currentPath.Count == 0)
                 return;
                 
@@ -272,11 +283,14 @@ namespace ConnectDotsGame.ViewModels
         {
             if (_activeColor != null)
             {
-                string colorKey = _activeColor.ToString();
-                if (_currentPaths.TryGetValue(colorKey, out var path))
+                string colorKey = GetColorKey(_activeColor);
+                if (!string.IsNullOrEmpty(colorKey) && _currentPaths.TryGetValue(colorKey, out var path))
                 {
                     // Удаляем временные линии пути
-                    CurrentLevel?.ClearPath($"{colorKey}-path");
+                    if (CurrentLevel != null)
+                    {
+                        CurrentLevel.ClearPath($"{colorKey}-path");
+                    }
                     
                     // Сбрасываем соединение для начальной и конечной точек
                     foreach (var point in path.Where(p => p.HasColor && p.Color == _activeColor))
@@ -372,14 +386,15 @@ namespace ConnectDotsGame.ViewModels
                 
             // Проверяем все цветные точки на уровне
             var colorGroups = CurrentLevel.Points.Where(p => p.HasColor)
-                                                .GroupBy(p => p.Color.ToString())
+                                                .GroupBy(p => p.Color?.ToString())
+                                                .Where(g => g.Key != null)
                                                 .ToList();
             
             bool allCompleted = true;
             
             foreach (var group in colorGroups)
             {
-                string colorKey = group.Key;
+                string colorKey = group.Key!; // We filtered out null keys above
                 
                 // Проверяем, есть ли путь для этого цвета
                 if (!CurrentLevel.Paths.ContainsKey($"{colorKey}-path"))
@@ -398,6 +413,10 @@ namespace ConnectDotsGame.ViewModels
             
             // Если все пути завершены, отмечаем уровень как завершенный
             CurrentLevel.IsCompleted = allCompleted;
+            if (allCompleted)
+            {
+                CurrentLevel.WasEverCompleted = true;
+            }
             IsLevelCompleted = allCompleted;
             
             // Если уровень завершен, сохраняем состояние игры
@@ -481,10 +500,17 @@ namespace ConnectDotsGame.ViewModels
         // Завершение пути на указанной точке
         public void EndPath(ModelPoint? endPoint)
         {
-            if (!IsDrawingPath) return;
+            if (!IsDrawingPath || _activeColor == null) 
+                return;
             
-            var colorKey = _activeColor?.ToString() ?? "";
-            var currentPath = _currentPaths.ContainsKey(colorKey) ? _currentPaths[colorKey] : new List<ModelPoint>();
+            string colorKey = GetColorKey(_activeColor);
+            if (string.IsNullOrEmpty(colorKey))
+                return;
+                
+            if (!_currentPaths.ContainsKey(colorKey))
+                return;
+                
+            var currentPath = _currentPaths[colorKey];
             
             // Если указана конечная точка, добавляем её в путь
             if (endPoint != null && _activePoint != endPoint && 
@@ -543,4 +569,4 @@ namespace ConnectDotsGame.ViewModels
         
         #endregion
     }
-} 
+}
