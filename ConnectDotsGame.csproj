@@ -13,17 +13,11 @@
     <PackageReference Include="Avalonia.Desktop" Version="11.2.1" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.1" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.1" />
-    <PackageReference Include="LibVLCSharp" Version="3.8.4" />
-    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.20" />
+<!--    <PackageReference Include="LibVLCSharp" Version="3.8.4" />-->
+<!--    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.20" />-->
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Resources\Audio\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Resources\Audio\background_music.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Folder Include="Resources\" />
   </ItemGroup>
 </Project>

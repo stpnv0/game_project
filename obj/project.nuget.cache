@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "PUf27gc9pKQ=",
+  "dgSpecHash": "pENFGEmYsns=",
   "success": true,
   "projectFilePath": "C:\\Users\\choko\\RiderProjects\\game_project\\ConnectDotsGame.csproj",
   "expectedPackageFiles": [
@@ -21,7 +21,6 @@
     "C:\\Users\\choko\\.nuget\\packages\\harfbuzzsharp.nativeassets.macos\\7.3.0.2\\harfbuzzsharp.nativeassets.macos.7.3.0.2.nupkg.sha512",
     "C:\\Users\\choko\\.nuget\\packages\\harfbuzzsharp.nativeassets.webassembly\\7.3.0.3-preview.2.2\\harfbuzzsharp.nativeassets.webassembly.7.3.0.3-preview.2.2.nupkg.sha512",
     "C:\\Users\\choko\\.nuget\\packages\\harfbuzzsharp.nativeassets.win32\\7.3.0.2\\harfbuzzsharp.nativeassets.win32.7.3.0.2.nupkg.sha512",
-    "C:\\Users\\choko\\.nuget\\packages\\libvlcsharp\\3.8.4\\libvlcsharp.3.8.4.nupkg.sha512",
     "C:\\Users\\choko\\.nuget\\packages\\microcom.runtime\\0.11.0\\microcom.runtime.0.11.0.nupkg.sha512",
     "C:\\Users\\choko\\.nuget\\packages\\skiasharp\\2.88.8\\skiasharp.2.88.8.nupkg.sha512",
     "C:\\Users\\choko\\.nuget\\packages\\skiasharp.nativeassets.linux\\2.88.8\\skiasharp.nativeassets.linux.2.88.8.nupkg.sha512",
@@ -29,8 +28,7 @@
     "C:\\Users\\choko\\.nuget\\packages\\skiasharp.nativeassets.webassembly\\2.88.8\\skiasharp.nativeassets.webassembly.2.88.8.nupkg.sha512",
     "C:\\Users\\choko\\.nuget\\packages\\skiasharp.nativeassets.win32\\2.88.8\\skiasharp.nativeassets.win32.2.88.8.nupkg.sha512",
     "C:\\Users\\choko\\.nuget\\packages\\system.io.pipelines\\8.0.0\\system.io.pipelines.8.0.0.nupkg.sha512",
-    "C:\\Users\\choko\\.nuget\\packages\\tmds.dbus.protocol\\0.20.0\\tmds.dbus.protocol.0.20.0.nupkg.sha512",
-    "C:\\Users\\choko\\.nuget\\packages\\videolan.libvlc.windows\\3.0.20\\videolan.libvlc.windows.3.0.20.nupkg.sha512"
+    "C:\\Users\\choko\\.nuget\\packages\\tmds.dbus.protocol\\0.20.0\\tmds.dbus.protocol.0.20.0.nupkg.sha512"
   ],
   "logs": []
 }

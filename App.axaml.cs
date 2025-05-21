@@ -70,6 +70,6 @@ public partial class App : Application
     private void OnExit(object? sender, ControlledApplicationLifetimeExitEventArgs e)
     {
         // Останавливаем музыку перед выходом
-        AudioService.Instance.StopBackgroundMusic();
+        // AudioService.Instance.StopBackgroundMusic();
     }
 }

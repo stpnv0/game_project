@@ -11,9 +11,7 @@
           "Avalonia": "11.2.1",
           "Avalonia.Desktop": "11.2.1",
           "Avalonia.Fonts.Inter": "11.2.1",
-          "Avalonia.Themes.Fluent": "11.2.1",
-          "LibVLCSharp": "3.8.4",
-          "VideoLAN.LibVLC.Windows": "3.0.20"
+          "Avalonia.Themes.Fluent": "11.2.1"
         },
         "runtime": {
           "ConnectDotsGame.dll": {}
@@ -277,14 +275,6 @@
           }
         }
       },
-      "LibVLCSharp/3.8.4": {
-        "runtime": {
-          "lib/net6.0/LibVLCSharp.dll": {
-            "assemblyVersion": "3.8.4.0",
-            "fileVersion": "3.8.4.0"
-          }
-        }
-      },
       "MicroCom.Runtime/0.11.0": {
         "runtime": {
           "lib/net5.0/MicroCom.Runtime.dll": {
@@ -372,8 +362,7 @@
             "fileVersion": "0.20.0.0"
           }
         }
-      },
-      "VideoLAN.LibVLC.Windows/3.0.20": {}
+      }
     }
   },
   "libraries": {
@@ -501,13 +490,6 @@
       "path": "harfbuzzsharp.nativeassets.win32/7.3.0.2",
       "hashPath": "harfbuzzsharp.nativeassets.win32.7.3.0.2.nupkg.sha512"
     },
-    "LibVLCSharp/3.8.4": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-LiV03hhaR/CiK3vgNyPosopGeCSbJPk1gMMGJDjpNpXXgFwwaF2LgT0uLpJb3naiIKulAGN61CyFCRv7MCG6ww==",
-      "path": "libvlcsharp/3.8.4",
-      "hashPath": "libvlcsharp.3.8.4.nupkg.sha512"
-    },
     "MicroCom.Runtime/0.11.0": {
       "type": "package",
       "serviceable": true,
@@ -563,13 +545,6 @@
       "sha512": "sha512-2gkt2kuYPhDKd8gtl34jZSJOnn4nRJfFngCDcTZT/uySbK++ua0YQx2418l9Rn1Y4dE5XNq6zG9ZsE5ltLlNNw==",
       "path": "tmds.dbus.protocol/0.20.0",
       "hashPath": "tmds.dbus.protocol.0.20.0.nupkg.sha512"
-    },
-    "VideoLAN.LibVLC.Windows/3.0.20": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-ahujCn2kTPJSLEpwXu2BHIyv9Ke/iahd367hFwMMHSP9UkSOYC5QekOGFrSxKz22yZP67arcfCgNgDIcV31DpQ==",
-      "path": "videolan.libvlc.windows/3.0.20",
-      "hashPath": "videolan.libvlc.windows.3.0.20.nupkg.sha512"
     }
   }
 }

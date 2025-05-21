@@ -14,7 +14,7 @@ namespace ConnectDotsGame
 
         protected override void OnClosed(EventArgs e)
         {
-            AudioService.Instance.Dispose();
+            // AudioService.Instance.Dispose();
             base.OnClosed(e);
         }
     }
