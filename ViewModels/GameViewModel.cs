@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Avalonia.Media;
+using ConnectDotsGame.Commands;
 using ConnectDotsGame.Models;
 using ConnectDotsGame.Navigation;
 using ConnectDotsGame.Utils;
@@ -86,22 +87,15 @@ namespace ConnectDotsGame.ViewModels
         
         public IBrush? ActiveColor => _activeColor;
         
-        private string GetColorKey(IBrush? brush)
-        {
-            return brush?.ToString() ?? string.Empty;
-        }
-        
         public List<ModelPoint> CurrentPath 
         { 
             get 
             {
-                string colorKey = GetColorKey(_activeColor);
-                if (string.IsNullOrEmpty(colorKey))
+                if (_activeColor != null && _currentPaths.TryGetValue(_activeColor.ToString(), out var path))
                 {
-                    return new List<ModelPoint>();
+                    return path;
                 }
-
-                return _currentPaths.TryGetValue(colorKey, out var path) ? path : new List<ModelPoint>();
+                return new List<ModelPoint>();
             }
         }
         
@@ -129,16 +123,21 @@ namespace ConnectDotsGame.ViewModels
         // Конструктор для режима дизайна
         public GameViewModel() : this(new DummyNavigation(), new GameState()) { }
         
+
+        // Проверяет, являются ли точки соседями по вертикали или горизонтали
+         private bool IsNeighbor(ModelPoint a, ModelPoint b)
+         {
+            return (Math.Abs(a.Row - b.Row) == 1 && a.Column == b.Column) ||
+                   (Math.Abs(a.Column - b.Column) == 1 && a.Row == b.Row);
+         }
         // Начало пути от точки
         public void StartPath(ModelPoint point)
         {
-            if (CurrentLevel == null || IsLevelCompleted || !point.HasColor || point.Color == null)
+            if (CurrentLevel == null || IsLevelCompleted || !point.HasColor)
                 return;
                 
-            string colorKey = GetColorKey(point.Color);
-            if (string.IsNullOrEmpty(colorKey))
-                return;
-            
+            string colorKey = point.Color.ToString();
+                
             // Сбрасываем предыдущий незавершенный путь того же цвета
             if (_currentPaths.ContainsKey(colorKey))
             {
@@ -164,53 +163,68 @@ namespace ConnectDotsGame.ViewModels
             OnPropertyChanged(nameof(ActiveColor));
             OnPropertyChanged(nameof(CurrentLevel));
         }
-        
+
         // Продолжение пути через точку
         public void ContinuePath(ModelPoint point)
         {
             if (CurrentLevel == null || !IsDrawingPath || _activePoint == null || _activeColor == null)
                 return;
 
-            string colorKey = GetColorKey(_activeColor);
-            if (string.IsNullOrEmpty(colorKey))
-                return;
-
+            string colorKey = _activeColor.ToString();
             if (!_currentPaths.TryGetValue(colorKey, out var currentPath) || currentPath.Count == 0)
                 return;
-                
-            // Получаем последнюю точку пути
+
             var lastPoint = currentPath.Last();
-            
+
             // Если это та же самая точка, ничего не делаем
             if (lastPoint.Row == point.Row && lastPoint.Column == point.Column)
                 return;
-                
+
+            // --- L-образное движение: сначала по X (столбцы), потом по Y (строки) ---
+            int currRow = lastPoint.Row;
+            int currCol = lastPoint.Column;
+            // Перемещаемся по горизонтали
+            while (currCol != point.Column)
+            {
+                currCol += Math.Sign(point.Column - currCol);
+                var nextPoint = CurrentLevel.Points.FirstOrDefault(p => p.Row == currRow && p.Column == currCol);
+                if (nextPoint == null || !IsNeighbor(currentPath.Last(), nextPoint))
+                    return;
+                // Для промежуточных точек — рекурсивно строим путь
+                if (nextPoint.Row != point.Row || nextPoint.Column != point.Column)
+                    ContinuePath(nextPoint);
+            }
+            // Затем по вертикали
+            while (currRow != point.Row)
+            {
+                currRow += Math.Sign(point.Row - currRow);
+                var nextPoint = CurrentLevel.Points.FirstOrDefault(p => p.Row == currRow && p.Column == currCol);
+                if (nextPoint == null || !IsNeighbor(currentPath.Last(), nextPoint))
+                    return;
+                // Для промежуточных точек — рекурсивно строим путь
+                if (nextPoint.Row != point.Row || nextPoint.Column != point.Column)
+                    ContinuePath(nextPoint);
+            }
+
+            // После этого мы оказались в нужной точке (point)
+            // Далее стандартная логика добавления точки в путь:
+
             // Если точка уже в пути, проверяем, не движемся ли мы назад
-            bool isBacktrack = currentPath.Count >= 2 && 
-                              currentPath[currentPath.Count - 2].Row == point.Row && 
-                              currentPath[currentPath.Count - 2].Column == point.Column;
-                
+            bool isBacktrack = currentPath.Count >= 2 &&
+                               currentPath[currentPath.Count - 2].Row == point.Row &&
+                               currentPath[currentPath.Count - 2].Column == point.Column;
+
             if (isBacktrack)
             {
                 // Удаляем последнюю точку из пути (движение назад)
                 currentPath.RemoveAt(currentPath.Count - 1);
                 _activePoint = point;
-                
+
                 // Обновляем линии на UI
                 RedrawCurrentPath(colorKey, currentPath);
                 return;
             }
-            
-            // Проверка, находится ли точка рядом с последней
-            int rowDiff = Math.Abs(lastPoint.Row - point.Row);
-            int colDiff = Math.Abs(lastPoint.Column - point.Column);
-            
-            // Точки должны быть соседними только по вертикали или горизонтали (не по диагонали)
-            bool isAdjacent = (rowDiff == 0 && colDiff == 1) || (rowDiff == 1 && colDiff == 0);
-            
-            if (!isAdjacent)
-                return;
-                
+
             // Проверка, не занята ли точка другим путем
             var targetPath = GameLogic.CheckForCrossingPath(CurrentLevel, point);
             if (targetPath != null)
@@ -228,20 +242,20 @@ namespace ConnectDotsGame.ViewModels
                     _currentPaths.Remove(targetPath.Replace("-path", ""));
                 }
             }
-            
+
             // Если это цветная точка и не того же цвета, нельзя проходить через неё
             if (point.HasColor && point.Color != _activeColor)
                 return;
-                
+
             // Если это точка того же цвета, проверяем, завершаем ли мы путь
             if (point.HasColor && point.Color == _activeColor && point != currentPath[0])
             {
                 // Добавляем конечную точку в путь
                 currentPath.Add(point);
-                
+
                 // Создаем все линии пути
                 CreatePathLines(colorKey, currentPath);
-                
+
                 // Отмечаем ВСЕ точки в пути как соединенные
                 foreach (var pathPoint in currentPath)
                 {
@@ -250,47 +264,44 @@ namespace ConnectDotsGame.ViewModels
                         pathPoint.IsConnected = true;
                     }
                 }
-                
+
                 // Завершаем рисование
                 _activePoint = null;
                 _activeColor = null;
                 IsDrawingPath = false;
-                
+
                 // Проверяем, завершён ли уровень
                 CheckLevelCompletion();
-                
+
                 // Обновляем UI
                 OnPropertyChanged(nameof(ActivePoint));
                 OnPropertyChanged(nameof(ActiveColor));
                 OnPropertyChanged(nameof(CurrentLevel));
-                
+
                 return;
             }
-            
+
             // Добавляем точку в путь
             currentPath.Add(point);
             _activePoint = point;
-            
+
             // Обновляем линии на UI
             RedrawCurrentPath(colorKey, currentPath);
-            
+
             OnPropertyChanged(nameof(ActivePoint));
             OnPropertyChanged(nameof(CurrentLevel));
         }
-        
+
         // Отмена текущего пути
         public void CancelPath()
         {
             if (_activeColor != null)
             {
-                string colorKey = GetColorKey(_activeColor);
-                if (!string.IsNullOrEmpty(colorKey) && _currentPaths.TryGetValue(colorKey, out var path))
+                string colorKey = _activeColor.ToString();
+                if (_currentPaths.TryGetValue(colorKey, out var path))
                 {
                     // Удаляем временные линии пути
-                    if (CurrentLevel != null)
-                    {
-                        CurrentLevel.ClearPath($"{colorKey}-path");
-                    }
+                    CurrentLevel?.ClearPath($"{colorKey}-path");
                     
                     // Сбрасываем соединение для начальной и конечной точек
                     foreach (var point in path.Where(p => p.HasColor && p.Color == _activeColor))
@@ -363,7 +374,7 @@ namespace ConnectDotsGame.ViewModels
         // Получение Brush по имени цвета
         private IBrush GetBrushByName(string colorName)
         {
-            // Используем только цвета, которые реально используются в игре
+            // Используем словарь цветов вместо метода Parse
             switch (colorName)
             {
                 case "Red": return Brushes.Red;
@@ -372,10 +383,9 @@ namespace ConnectDotsGame.ViewModels
                 case "Yellow": return Brushes.Yellow;
                 case "Orange": return Brushes.Orange;
                 case "Purple": return Brushes.Purple;
-                case "Aqua": return Brushes.Cyan;
+                case "Cyan": return Brushes.Cyan;
                 case "Pink": return Brushes.Pink;
-                case "Gray": return Brushes.Gray;
-                default: return Brushes.White;  // Оставляем белый цвет по умолчанию для заметности ошибок
+                default: return Brushes.Gray;
             }
         }
         
@@ -387,15 +397,14 @@ namespace ConnectDotsGame.ViewModels
                 
             // Проверяем все цветные точки на уровне
             var colorGroups = CurrentLevel.Points.Where(p => p.HasColor)
-                                                .GroupBy(p => p.Color?.ToString())
-                                                .Where(g => g.Key != null)
+                                                .GroupBy(p => p.Color.ToString())
                                                 .ToList();
             
             bool allCompleted = true;
             
             foreach (var group in colorGroups)
             {
-                string colorKey = group.Key!; // We filtered out null keys above
+                string colorKey = group.Key;
                 
                 // Проверяем, есть ли путь для этого цвета
                 if (!CurrentLevel.Paths.ContainsKey($"{colorKey}-path"))
@@ -414,10 +423,6 @@ namespace ConnectDotsGame.ViewModels
             
             // Если все пути завершены, отмечаем уровень как завершенный
             CurrentLevel.IsCompleted = allCompleted;
-            if (allCompleted)
-            {
-                CurrentLevel.WasEverCompleted = true;
-            }
             IsLevelCompleted = allCompleted;
             
             // Если уровень завершен, сохраняем состояние игры
@@ -501,17 +506,10 @@ namespace ConnectDotsGame.ViewModels
         // Завершение пути на указанной точке
         public void EndPath(ModelPoint? endPoint)
         {
-            if (!IsDrawingPath || _activeColor == null) 
-                return;
+            if (!IsDrawingPath) return;
             
-            string colorKey = GetColorKey(_activeColor);
-            if (string.IsNullOrEmpty(colorKey))
-                return;
-                
-            if (!_currentPaths.ContainsKey(colorKey))
-                return;
-                
-            var currentPath = _currentPaths[colorKey];
+            var colorKey = _activeColor?.ToString() ?? "";
+            var currentPath = _currentPaths.ContainsKey(colorKey) ? _currentPaths[colorKey] : new List<ModelPoint>();
             
             // Если указана конечная точка, добавляем её в путь
             if (endPoint != null && _activePoint != endPoint && 
@@ -570,4 +568,4 @@ namespace ConnectDotsGame.ViewModels
         
         #endregion
     }
-}
+} 

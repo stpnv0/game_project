@@ -91,10 +91,10 @@ namespace ConnectDotsGame.Levels
             
             // Добавляем цветные точки для проходимого уровня
             level.Points.First(p => p.Row == 0 && p.Column == 0).Color = Brushes.Red;
-            level.Points.First(p => p.Row == 0 && p.Column == 5).Color = Brushes.Red;
+            level.Points.First(p => p.Row == 0 && p.Column == 4).Color = Brushes.Red;
             
-            level.Points.First(p => p.Row == 5 && p.Column == 0).Color = Brushes.Blue;
-            level.Points.First(p => p.Row == 5 && p.Column == 5).Color = Brushes.Blue;
+            level.Points.First(p => p.Row == 4 && p.Column == 0).Color = Brushes.Blue;
+            level.Points.First(p => p.Row == 4 && p.Column == 4).Color = Brushes.Blue;
             
             level.Points.First(p => p.Row == 2 && p.Column == 2).Color = Brushes.Green;
             level.Points.First(p => p.Row == 3 && p.Column == 3).Color = Brushes.Green;
