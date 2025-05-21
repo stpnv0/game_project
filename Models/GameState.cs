@@ -139,10 +139,20 @@ namespace ConnectDotsGame.Models
             }
         }
         
-        public Level? CurrentLevel => CurrentLevelIndex >= 0 && CurrentLevelIndex < Levels.Count 
-            ? Levels[CurrentLevelIndex] 
-            : null;
-            
+        public Level? CurrentLevel
+        {
+            get
+            {
+                if (CurrentLevelIndex >= 0 && CurrentLevelIndex < Levels.Count)
+                {
+                    // Загружаем актуальный прогресс при каждом обращении к текущему уровню
+                    LoadProgress();
+                    return Levels[CurrentLevelIndex];
+                }
+                return null;
+            }
+        }
+
         public bool HasNextLevel => CurrentLevelIndex < Levels.Count - 1;
         
         public bool GoToNextLevel()
@@ -160,6 +170,8 @@ namespace ConnectDotsGame.Models
         {
             if (CurrentLevel != null)
             {
+                bool wasEverCompleted = CurrentLevel.WasEverCompleted;
+
                 foreach (var point in CurrentLevel.Points)
                 {
                     point.IsConnected = false;
@@ -170,6 +182,7 @@ namespace ConnectDotsGame.Models
                 
                 ResetPathState();
                 CurrentLevel.IsCompleted = false;
+                CurrentLevel.WasEverCompleted = wasEverCompleted; // Preserve WasEverCompleted state
             }
         }
         
@@ -234,16 +247,14 @@ namespace ConnectDotsGame.Models
             bool wasCompleted = CurrentLevel.IsCompleted;
             CurrentLevel.IsCompleted = allCompleted;
             
-            // Если уровень завершен, отмечаем его как пройденный хотя бы раз
+            // Если уровень завершен
             if (allCompleted)
             {
-                CurrentLevel.WasEverCompleted = true;
-                // Сохраняем прогресс только если это первое завершение
-                if (!wasCompleted)
-                {
-                    SaveProgress();
-                }
+                CurrentLevel.WasEverCompleted = true; // Отмечаем как пройденный хотя бы раз
+                
+                // Сохраняем прогресс в любом случае, чтобы обновить WasEverCompleted
+                SaveProgress();
             }
         }
     }
-} 
+}

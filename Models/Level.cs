@@ -66,7 +66,7 @@ namespace ConnectDotsGame.Models
         {
             Points = new List<Point>();
             Lines = new List<Line>();
-            IsCompleted = false;
+            IsCompleted = true;
             WasEverCompleted = false;
         }
         

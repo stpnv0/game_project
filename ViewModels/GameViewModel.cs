@@ -111,13 +111,34 @@ namespace ConnectDotsGame.ViewModels
             _navigation = navigation;
             _gameState = gameState;
             
-            NextLevelCommand = new RelayCommand(NextLevel, () => IsLevelCompleted && HasNextLevel);
+            // Загружаем сохраненный прогресс
+            _gameState.LoadProgress();
+            
+            // Кнопка следующего уровня доступна, если уровень был когда-либо пройден
+            NextLevelCommand = new RelayCommand(NextLevel, () => CurrentLevel?.WasEverCompleted == true && HasNextLevel);
             ResetLevelCommand = new RelayCommand(ResetLevel, () => _gameState.CurrentLevel != null);
             BackToMenuCommand = new RelayCommand(() => _navigation.GoBack());
             BackToLevelsCommand = new RelayCommand(() => _navigation.NavigateTo<LevelSelectViewModel>());
             
-            StatusMessage = "Соедините точки одинаковых цветов!";
+            // Устанавливаем начальное состояние
+            HasNextLevel = _gameState.HasNextLevel;
+            IsLevelCompleted = CurrentLevel?.IsCompleted ?? false;
+            
+            // Обновляем статус и состояние кнопок
             UpdateGameState();
+            ((RelayCommand)NextLevelCommand).RaiseCanExecuteChanged();
+            
+            // Устанавливаем начальное сообщение
+            if (CurrentLevel?.WasEverCompleted == true)
+            {
+                StatusMessage = HasNextLevel
+                    ? "Уровень был пройден! Можете перейти к следующему уровню"
+                    : "Поздравляем! Вы прошли все уровни!";
+            }
+            else
+            {
+                StatusMessage = "Соедините точки одинаковых цветов!";
+            }
         }
         
         // Конструктор для режима дизайна
@@ -133,10 +154,10 @@ namespace ConnectDotsGame.ViewModels
         // Начало пути от точки
         public void StartPath(ModelPoint point)
         {
-            if (CurrentLevel == null || IsLevelCompleted || !point.HasColor)
+            if (CurrentLevel == null || !point.HasColor || point.Color == null)
                 return;
                 
-            string colorKey = point.Color.ToString();
+            string colorKey = point.Color.ToString() ?? "";
                 
             // Сбрасываем предыдущий незавершенный путь того же цвета
             if (_currentPaths.ContainsKey(colorKey))
@@ -170,7 +191,7 @@ namespace ConnectDotsGame.ViewModels
             if (CurrentLevel == null || !IsDrawingPath || _activePoint == null || _activeColor == null)
                 return;
 
-            string colorKey = _activeColor.ToString();
+            string colorKey = _activeColor.ToString() ?? "";
             if (!_currentPaths.TryGetValue(colorKey, out var currentPath) || currentPath.Count == 0)
                 return;
 
@@ -297,7 +318,7 @@ namespace ConnectDotsGame.ViewModels
         {
             if (_activeColor != null)
             {
-                string colorKey = _activeColor.ToString();
+                string colorKey = _activeColor.ToString() ?? "";
                 if (_currentPaths.TryGetValue(colorKey, out var path))
                 {
                     // Удаляем временные линии пути
@@ -383,7 +404,7 @@ namespace ConnectDotsGame.ViewModels
                 case "Yellow": return Brushes.Yellow;
                 case "Orange": return Brushes.Orange;
                 case "Purple": return Brushes.Purple;
-                case "Cyan": return Brushes.Cyan;
+                case "Aqua": return Brushes.Cyan;
                 case "Pink": return Brushes.Pink;
                 default: return Brushes.Gray;
             }
@@ -396,15 +417,16 @@ namespace ConnectDotsGame.ViewModels
                 return;
                 
             // Проверяем все цветные точки на уровне
-            var colorGroups = CurrentLevel.Points.Where(p => p.HasColor)
-                                                .GroupBy(p => p.Color.ToString())
-                                                .ToList();
+            var colorGroups = CurrentLevel.Points
+                .Where(p => p.HasColor && p.Color != null)
+                .GroupBy(p => p.Color.ToString())
+                .ToList();
             
             bool allCompleted = true;
             
             foreach (var group in colorGroups)
             {
-                string colorKey = group.Key;
+                string colorKey = group.Key ?? "";
                 
                 // Проверяем, есть ли путь для этого цвета
                 if (!CurrentLevel.Paths.ContainsKey($"{colorKey}-path"))
@@ -428,6 +450,7 @@ namespace ConnectDotsGame.ViewModels
             // Если уровень завершен, сохраняем состояние игры
             if (allCompleted)
             {
+                CurrentLevel.WasEverCompleted = true;
                 _gameState.SaveProgress();
             }
             
@@ -440,7 +463,7 @@ namespace ConnectDotsGame.ViewModels
             if (_gameState.HasNextLevel)
             {
                 _gameState.CurrentLevelIndex++;
-                IsLevelCompleted = false;
+                IsLevelCompleted = true;
                 _currentPaths.Clear();
                 UpdateGameState();
             }
@@ -450,6 +473,8 @@ namespace ConnectDotsGame.ViewModels
         {
             if (CurrentLevel != null)
             {
+                bool wasEverCompleted = CurrentLevel.WasEverCompleted; // Сохраняем состояние WasEverCompleted
+                
                 // Сбрасываем состояние всех точек
                 foreach (var point in CurrentLevel.Points)
                 {
@@ -466,8 +491,9 @@ namespace ConnectDotsGame.ViewModels
                 IsDrawingPath = false;
                 _currentPaths.Clear();
                 
-                // Сбрасываем состояние уровня
+                // Сбрасываем состояние уровня, но сохраняем WasEverCompleted
                 CurrentLevel.IsCompleted = false;
+                CurrentLevel.WasEverCompleted = wasEverCompleted;
                 IsLevelCompleted = false;
                 
                 UpdateGameState();
@@ -485,8 +511,12 @@ namespace ConnectDotsGame.ViewModels
             if (IsLevelCompleted)
             {
                 StatusMessage = HasNextLevel
-                    ? "Уровень пройден! Нажмите 'Следующий уровень'"
+                    ? "Уровень пройден! Нажмите 'Следующий уровень' или начните заново"
                     : "Поздравляем! Вы прошли все уровни!";
+            }
+            else if (CurrentLevel?.WasEverCompleted == true)
+            {
+                StatusMessage = "Повторное прохождение уровня. Соедините точки одинаковых цветов!";
             }
             else
             {
@@ -495,6 +525,7 @@ namespace ConnectDotsGame.ViewModels
             
             OnPropertyChanged(nameof(LevelName));
             OnPropertyChanged(nameof(CurrentLevel));
+            ((RelayCommand)NextLevelCommand).RaiseCanExecuteChanged();
         }
         
         // Завершение пути
@@ -568,4 +599,4 @@ namespace ConnectDotsGame.ViewModels
         
         #endregion
     }
-} 
+}

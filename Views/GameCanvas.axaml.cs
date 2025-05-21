@@ -188,16 +188,6 @@ namespace ConnectDotsGame.Views
                     return;
                 }
                     
-                // Проверяем, завершен ли уровень
-                bool isCompleted = _viewModel?.IsLevelCompleted ?? false;
-                
-                if (isCompleted)
-                {
-                    Console.WriteLine("Level is already completed");
-                    UpdateDebugText("Уровень уже завершен");
-                    return;
-                }
-                    
                 // Находим точку в сетке по координатам
                 var clickedPoint = GameLogic.FindPointAtPosition(level, position.X, position.Y, CellSize);
                 
