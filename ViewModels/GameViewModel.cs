@@ -363,7 +363,7 @@ namespace ConnectDotsGame.ViewModels
         // Получение Brush по имени цвета
         private IBrush GetBrushByName(string colorName)
         {
-            // Используем словарь цветов вместо метода Parse
+            // Используем только цвета, которые реально используются в игре
             switch (colorName)
             {
                 case "Red": return Brushes.Red;
@@ -372,9 +372,10 @@ namespace ConnectDotsGame.ViewModels
                 case "Yellow": return Brushes.Yellow;
                 case "Orange": return Brushes.Orange;
                 case "Purple": return Brushes.Purple;
-                case "Cyan": return Brushes.Cyan;
+                case "Aqua": return Brushes.Cyan;
                 case "Pink": return Brushes.Pink;
-                default: return Brushes.Gray;
+                case "Gray": return Brushes.Gray;
+                default: return Brushes.White;  // Оставляем белый цвет по умолчанию для заметности ошибок
             }
         }
         

@@ -16,7 +16,7 @@ namespace ConnectDotsGame.Levels
             
             try
             {
-                // Загружаем все 10 уровней
+                // Загружаем все уровни
                 levels.Add(CreateLevel1());
                 levels.Add(CreateLevel2());
                 levels.Add(CreateLevel3());
@@ -50,7 +50,6 @@ namespace ConnectDotsGame.Levels
                 Lines = new List<Line>()
             };
             
-            // Создаем сетку 5x5
             int id = 1;
             for (int row = 0; row < 5; row++)
             {
@@ -60,7 +59,6 @@ namespace ConnectDotsGame.Levels
                 }
             }
             
-            // Добавляем цветные точки для проходимого уровня
             level.Points.First(p => p.Row == 0 && p.Column == 0).Color = Brushes.Red;
             level.Points.First(p => p.Row == 0 && p.Column == 4).Color = Brushes.Red;
             
@@ -76,17 +74,16 @@ namespace ConnectDotsGame.Levels
             {
                 Id = 2,
                 Name = "Уровень 2",
-                Rows = 6,
-                Columns = 6,
+                Rows = 5,
+                Columns = 5,
                 Points = new List<Point>(),
                 Lines = new List<Line>()
             };
             
-            // Создаем сетку 6x6
             int id = 1;
-            for (int row = 0; row < 6; row++)
+            for (int row = 0; row < 5; row++)
             {
-                for (int col = 0; col < 6; col++)
+                for (int col = 0; col < 5; col++)
                 {
                     level.Points.Add(new Point(id++, row, col));
                 }
@@ -117,7 +114,6 @@ namespace ConnectDotsGame.Levels
                 Lines = new List<Line>()
             };
             
-            // Создаем сетку 7x7
             int id = 1;
             for (int row = 0; row < 7; row++)
             {
@@ -127,22 +123,19 @@ namespace ConnectDotsGame.Levels
                 }
             }
             
-            // Добавляем цветные точки для проходимого уровня
-            // Красные - по верхнему краю
             level.Points.First(p => p.Row == 0 && p.Column == 1).Color = Brushes.Red;
             level.Points.First(p => p.Row == 0 && p.Column == 5).Color = Brushes.Red;
             
-            // Синие - по нижнему краю
             level.Points.First(p => p.Row == 6 && p.Column == 1).Color = Brushes.Blue;
             level.Points.First(p => p.Row == 6 && p.Column == 5).Color = Brushes.Blue;
             
-            // Зеленые - по левому краю
             level.Points.First(p => p.Row == 1 && p.Column == 0).Color = Brushes.Green;
             level.Points.First(p => p.Row == 5 && p.Column == 0).Color = Brushes.Green;
             
-            // Желтые - по правому краю
             level.Points.First(p => p.Row == 1 && p.Column == 6).Color = Brushes.Yellow;
             level.Points.First(p => p.Row == 5 && p.Column == 6).Color = Brushes.Yellow;
+            
+            
             
             return level;
         }
@@ -160,7 +153,6 @@ namespace ConnectDotsGame.Levels
                 Lines = new List<Line>()
             };
             
-            // Создаем все точки сетки
             int id = 1;
             for (int row = 0; row < level.Rows; row++)
             {
@@ -171,28 +163,21 @@ namespace ConnectDotsGame.Levels
                 }
             }
             
-            // Добавляем цветные точки для проходимого уровня
-            // Красные - по верхнему краю
             GetPointAt(level, 0, 1).Color = Brushes.Red;
             GetPointAt(level, 0, 6).Color = Brushes.Red;
             
-            // Синие - по левому краю
             GetPointAt(level, 1, 0).Color = Brushes.Blue;
             GetPointAt(level, 6, 0).Color = Brushes.Blue;
             
-            // Зеленые - по правому краю
             GetPointAt(level, 1, 7).Color = Brushes.Green;
             GetPointAt(level, 6, 7).Color = Brushes.Green;
             
-            // Желтые - по нижнему краю
             GetPointAt(level, 7, 1).Color = Brushes.Yellow;
             GetPointAt(level, 7, 6).Color = Brushes.Yellow;
             
-            // Оранжевые - в левой части
             GetPointAt(level, 3, 2).Color = Brushes.Orange;
             GetPointAt(level, 4, 2).Color = Brushes.Orange;
             
-            // Пурпурные - в правой части
             GetPointAt(level, 3, 5).Color = Brushes.Purple;
             GetPointAt(level, 4, 5).Color = Brushes.Purple;
             
@@ -550,10 +535,6 @@ namespace ConnectDotsGame.Levels
             // Розовые - внутреннее кольцо (верх)
             GetPointAt(level, 3, 4).Color = Brushes.Pink;
             GetPointAt(level, 3, 7).Color = Brushes.Pink;
-            
-            // Черные - внутреннее кольцо (низ)
-            GetPointAt(level, 8, 4).Color = Brushes.Black;
-            GetPointAt(level, 8, 7).Color = Brushes.Black;
             
             return level;
         }
