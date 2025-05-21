@@ -9,7 +9,7 @@ namespace ConnectDotsGame
         public MainWindow()
         {
             InitializeComponent();
-            AudioService.Instance.PlayBackgroundMusic("Resources/Audio/background_music.wav");
+            // AudioService.Instance.PlayBackgroundMusic("Resources/Audio/background_music.wav");
         }
 
         protected override void OnClosed(EventArgs e)

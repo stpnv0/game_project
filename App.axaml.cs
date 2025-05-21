@@ -20,7 +20,7 @@ public partial class App : Application
         AvaloniaXamlLoader.Load(this);
 
         // Запуск фоновой музыки
-        AudioService.Instance.PlayBackgroundMusic("Resources/Audio/background_music.wav");
+        // AudioService.Instance.PlayBackgroundMusic("Resources/Audio/background_music.wav");
     }
 
     public override void OnFrameworkInitializationCompleted()
