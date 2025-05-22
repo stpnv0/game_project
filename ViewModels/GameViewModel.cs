@@ -23,6 +23,7 @@ namespace ConnectDotsGame.ViewModels
         private bool _isDrawingPath;
         private ModelPoint? _activePoint;
         private IBrush? _activeColor;
+        private bool _hitWrongColor; // Новый флаг
         private readonly Dictionary<string, List<ModelPoint>> _currentPaths = new Dictionary<string, List<ModelPoint>>();
         
         public string LevelName => _gameState.CurrentLevel?.Name ?? "Нет уровня";
@@ -91,7 +92,8 @@ namespace ConnectDotsGame.ViewModels
         { 
             get 
             {
-                if (_activeColor != null && _currentPaths.TryGetValue(_activeColor.ToString(), out var path))
+                string colorKey = _activeColor?.ToString() ?? "";
+                if (!string.IsNullOrEmpty(colorKey) && _currentPaths.TryGetValue(colorKey, out var path))
                 {
                     return path;
                 }
@@ -172,6 +174,7 @@ namespace ConnectDotsGame.ViewModels
             _activePoint = point;
             _activeColor = point.Color;
             IsDrawingPath = true;
+            _hitWrongColor = false; // Сбрасываем флаг при начале нового пути
             
             // Добавляем точку в текущий путь
             var path = new List<ModelPoint> { point };
@@ -201,44 +204,26 @@ namespace ConnectDotsGame.ViewModels
             if (lastPoint.Row == point.Row && lastPoint.Column == point.Column)
                 return;
 
-            // --- L-образное движение: сначала по X (столбцы), потом по Y (строки) ---
-            int currRow = lastPoint.Row;
-            int currCol = lastPoint.Column;
-            // Перемещаемся по горизонтали
-            while (currCol != point.Column)
-            {
-                currCol += Math.Sign(point.Column - currCol);
-                var nextPoint = CurrentLevel.Points.FirstOrDefault(p => p.Row == currRow && p.Column == currCol);
-                if (nextPoint == null || !IsNeighbor(currentPath.Last(), nextPoint))
-                    return;
-                // Для промежуточных точек — рекурсивно строим путь
-                if (nextPoint.Row != point.Row || nextPoint.Column != point.Column)
-                    ContinuePath(nextPoint);
-            }
-            // Затем по вертикали
-            while (currRow != point.Row)
-            {
-                currRow += Math.Sign(point.Row - currRow);
-                var nextPoint = CurrentLevel.Points.FirstOrDefault(p => p.Row == currRow && p.Column == currCol);
-                if (nextPoint == null || !IsNeighbor(currentPath.Last(), nextPoint))
-                    return;
-                // Для промежуточных точек — рекурсивно строим путь
-                if (nextPoint.Row != point.Row || nextPoint.Column != point.Column)
-                    ContinuePath(nextPoint);
-            }
+            // Проверяем, что точки являются соседними
+            if (!IsNeighbor(lastPoint, point))
+                return;
 
-            // После этого мы оказались в нужной точке (point)
-            // Далее стандартная логика добавления точки в путь:
-
-            // Если точка уже в пути, проверяем, не движемся ли мы назад
-            bool isBacktrack = currentPath.Count >= 2 &&
-                               currentPath[currentPath.Count - 2].Row == point.Row &&
-                               currentPath[currentPath.Count - 2].Column == point.Column;
-
-            if (isBacktrack)
+            // Проверяем, не возвращаемся ли мы к какой-либо точке пути
+            int returnIndex = currentPath.FindIndex(p => p.Row == point.Row && p.Column == point.Column);
+            if (returnIndex != -1)
             {
-                // Удаляем последнюю точку из пути (движение назад)
-                currentPath.RemoveAt(currentPath.Count - 1);
+                // Удаляем все точки после точки возврата
+                while (currentPath.Count > returnIndex + 1)
+                {
+                    var removedPoint = currentPath[currentPath.Count - 1];
+                    // Если удаляемая точка цветная, снимаем с неё отметку соединения
+                    if (removedPoint.HasColor && removedPoint.Color == _activeColor && removedPoint != currentPath[0])
+                    {
+                        removedPoint.IsConnected = false;
+                    }
+                    currentPath.RemoveAt(currentPath.Count - 1);
+                }
+                
                 _activePoint = point;
 
                 // Обновляем линии на UI
@@ -246,38 +231,26 @@ namespace ConnectDotsGame.ViewModels
                 return;
             }
 
-            // Проверка, не занята ли точка другим путем
-            var targetPath = GameLogic.CheckForCrossingPath(CurrentLevel, point);
-            if (targetPath != null)
-            {
-                // Если пересекаем путь того же цвета, запрещаем ход
-                if (targetPath.StartsWith(colorKey))
-                {
-                    Console.WriteLine($"Недопустимый ход: Точка {point.Row},{point.Column} уже занята линией того же цвета.");
-                    return;
-                }
-                // Если пересекаем путь другого цвета, очищаем его
-                else
-                {
-                    CurrentLevel.ClearPath(targetPath);
-                    _currentPaths.Remove(targetPath.Replace("-path", ""));
-                }
-            }
-
-            // Если это цветная точка и не того же цвета, нельзя проходить через неё
+            // Если точка уже имеет другой цвет (не наш цвет), запрещаем движение
             if (point.HasColor && point.Color != _activeColor)
                 return;
 
-            // Если это точка того же цвета, проверяем, завершаем ли мы путь
+            // Проверяем, не пересекаем ли мы другие пути
+            var crossingPath = GameLogic.CheckForCrossingPath(CurrentLevel, point);
+            if (crossingPath != null)
+            {
+                // Запрещаем пересечение с любыми путями
+                return;
+            }
+
+            // Если это конечная точка нашего цвета
             if (point.HasColor && point.Color == _activeColor && point != currentPath[0])
             {
-                // Добавляем конечную точку в путь
+                // Добавляем точку в путь и завершаем его
                 currentPath.Add(point);
-
-                // Создаем все линии пути
                 CreatePathLines(colorKey, currentPath);
 
-                // Отмечаем ВСЕ точки в пути как соединенные
+                // Отмечаем точки как соединенные
                 foreach (var pathPoint in currentPath)
                 {
                     if (pathPoint.HasColor && pathPoint.Color == _activeColor)
@@ -291,14 +264,13 @@ namespace ConnectDotsGame.ViewModels
                 _activeColor = null;
                 IsDrawingPath = false;
 
-                // Проверяем, завершён ли уровень
+                // Проверяем завершение уровня
                 CheckLevelCompletion();
 
                 // Обновляем UI
                 OnPropertyChanged(nameof(ActivePoint));
                 OnPropertyChanged(nameof(ActiveColor));
                 OnPropertyChanged(nameof(CurrentLevel));
-
                 return;
             }
 
@@ -537,37 +509,52 @@ namespace ConnectDotsGame.ViewModels
         // Завершение пути на указанной точке
         public void EndPath(ModelPoint? endPoint)
         {
-            if (!IsDrawingPath) return;
+            if (!IsDrawingPath) 
+                return;
             
             var colorKey = _activeColor?.ToString() ?? "";
             var currentPath = _currentPaths.ContainsKey(colorKey) ? _currentPaths[colorKey] : new List<ModelPoint>();
             
-            // Если указана конечная точка, добавляем её в путь
-            if (endPoint != null && _activePoint != endPoint && 
-                endPoint.HasColor && endPoint.Color != null && 
-                endPoint.Color.Equals(_activeColor))
+            // Если путь слишком короткий или нет конечной точки
+            if (currentPath.Count < 2 || endPoint == null)
             {
-                // Проверим, что точка имеет тот же цвет и не находится уже в пути
-                if (!currentPath.Contains(endPoint))
-                {
-                    currentPath.Add(endPoint);
-                    if (_currentPaths.ContainsKey(colorKey))
-                    {
-                        _currentPaths[colorKey] = currentPath;
-                    }
-                }
+                // Отменяем путь
+                CancelPath();
+                return;
             }
-            
-            if (currentPath.Count > 1)
+
+            // Проверяем, что конечная точка правильного цвета
+            if (!endPoint.HasColor || endPoint.Color != _activeColor)
             {
-                // Создаем все линии пути
+                CancelPath();
+                return;
+            }
+
+            // Проверяем, что конечная точка не является начальной
+            if (currentPath[0] == endPoint)
+            {
+                CancelPath();
+                return;
+            }
+
+            // Если конечная точка не является соседней с последней точкой пути
+            var lastPoint = currentPath.Last();
+            if (!IsNeighbor(lastPoint, endPoint))
+            {
+                CancelPath();
+                return;
+            }
+
+            // Добавляем конечную точку и завершаем путь
+            if (!currentPath.Contains(endPoint))
+            {
+                currentPath.Add(endPoint);
                 CreatePathLines(colorKey, currentPath);
                 
-                // Отмечаем ВСЕ точки в пути как соединенные
+                // Отмечаем только начальную и конечную точки как соединенные
                 foreach (var pathPoint in currentPath)
                 {
-                    if (pathPoint.HasColor && pathPoint.Color != null && 
-                        pathPoint.Color.Equals(_activeColor))
+                    if (pathPoint.HasColor && pathPoint.Color == _activeColor)
                     {
                         pathPoint.IsConnected = true;
                     }
