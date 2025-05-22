@@ -233,141 +233,140 @@ namespace ConnectDotsGame.Views
         }
         
         private void Canvas_PointerMoved(object? sender, PointerEventArgs e)
+{
+    if (!_isDrawing)
+    {
+        Console.WriteLine("PointerMoved: Drawing is not active. Ignoring pointer movement.");
+        return;
+    }
+
+    if (!EnsureCanvasAndViewModel())
+    {
+        Console.WriteLine("PointerMoved: ViewModel or Canvas is not initialized. Ignoring pointer movement.");
+        return;
+    }
+
+    try
+    {
+        var position = e.GetPosition(_drawingCanvas);
+        Console.WriteLine($"Pointer moved to position X={position.X}, Y={position.Y}");
+
+        var level = _viewModel?.CurrentLevel ?? _debugLevel;
+        if (level == null)
         {
-            if (!_isDrawing)
+            Console.WriteLine("ERROR in PointerMoved: CurrentLevel is null.");
+            UpdateDebugText("ERROR in PointerMoved: CurrentLevel is null.");
+            return;
+        }
+
+        var hoveredPoint = GameLogic.FindPointAtPosition(level, position.X, position.Y, CellSize);
+
+        if (hoveredPoint != null)
+        {
+            Console.WriteLine($"PointerMoved: Hovered point detected at Row={hoveredPoint.Row}, Column={hoveredPoint.Column}.");
+
+            var lastSelectedPoint = _viewModel?.CurrentPath?.LastOrDefault();
+            if (lastSelectedPoint != null)
             {
-                return;
-            }
-            
-            if (!EnsureCanvasAndViewModel())
-            {
-                return;
-            }
-            
-            try
-            {
-                // Получаем координаты относительно Canvas
-                var position = e.GetPosition(_drawingCanvas);
-                Console.WriteLine($"Pointer moved to position {position.X},{position.Y}");
-                
-                var level = _viewModel?.CurrentLevel ?? _debugLevel;
-                if (level == null)
+                int rowDiff = Math.Abs(hoveredPoint.Row - lastSelectedPoint.Row);
+                int colDiff = Math.Abs(hoveredPoint.Column - lastSelectedPoint.Column);
+
+                Console.WriteLine($"PointerMoved: LastSelectedPoint at Row={lastSelectedPoint.Row}, Column={lastSelectedPoint.Column}.");
+                Console.WriteLine($"PointerMoved: Calculated rowDiff={rowDiff}, colDiff={colDiff}.");
+
+                // Проверяем недопустимые движения
+                if ((rowDiff == 1 && colDiff == 1) || rowDiff > 1 || colDiff > 1)
                 {
-                    Console.WriteLine("ERROR in PointerMoved: level is null");
-                    UpdateDebugText("Ошибка PointerMoved: level is null");
+                    Console.WriteLine($"PointerMoved: Invalid movement to Row={hoveredPoint.Row}, Column={hoveredPoint.Column}. Stopping execution.");
                     return;
                 }
-                
-                // Находим точку под курсором
-                var hoveredPoint = GameLogic.FindPointAtPosition(level, position.X, position.Y, CellSize);
-                
-                if (hoveredPoint != null)
-                {
-                    Console.WriteLine($"Continuing path to point {hoveredPoint.Row},{hoveredPoint.Column}");
-                    UpdateDebugText($"Continuing path to point [{hoveredPoint.Row},{hoveredPoint.Column}]");
-                    
-                    try
-                    {
-                        // Продолжаем путь
-                        _viewModel?.ContinuePath(hoveredPoint);
-                        DrawLevel();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error continuing path: {ex.Message}");
-                        Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                        UpdateDebugText($"Ошибка ContinuePath: {ex.Message}");
-                    }
-                }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in PointerMoved: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                UpdateDebugText($"Ошибка PointerMoved: {ex.Message}");
-            }
+
+            Console.WriteLine($"PointerMoved: Continuing path to point Row={hoveredPoint.Row}, Column={hoveredPoint.Column}.");
+            _viewModel?.ContinuePath(hoveredPoint);
+            DrawLevel();
         }
+        else
+        {
+            Console.WriteLine("PointerMoved: Hovered point is null. Ignoring pointer movement.");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"ERROR in PointerMoved: {ex.Message}");
+        Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+        UpdateDebugText($"ERROR in PointerMoved: {ex.Message}");
+    }
+}
         
-        private void Canvas_PointerReleased(object? sender, PointerReleasedEventArgs e)
+      private void Canvas_PointerReleased(object? sender, PointerReleasedEventArgs e)
+{
+    if (!_isDrawing)
+    {
+        Console.WriteLine("PointerReleased: Drawing is not active. Ignoring pointer release.");
+        return;
+    }
+
+    if (!EnsureCanvasAndViewModel())
+    {
+        Console.WriteLine("PointerReleased: ViewModel or Canvas is not initialized. Ignoring pointer release.");
+        return;
+    }
+
+    try
+    {
+        var position = e.GetPosition(_drawingCanvas);
+        Console.WriteLine($"Pointer released at position X={position.X}, Y={position.Y}");
+
+        var level = _viewModel?.CurrentLevel ?? _debugLevel;
+        if (level == null)
         {
-            Console.WriteLine(">>> Canvas_PointerReleased ВЫЗВАН <<<");
-            
-            if (!_isDrawing)
+            Console.WriteLine("ERROR in PointerReleased: CurrentLevel is null.");
+            UpdateDebugText("ERROR in PointerReleased: CurrentLevel is null.");
+            return;
+        }
+
+        var hoveredPoint = GameLogic.FindPointAtPosition(level, position.X, position.Y, CellSize);
+        if (hoveredPoint != null)
+        {
+            Console.WriteLine($"PointerReleased: Hovered point detected at Row={hoveredPoint.Row}, Column={hoveredPoint.Column}.");
+
+            var lastSelectedPoint = _viewModel?.CurrentPath?.LastOrDefault();
+            if (lastSelectedPoint != null)
             {
-                Console.WriteLine("Not drawing, skipping PointerReleased");
-                return;
-            }
-            
-            if (!EnsureCanvasAndViewModel())
-            {
-                _isDrawing = false; // Сбрасываем флаг в любом случае
-                return;
-            }
-            
-            try
-            {
-                // Получаем координаты относительно Canvas
-                var position = e.GetPosition(_drawingCanvas);
-                Console.WriteLine($"Pointer released at position {position.X},{position.Y}");
-                
-                // Сбрасываем флаг рисования
-                _isDrawing = false;
-                
-                var level = _viewModel?.CurrentLevel ?? _debugLevel;
-                if (level == null)
+                int rowDiff = Math.Abs(hoveredPoint.Row - lastSelectedPoint.Row);
+                int colDiff = Math.Abs(hoveredPoint.Column - lastSelectedPoint.Column);
+
+                Console.WriteLine($"PointerReleased: LastSelectedPoint at Row={lastSelectedPoint.Row}, Column={lastSelectedPoint.Column}.");
+                Console.WriteLine($"PointerReleased: Calculated rowDiff={rowDiff}, colDiff={colDiff}.");
+
+                if ((rowDiff == 1 && colDiff == 1) || rowDiff > 1 || colDiff > 1)
                 {
-                    Console.WriteLine("ERROR in PointerReleased: level is null");
-                    UpdateDebugText("Ошибка PointerReleased: level is null");
+                    Console.WriteLine($"PointerReleased: Invalid movement to Row={hoveredPoint.Row}, Column={hoveredPoint.Column}. Stopping execution.");
                     return;
                 }
-                
-                // Находим точку под курсором
-                var releasedPoint = GameLogic.FindPointAtPosition(level, position.X, position.Y, CellSize);
-                
-                if (releasedPoint != null && releasedPoint.HasColor)
-                {
-                    Console.WriteLine($"Ending path at colored point {releasedPoint.Row},{releasedPoint.Column}");
-                    UpdateDebugText($"Ending path at colored point [{releasedPoint.Row},{releasedPoint.Column}]");
-                    
-                    try
-                    {
-                        // Завершаем путь
-                        _viewModel?.EndPath(releasedPoint);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error ending path: {ex.Message}");
-                        Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                        UpdateDebugText($"Ошибка EndPath: {ex.Message}");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Canceling path - no valid end point");
-                    UpdateDebugText("Отмена пути - нет подходящей конечной точки");
-                    
-                    try
-                    {
-                        // Отменяем путь
-                        _viewModel?.CancelPath();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error canceling path: {ex.Message}");
-                        Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                        UpdateDebugText($"Ошибка CancelPath: {ex.Message}");
-                    }
-                }
-                
-                DrawLevel();
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in PointerReleased: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                UpdateDebugText($"Ошибка PointerReleased: {ex.Message}");
-            }
+
+            Console.WriteLine($"PointerReleased: Attempting to end path at point Row={hoveredPoint.Row}, Column={hoveredPoint.Column}.");
+            _viewModel?.EndPath(hoveredPoint);
         }
+        else
+        {
+            Console.WriteLine("PointerReleased: Hovered point is null. Ignoring pointer release.");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"ERROR in PointerReleased: {ex.Message}");
+        Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+        UpdateDebugText($"ERROR in PointerReleased: {ex.Message}");
+    }
+    finally
+    {
+        _isDrawing = false; // Завершаем рисование
+        Console.WriteLine("PointerReleased: Drawing has been deactivated.");
+    }
+}
         
         // Обработчик события потери захвата указателя
         private void Canvas_PointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)

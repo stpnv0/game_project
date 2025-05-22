@@ -109,98 +109,122 @@ namespace ConnectDotsGame.ViewModels
         }
         
         public void ContinuePath(ModelPoint point)
+{
+    if (_gameState.CurrentLevel == null || !IsDrawingPath || 
+        _gameState.LastSelectedPoint == null || _gameState.CurrentPathColor == null)
+    {
+        Console.WriteLine("ContinuePath: Cannot continue path. Missing required game state data.");
+        return;
+    }
+
+    Console.WriteLine($"ContinuePath: Attempting to add point Row={point.Row}, Column={point.Column}.");
+    Console.WriteLine($"ContinuePath: LastSelectedPoint at Row={_gameState.LastSelectedPoint.Row}, Column={_gameState.LastSelectedPoint.Column}.");
+
+    int rowDiff = Math.Abs(point.Row - _gameState.LastSelectedPoint.Row);
+    int colDiff = Math.Abs(point.Column - _gameState.LastSelectedPoint.Column);
+
+    Console.WriteLine($"ContinuePath: Calculated rowDiff={rowDiff}, colDiff={colDiff}.");
+
+    // Блокируем диагональные движения и движения на большое расстояние
+    if ((rowDiff == 1 && colDiff == 1) || rowDiff > 1 || colDiff > 1)
+    {
+        Console.WriteLine($"ContinuePath: Invalid movement to Row={point.Row}, Column={point.Column}. Stopping execution.");
+        return;
+    }
+
+    if (_gameState.IsPointInCurrentPath(point))
+    {
+        if (_gameState.CurrentPath.Count >= 2 &&
+            _gameState.CurrentPath[_gameState.CurrentPath.Count - 2].Equals(point))
         {
-            if (_gameState.CurrentLevel == null || !IsDrawingPath || 
-                _gameState.LastSelectedPoint == null || _gameState.CurrentPathColor == null)
-                return;
-                
-            // Если точка уже в пути, проверяем, не движение ли это назад
-            if (_gameState.IsPointInCurrentPath(point))
+            Console.WriteLine("ContinuePath: Moving back to previous point. Removing last point from path.");
+            _gameState.RemoveLastPointFromPath();
+            UpdateGameState();
+        }
+        else
+        {
+            Console.WriteLine("ContinuePath: Point already exists in current path. Ignoring.");
+        }
+        return;
+    }
+
+    if (GameLogic.CanConnectPoints(_gameState.CurrentLevel, _gameState.LastSelectedPoint, point))
+    {
+        Console.WriteLine($"ContinuePath: Adding point Row={point.Row}, Column={point.Column} to path.");
+        _gameState.CurrentPath.Add(point);
+        _gameState.LastSelectedPoint = point;
+        UpdateGameState();
+    }
+    else
+    {
+        Console.WriteLine($"ContinuePath: Cannot connect to Row={point.Row}, Column={point.Column}. Ignoring.");
+    }
+
+    // Если нажали на точку того же цвета - завершаем путь
+    if (point.HasColor && point.Color == _gameState.CurrentPathColor)
+    {
+        if (GameLogic.CanConnectPoints(_gameState.CurrentLevel, _gameState.LastSelectedPoint, point))
+        {
+            Console.WriteLine($"ContinuePath: Завершаем путь на точке {point.Row},{point.Column}.");
+            EndPath(point);
+        }
+        return;
+    }
+
+    // Если это пустая точка, проверяем, можно ли добавить к пути
+    if (!point.HasColor)
+    {
+        bool sameRow = _gameState.LastSelectedPoint.Row == point.Row;
+        bool sameColumn = _gameState.LastSelectedPoint.Column == point.Column;
+
+        if ((rowDiff == 0 && colDiff == 1) || (colDiff == 0 && rowDiff == 1))
+        {
+            var crossingPath = GameLogic.CheckForCrossingPath(_gameState.CurrentLevel, point);
+            if (crossingPath != null)
             {
-                // Если это предпоследняя точка пути, значит, мы движемся назад
-                if (_gameState.CurrentPath.Count >= 2 && 
-                    _gameState.CurrentPath[_gameState.CurrentPath.Count - 2].Row == point.Row && 
-                    _gameState.CurrentPath[_gameState.CurrentPath.Count - 2].Column == point.Column)
-                {
-                    // Удаляем последнюю точку пути
-                    _gameState.RemoveLastPointFromPath();
-                    UpdateGameState();
-                }
+                Console.WriteLine($"ContinuePath: Пересечение пути найдено, очищаем пересеченный путь.");
+                _gameState.CurrentLevel.ClearPath(crossingPath);
+            }
+
+            Console.WriteLine($"ContinuePath: Добавляем точку {point.Row},{point.Column} к пути.");
+            _gameState.LastSelectedPoint = point;
+            _gameState.CurrentPath.Add(point);
+            UpdateGameState();
+        }
+    }
+}
+        
+        public void EndPath(ModelPoint point)
+        {
+            if (_gameState.CurrentLevel == null || _gameState.LastSelectedPoint == null || _gameState.CurrentPathColor == null)
+            {
+                Console.WriteLine("EndPath: Cannot end path. Missing required game state data.");
                 return;
             }
-            
-            // Если нажали на точку того же цвета - завершаем путь
+
+            Console.WriteLine($"EndPath: Attempting to end path at Row={point.Row}, Column={point.Column}.");
+            Console.WriteLine($"EndPath: LastSelectedPoint at Row={_gameState.LastSelectedPoint.Row}, Column={_gameState.LastSelectedPoint.Column}.");
+
+            int rowDiff = Math.Abs(point.Row - _gameState.LastSelectedPoint.Row);
+            int colDiff = Math.Abs(point.Column - _gameState.LastSelectedPoint.Column);
+
+            if ((rowDiff == 1 && colDiff == 1) || rowDiff > 1 || colDiff > 1)
+            {
+                Console.WriteLine($"EndPath: Invalid movement to Row={point.Row}, Column={point.Column}. Stopping execution.");
+                return;
+            }
+
             if (point.HasColor && point.Color == _gameState.CurrentPathColor)
             {
-                // Проверяем, можно ли соединить последнюю точку пути с текущей
-                if (GameLogic.CanConnectPoints(_gameState.CurrentLevel, _gameState.LastSelectedPoint, point))
-                {
-                    EndPath(point);
-                }
-                return;
-            }
-            
-            // Если это пустая точка, проверяем, можно ли добавить к пути
-            if (!point.HasColor)
-            {
-                // Проверяем, находится ли точка на одной линии (строке или столбце) с последней выбранной точкой
-                bool sameRow = _gameState.LastSelectedPoint.Row == point.Row;
-                bool sameColumn = _gameState.LastSelectedPoint.Column == point.Column;
-                
-                // Точки должны быть соседними только по вертикали или горизонтали, но не по диагонали
-                int rowDiff = Math.Abs(point.Row - _gameState.LastSelectedPoint.Row);
-                int colDiff = Math.Abs(point.Column - _gameState.LastSelectedPoint.Column);
-                
-                if ((rowDiff == 0 && colDiff == 1) || (colDiff == 0 && rowDiff == 1))
-                {
-                    // Проверяем, пересекаем ли мы существующий путь
-                    var crossingPath = GameLogic.CheckForCrossingPath(_gameState.CurrentLevel, point);
-                    if (crossingPath != null)
-                    {
-                        // Удаляем пересеченный путь
-                        _gameState.CurrentLevel.ClearPath(crossingPath);
-                    }
-                    
-                    // Добавляем точку к текущему пути
-                    _gameState.LastSelectedPoint = point;
-                    _gameState.CurrentPath.Add(point);
-                    
-                    UpdateGameState();
-                }
-            }
-        }
-        
-        public void EndPath(ModelPoint endPoint)
-        {
-            if (_gameState.CurrentLevel == null || !IsDrawingPath || 
-                _gameState.LastSelectedPoint == null || _gameState.CurrentPathColor == null)
-                return;
-                
-            // Если закончили на точке того же цвета, что и начальная
-            if (endPoint.HasColor && endPoint.Color == _gameState.CurrentPathColor)
-            {
-                // Проверяем, это не та же самая начальная точка
-                if (_gameState.CurrentPath.Count == 1 && 
-                    _gameState.CurrentPath[0].Row == endPoint.Row && 
-                    _gameState.CurrentPath[0].Column == endPoint.Column)
-                {
-                    CancelPath();
-                    return;
-                }
-                
-                // Всегда соединяем с конечной точкой того же цвета
-                // Завершаем путь и создаем линии
-                CompletePath(endPoint);
-                
-                // Сбрасываем состояние рисования
-                IsDrawingPath = false;
-                
+                Console.WriteLine($"EndPath: Successfully ended path at point Row={point.Row}, Column={point.Column}.");
+                _gameState.CurrentPath.Add(point);
+                _gameState.LastSelectedPoint = null;
                 UpdateGameState();
-                return;
             }
-            
-            // Если точка не цветная или не того же цвета
-            CancelPath();
+            else
+            {
+                Console.WriteLine($"EndPath: Point Row={point.Row}, Column={point.Column} is not valid for ending. Ignoring.");
+            }
         }
         
         private void CompletePath(ModelPoint endPoint)

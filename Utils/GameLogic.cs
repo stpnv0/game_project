@@ -85,176 +85,119 @@ namespace ConnectDotsGame.Utils
         /// <param name="gameState">Текущее состояние игры.</param>
         /// <param name="clickedPoint">Точка, на которую нажал пользователь.</param>
         /// <returns>True, если соединение успешно; иначе false.</returns>
-        public static bool TryConnectPoints(GameState gameState, ModelPoint clickedPoint)
+        /// <summary>
+/// Основной метод логики соединения точек.
+/// </summary>
+/// <param name="gameState">Текущее состояние игры.</param>
+/// <param name="clickedPoint">Точка, на которую нажал пользователь.</param>
+/// <returns>True, если соединение успешно; иначе false.</returns>
+/// <summary>
+/// Основной метод логики соединения точек.
+/// </summary>
+/// <param name="gameState">Текущее состояние игры.</param>
+/// <param name="clickedPoint">Точка, на которую нажал пользователь.</param>
+/// <returns>True, если соединение успешно; иначе false.</returns>
+/// <summary>
+/// Основной метод логики соединения точек.
+/// </summary>
+/// <param name="gameState">Текущее состояние игры.</param>
+/// <param name="clickedPoint">Точка, на которую нажал пользователь.</param>
+/// <returns>True, если соединение успешно; иначе false.</returns>
+/// <summary>
+/// Основной метод логики соединения точек.
+/// </summary>
+/// <param name="gameState">Текущее состояние игры.</param>
+/// <param name="clickedPoint">Точка, на которую нажал пользователь.</param>
+/// <returns>True, если соединение успешно; иначе false.</returns>
+public static bool TryConnectPoints(GameState gameState, ModelPoint clickedPoint)
+{
+    if (gameState == null || clickedPoint == null)
+    {
+        throw new ArgumentNullException("GameState или clickedPoint не может быть null.");
+    }
+
+    var currentLevel = gameState.CurrentLevel;
+    if (currentLevel == null)
+    {
+        return false; // Уровень не загружен
+    }
+
+    // Проверяем, есть ли активная точка
+    if (gameState.LastSelectedPoint == null)
+    {
+        // Если нет активной точки, начинаем новый путь
+        if (clickedPoint.HasColor)
         {
-            if (gameState.CurrentLevel == null)
-                return false;
-
-            var currentLevel = gameState.CurrentLevel;
-
-            // Логика для цветных точек (начало или конец пути)
-            if (clickedPoint.HasColor)
-            {
-                IBrush? pointBrush = clickedPoint.Color;
-
-                // Сценарий 1: Начинаем новый путь или кликнули на цветную точку другого цвета
-                if (gameState.LastSelectedPoint == null || !AreBrushesEqual(gameState.CurrentPathColor, pointBrush))
-                {
-                    // Проверяем, не занята ли точка, с которой начинаем, линией другого пути
-                    Line? occupyingLine = GetOccupyingLine(currentLevel, clickedPoint);
-                    if (occupyingLine != null)
-                    {
-                        // Точка занята. Стираем путь, только если цвета разные
-                        if (!AreBrushesEqual(occupyingLine.Color, pointBrush))
-                        {
-                            Console.WriteLine($"Начинаем новый путь ({pointBrush}) поверх существующего пути {occupyingLine.PathId} (Цвет: {occupyingLine.Color}). Стираем его.");
-                            currentLevel.ClearPath(occupyingLine.PathId);
-                        }
-                        // Если цвета совпадают, перерисовываем путь заново
-                        else if (AreBrushesEqual(occupyingLine.Color, pointBrush)) 
-                        {
-                            Console.WriteLine($"Перерисовываем путь {occupyingLine.PathId}, начиная с точки {clickedPoint.Row},{clickedPoint.Column}.");
-                            currentLevel.ClearPath(occupyingLine.PathId); // Очищаем старый путь перед началом нового
-                        }
-                    }
-
-                    Console.WriteLine($"Начинаем новый путь с цветной точки {clickedPoint.Row},{clickedPoint.Column}");
-                    gameState.StartNewPath(clickedPoint);
-                    return true;
-                }
-
-                // Сценарий 2: Завершаем путь, кликнув на вторую точку того же цвета
-                if (AreBrushesEqual(gameState.CurrentPathColor, pointBrush) && gameState.LastSelectedPoint != clickedPoint)
-                {
-                    if (CanConnectPoints(currentLevel, gameState.LastSelectedPoint, clickedPoint))
-                    {
-                        // Проверяем, не лежит ли конечная точка на пути другого цвета
-                        Line? occupyingLine = GetOccupyingLine(currentLevel, clickedPoint);
-                        if (occupyingLine != null && !AreBrushesEqual(occupyingLine.Color, gameState.CurrentPathColor))
-                        {
-                            Console.WriteLine($"Завершаем путь, стирая пересекаемый путь {occupyingLine.PathId} в конечной точке.");
-                            currentLevel.ClearPath(occupyingLine.PathId);
-                        }
-
-                        Console.WriteLine($"Завершаем путь {gameState.CurrentPathId} в точке {clickedPoint.Row},{clickedPoint.Column}");
-                        
-                        // Проверяем наличие цвета и ID текущего пути
-                        if (gameState.CurrentPathColor == null || gameState.CurrentPathId == null)
-                        {
-                            Console.WriteLine("Ошибка: Невозможно завершить путь, отсутствует цвет или ID текущего пути.");
-                            return false;
-                        }
-
-                        // Создаем последнюю линию пути
-                        var finalLine = new Line(gameState.LastSelectedPoint, clickedPoint, gameState.CurrentPathColor, gameState.CurrentPathId);
-                        finalLine.IsVisible = true;
-                        currentLevel.Lines.Add(finalLine);
-                        currentLevel.AddLineToPaths(finalLine);
-
-                        clickedPoint.IsConnected = true;
-                        gameState.CurrentPath.Add(clickedPoint);
-                        gameState.CheckCompletedPaths();
-                        gameState.ResetPathState();
-                        return true;
-                    }
-                    else 
-                    {
-                        Console.WriteLine($"Невозможно завершить путь: точки не соседние.");
-                        return false;
-                    }
-                }
-                return false;
-            }
-
-            // Логика для пустых точек (продолжение пути)
-            if (!clickedPoint.HasColor && gameState.LastSelectedPoint != null && gameState.CurrentPathColor != null)
-            {
-                if (CanConnectPoints(currentLevel, gameState.LastSelectedPoint, clickedPoint))
-                {
-                    // Проверка 1: Точка уже является частью текущего рисуемого пути?
-                    if (gameState.IsPointInCurrentPath(clickedPoint))
-                    {
-                        Console.WriteLine($"Недопустимый ход: Точка {clickedPoint.Row},{clickedPoint.Column} уже есть в текущем рисуемом пути.");
-                        return false;
-                    }
-                    
-                    // Проверка 1.5: Проверяем, не является ли точка начальной точкой текущего пути
-                    if (gameState.CurrentPath.Count > 0)
-                    {
-                        var startPoint = gameState.CurrentPath[0];
-                        if (startPoint.Row == clickedPoint.Row && startPoint.Column == clickedPoint.Column)
-                        {
-                            Console.WriteLine($"Недопустимый ход: Нельзя вернуться в начальную точку пути {clickedPoint.Row},{clickedPoint.Column}.");
-                            return false;
-                        }
-                    }
-                    
-                    // Проверка 2: Не пересекает ли линия саму себя (линию того же цвета)
-                    foreach (var pathEntry in currentLevel.Paths)
-                    {
-                        if (gameState.CurrentPathColor != null && 
-                            pathEntry.Key.StartsWith(gameState.CurrentPathColor.ToString() ?? ""))
-                        {
-                            foreach (var line in pathEntry.Value)
-                            {
-                                if ((line.StartPoint.Row == clickedPoint.Row && line.StartPoint.Column == clickedPoint.Column) ||
-                                    (line.EndPoint.Row == clickedPoint.Row && line.EndPoint.Column == clickedPoint.Column))
-                                {
-                                    Console.WriteLine($"Недопустимый ход: Точка {clickedPoint.Row},{clickedPoint.Column} уже занята линией того же цвета.");
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-
-                    // Проверка 3: Занята ли целевая точка существующей линией?
-                    Line? occupyingLine = GetOccupyingLine(currentLevel, clickedPoint);
-
-                    if (occupyingLine != null)
-                    {
-                        // Сравниваем цвет занимающей линии с цветом текущего пути
-                        if (AreBrushesEqual(occupyingLine.Color, gameState.CurrentPathColor))
-                        {
-                            // Цвета совпадают - недопустимый ход
-                            Console.WriteLine($"Недопустимый ход: Точка {clickedPoint.Row},{clickedPoint.Column} уже занята сегментом пути того же цвета (PathId: {occupyingLine.PathId}).");
-                            return false;
-                        }
-                        else
-                        {
-                            // Цвета разные - стираем путь другого цвета
-                            Console.WriteLine($"Пересечение пути {occupyingLine.PathId} (Цвет: {occupyingLine.Color}) в точке {clickedPoint.Row},{clickedPoint.Column}. Стираем его.");
-                            currentLevel.ClearPath(occupyingLine.PathId);
-                        }
-                    }
-
-                    // Добавляем новый сегмент линии
-                    Console.WriteLine($"Добавляем линию к точке {clickedPoint.Row},{clickedPoint.Column}");
-
-                    // Проверяем наличие ID текущего пути
-                    if (gameState.CurrentPathId == null) {
-                        Console.WriteLine("Ошибка: Невозможно добавить линию, отсутствует ID текущего пути в GameState.");
-                        return false;
-                    }
-
-                    // Создаем новую линию
-                    var newLine = new Line(gameState.LastSelectedPoint, clickedPoint, gameState.CurrentPathColor, gameState.CurrentPathId);
-                    newLine.IsVisible = true;
-                    currentLevel.Lines.Add(newLine);
-                    currentLevel.AddLineToPaths(newLine);
-
-                    gameState.LastSelectedPoint = clickedPoint;
-                    gameState.CurrentPath.Add(clickedPoint);
-                    return true;
-                }
-                else 
-                {
-                    Console.WriteLine($"Недопустимый ход: Точки не являются соседними.");
-                    return false;
-                }
-            }
-            return false;
+            gameState.StartNewPath(clickedPoint);
+            return true;
         }
+        return false; // Нельзя начать путь с пустой точки
+    }
 
+    var lastPoint = gameState.LastSelectedPoint;
+
+    // Проверяем, не является ли кликнутая точка той же самой
+    if (lastPoint == clickedPoint)
+    {
+        return false; // Нельзя соединить точку саму с собой
+    }
+
+    // Проверяем, находится ли точка в текущем пути
+    if (gameState.IsPointInCurrentPath(clickedPoint))
+    {
+        // Если точка уже в пути, удаляем её и все последующие точки
+        while (gameState.CurrentPath.Last() != clickedPoint)
+        {
+            gameState.RemoveLastPointFromPath();
+        }
+        return true;
+    }
+
+    // Проверяем, имеет ли точка цвет и совпадает ли он с активным цветом
+    if (clickedPoint.HasColor && clickedPoint.Color != gameState.CurrentPathColor)
+    {
+        return false; // Нельзя соединить точки разных цветов
+    }
+
+    // Проверяем, не находится ли текущая точка на расстоянии больше одной клетки от предыдущей
+    int rowDiff = Math.Abs(clickedPoint.Row - lastPoint.Row);
+    int colDiff = Math.Abs(clickedPoint.Column - lastPoint.Column);
+    if ((rowDiff > 1 || colDiff > 1) || (rowDiff == 1 && colDiff == 1))
+    {
+        Console.WriteLine($"Недопустимое соединение: {lastPoint.Row},{lastPoint.Column} -> {clickedPoint.Row},{clickedPoint.Column}. Расстояние превышает одну клетку.");
+        return false; // Автодостраивание запрещено для точек на большем расстоянии
+    }
+
+    // Проверяем, можно ли соединить точки (соседние ли они)
+    if (!CanConnectPoints(currentLevel, lastPoint, clickedPoint))
+    {
+        return false; // Точки не соседние
+    }
+
+    // Проверяем, не занята ли точка линией другого цвета
+    Line? occupyingLine = GetOccupyingLine(currentLevel, clickedPoint);
+    if (occupyingLine != null && !AreBrushesEqual(occupyingLine.Color, gameState.CurrentPathColor))
+    {
+        return false; // Точка занята линией другого цвета
+    }
+
+    // Создаем линию между последней выбранной точкой и текущей
+    var newLine = new Line(lastPoint, clickedPoint, gameState.CurrentPathColor, gameState.CurrentPathId);
+    currentLevel.Lines.Add(newLine);
+    currentLevel.AddLineToPaths(newLine);
+
+    // Добавляем точку в текущий путь
+    gameState.CurrentPath.Add(clickedPoint);
+    gameState.LastSelectedPoint = clickedPoint;
+
+    // Если точка имеет цвет, отмечаем её как соединённую
+    if (clickedPoint.HasColor)
+    {
+        clickedPoint.IsConnected = true;
+    }
+
+    return true;
+}
         /// <summary>
         /// Проверяет, можно ли соединить две точки (являются ли они соседними).
         /// </summary>
@@ -264,11 +207,27 @@ namespace ConnectDotsGame.Utils
         /// <returns>True, если точки соседние; иначе false.</returns>
         public static bool CanConnectPoints(Level level, ModelPoint? startPoint, ModelPoint endPoint)
         {
-            if (startPoint == null) return false;
+            if (startPoint == null)
+            {
+                Console.WriteLine("CanConnectPoints: StartPoint is null. Returning false.");
+                return false;
+            }
+
             int rowDiff = Math.Abs(endPoint.Row - startPoint.Row);
             int colDiff = Math.Abs(endPoint.Column - startPoint.Column);
-            bool areAdjacent = (rowDiff == 0 && colDiff == 1) || (rowDiff == 1 && colDiff == 0);
-            return areAdjacent;
+
+            Console.WriteLine($"CanConnectPoints: Checking connection from Row={startPoint.Row}, Column={startPoint.Column} to Row={endPoint.Row}, Column={endPoint.Column}.");
+            Console.WriteLine($"CanConnectPoints: Calculated rowDiff={rowDiff}, colDiff={colDiff}.");
+
+            // Блокируем диагональные движения и движения на большое расстояние
+            if ((rowDiff == 1 && colDiff == 1) || rowDiff > 1 || colDiff > 1)
+            {
+                Console.WriteLine("CanConnectPoints: Invalid movement. Returning false.");
+                return false;
+            }
+
+            
+            return true;
         }
 
         /// <summary>
