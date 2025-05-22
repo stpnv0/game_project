@@ -37,7 +37,14 @@ namespace ConnectDotsGame.Levels
             
             return levels;
         }
-        
+
+        // Вспомогательный метод для получения точки по координатам
+        private Point GetPointAt(Level level, int row, int col)
+        {
+            return level.Points.Find(p => p.Row == row && p.Column == col)
+                ?? throw new InvalidOperationException($"Точка с координатами {row},{col} не найдена");
+        }
+
         private Level CreateLevel1()
         {
             var level = new Level
@@ -58,13 +65,12 @@ namespace ConnectDotsGame.Levels
                     level.Points.Add(new Point(id++, row, col));
                 }
             }
-            
-            level.Points.First(p => p.Row == 0 && p.Column == 0).Color = Brushes.Red;
-            level.Points.First(p => p.Row == 0 && p.Column == 4).Color = Brushes.Red;
-            
-            level.Points.First(p => p.Row == 4 && p.Column == 0).Color = Brushes.Blue;
-            level.Points.First(p => p.Row == 4 && p.Column == 4).Color = Brushes.Blue;
-            
+
+            GetPointAt(level, 0, 0);
+            GetPointAt(level, 0, 4);
+
+            GetPointAt(level, 4, 0);
+            GetPointAt(level, 4, 4);
             return level;
         }
         
@@ -88,16 +94,16 @@ namespace ConnectDotsGame.Levels
                     level.Points.Add(new Point(id++, row, col));
                 }
             }
-            
+
             // Добавляем цветные точки для проходимого уровня
-            level.Points.First(p => p.Row == 0 && p.Column == 0).Color = Brushes.Red;
-            level.Points.First(p => p.Row == 0 && p.Column == 4).Color = Brushes.Red;
-            
-            level.Points.First(p => p.Row == 4 && p.Column == 0).Color = Brushes.Blue;
-            level.Points.First(p => p.Row == 4 && p.Column == 4).Color = Brushes.Blue;
-            
-            level.Points.First(p => p.Row == 2 && p.Column == 2).Color = Brushes.Green;
-            level.Points.First(p => p.Row == 3 && p.Column == 3).Color = Brushes.Green;
+            GetPointAt(level, 0, 0);
+            GetPointAt(level, 0, 4);
+
+            GetPointAt(level, 4, 0);
+            GetPointAt(level, 4, 4);
+
+            GetPointAt(level, 2, 2);
+            GetPointAt(level, 3, 3);
             
             return level;
         }
@@ -122,18 +128,18 @@ namespace ConnectDotsGame.Levels
                     level.Points.Add(new Point(id++, row, col));
                 }
             }
-            
-            level.Points.First(p => p.Row == 0 && p.Column == 1).Color = Brushes.Red;
-            level.Points.First(p => p.Row == 0 && p.Column == 5).Color = Brushes.Red;
-            
-            level.Points.First(p => p.Row == 6 && p.Column == 1).Color = Brushes.Blue;
-            level.Points.First(p => p.Row == 6 && p.Column == 5).Color = Brushes.Blue;
-            
-            level.Points.First(p => p.Row == 1 && p.Column == 0).Color = Brushes.Green;
-            level.Points.First(p => p.Row == 5 && p.Column == 0).Color = Brushes.Green;
-            
-            level.Points.First(p => p.Row == 1 && p.Column == 6).Color = Brushes.Yellow;
-            level.Points.First(p => p.Row == 5 && p.Column == 6).Color = Brushes.Yellow;
+
+            GetPointAt(level, 0, 1);
+            GetPointAt(level, 0, 5);
+
+            GetPointAt(level, 6, 1);
+            GetPointAt(level, 6, 5);
+
+            GetPointAt(level, 1, 0);
+            GetPointAt(level, 5, 0);
+
+            GetPointAt(level, 1, 6);
+            GetPointAt(level, 5, 6);
             
             
             
@@ -175,10 +181,10 @@ namespace ConnectDotsGame.Levels
             GetPointAt(level, 7, 1).Color = Brushes.Yellow;
             GetPointAt(level, 7, 6).Color = Brushes.Yellow;
             
-            GetPointAt(level, 3, 2).Color = Brushes.Orange;
+            GetPointAt(level, 3, 3).Color = Brushes.Orange;
             GetPointAt(level, 4, 2).Color = Brushes.Orange;
             
-            GetPointAt(level, 3, 5).Color = Brushes.Purple;
+            GetPointAt(level, 3, 4).Color = Brushes.Purple;
             GetPointAt(level, 4, 5).Color = Brushes.Purple;
             
             return level;
@@ -240,12 +246,7 @@ namespace ConnectDotsGame.Levels
             return level;
         }
         
-        // Вспомогательный метод для получения точки по координатам
-        private Point GetPointAt(Level level, int row, int col)
-        {
-            return level.Points.Find(p => p.Row == row && p.Column == col) 
-                ?? throw new InvalidOperationException($"Точка с координатами {row},{col} не найдена");
-        }
+        
         
         // Уровень 6: Мастер (9x9)
         private Level CreateLevel6()
@@ -338,11 +339,11 @@ namespace ConnectDotsGame.Levels
             
             // Фиолетовые - левый центр
             GetPointAt(level, 4, 1).Color = Brushes.Purple;
-            GetPointAt(level, 5, 1).Color = Brushes.Purple;
+            GetPointAt(level, 4, 9).Color = Brushes.Purple;
             
             // Желтые - правый центр
             GetPointAt(level, 4, 8).Color = Brushes.Yellow;
-            GetPointAt(level, 5, 8).Color = Brushes.Yellow;
+            GetPointAt(level, 5, 0).Color = Brushes.Yellow;
             
             // Оранжевые - седьмой ряд
             GetPointAt(level, 7, 0).Color = Brushes.Orange;
@@ -398,18 +399,18 @@ namespace ConnectDotsGame.Levels
             
             // Желтые - верхний центр
             GetPointAt(level, 1, 4).Color = Brushes.Yellow;
-            GetPointAt(level, 1, 5).Color = Brushes.Yellow;
+            GetPointAt(level, 4, 4).Color = Brushes.Yellow;
             
             // Оранжевые - нижний центр
             GetPointAt(level, 8, 4).Color = Brushes.Orange;
-            GetPointAt(level, 8, 5).Color = Brushes.Orange;
+            GetPointAt(level, 5, 4).Color = Brushes.Orange;
             
             // Серые - левый центр
             GetPointAt(level, 4, 1).Color = Brushes.Gray;
-            GetPointAt(level, 5, 1).Color = Brushes.Gray;
+            GetPointAt(level, 5, 9).Color = Brushes.Gray;
             
             // Бирюзовые - правый центр
-            GetPointAt(level, 4, 8).Color = Brushes.Cyan;
+            GetPointAt(level, 4, 0).Color = Brushes.Cyan;
             GetPointAt(level, 5, 8).Color = Brushes.Cyan;
             
             return level;
