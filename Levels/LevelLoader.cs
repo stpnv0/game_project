@@ -66,11 +66,11 @@ namespace ConnectDotsGame.Levels
                 }
             }
 
-            GetPointAt(level, 0, 0);
-            GetPointAt(level, 0, 4);
+            GetPointAt(level, 0, 0).Color = Brushes.Red;
+            GetPointAt(level, 0, 4).Color = Brushes.Red;
 
-            GetPointAt(level, 4, 0);
-            GetPointAt(level, 4, 4);
+            GetPointAt(level, 4, 0).Color = Brushes.Blue;
+            GetPointAt(level, 4, 4).Color = Brushes.Blue;
             return level;
         }
         
@@ -96,14 +96,14 @@ namespace ConnectDotsGame.Levels
             }
 
             // Добавляем цветные точки для проходимого уровня
-            GetPointAt(level, 0, 0);
-            GetPointAt(level, 0, 4);
+            GetPointAt(level, 0, 0).Color = Brushes.Red;
+            GetPointAt(level, 0, 4).Color = Brushes.Red;
 
-            GetPointAt(level, 4, 0);
-            GetPointAt(level, 4, 4);
+            GetPointAt(level, 4, 0).Color = Brushes.Blue;
+            GetPointAt(level, 4, 4).Color = Brushes.Blue;
 
-            GetPointAt(level, 2, 2);
-            GetPointAt(level, 3, 3);
+            GetPointAt(level, 2, 2).Color = Brushes.Green;
+            GetPointAt(level, 3, 3).Color = Brushes.Green;
             
             return level;
         }
@@ -129,17 +129,17 @@ namespace ConnectDotsGame.Levels
                 }
             }
 
-            GetPointAt(level, 0, 1);
-            GetPointAt(level, 0, 5);
+            GetPointAt(level, 0, 1).Color = Brushes.Red;
+            GetPointAt(level, 0, 5).Color = Brushes.Red;
 
-            GetPointAt(level, 6, 1);
-            GetPointAt(level, 6, 5);
+            GetPointAt(level, 6, 1).Color = Brushes.Blue;
+            GetPointAt(level, 6, 5).Color = Brushes.Blue;
 
-            GetPointAt(level, 1, 0);
-            GetPointAt(level, 5, 0);
+            GetPointAt(level, 1, 0).Color = Brushes.Green;
+            GetPointAt(level, 5, 0).Color = Brushes.Green;
 
-            GetPointAt(level, 1, 6);
-            GetPointAt(level, 5, 6);
+            GetPointAt(level, 1, 6).Color = Brushes.Yellow;
+            GetPointAt(level, 5, 6).Color = Brushes.Yellow;
             
             
             
