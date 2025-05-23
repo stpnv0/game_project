@@ -26,21 +26,13 @@ namespace ConnectDotsGame.Views
         {
             if (_gameCanvas != null && DataContext != null)
             {
-                Console.WriteLine($"GamePage: Updating GameCanvas DataContext to {DataContext.GetType().Name}");
-                
                 // Приводим GameViewModel к MainViewModel для GameCanvas
                 if (DataContext is GameViewModel gameVM)
                 {
-                    Console.WriteLine("Explicitly setting DataContext on GameCanvas");
                     Dispatcher.UIThread.Post(() => {
                         _gameCanvas.DataContext = DataContext;
-                        Console.WriteLine("GamePage: Successfully passed GameViewModel to GameCanvas");
                     }, DispatcherPriority.Normal);
                 }
-            }
-            else
-            {
-                Console.WriteLine($"GamePage: DataContext changed to {DataContext?.GetType().Name ?? "null"}, but _gameCanvas is {(_gameCanvas == null ? "null" : "not null")}");
             }
         }
         

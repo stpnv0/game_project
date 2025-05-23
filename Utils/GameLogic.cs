@@ -107,18 +107,15 @@ namespace ConnectDotsGame.Utils
                         // Точка занята. Стираем путь, только если цвета разные
                         if (!AreBrushesEqual(occupyingLine.Color, pointBrush))
                         {
-                            Console.WriteLine($"Начинаем новый путь ({pointBrush}) поверх существующего пути {occupyingLine.PathId} (Цвет: {occupyingLine.Color}). Стираем его.");
                             currentLevel.ClearPath(occupyingLine.PathId);
                         }
                         // Если цвета совпадают, перерисовываем путь заново
                         else if (AreBrushesEqual(occupyingLine.Color, pointBrush)) 
                         {
-                            Console.WriteLine($"Перерисовываем путь {occupyingLine.PathId}, начиная с точки {clickedPoint.Row},{clickedPoint.Column}.");
                             currentLevel.ClearPath(occupyingLine.PathId); // Очищаем старый путь перед началом нового
                         }
                     }
 
-                    Console.WriteLine($"Начинаем новый путь с цветной точки {clickedPoint.Row},{clickedPoint.Column}");
                     gameState.StartNewPath(clickedPoint);
                     return true;
                 }
@@ -132,16 +129,12 @@ namespace ConnectDotsGame.Utils
                         Line? occupyingLine = GetOccupyingLine(currentLevel, clickedPoint);
                         if (occupyingLine != null && !AreBrushesEqual(occupyingLine.Color, gameState.CurrentPathColor))
                         {
-                            Console.WriteLine($"Завершаем путь, стирая пересекаемый путь {occupyingLine.PathId} в конечной точке.");
                             currentLevel.ClearPath(occupyingLine.PathId);
                         }
 
-                        Console.WriteLine($"Завершаем путь {gameState.CurrentPathId} в точке {clickedPoint.Row},{clickedPoint.Column}");
-                        
                         // Проверяем наличие цвета и ID текущего пути
                         if (gameState.CurrentPathColor == null || gameState.CurrentPathId == null)
                         {
-                            Console.WriteLine("Ошибка: Невозможно завершить путь, отсутствует цвет или ID текущего пути.");
                             return false;
                         }
 
@@ -158,7 +151,6 @@ namespace ConnectDotsGame.Utils
                     }
                     else 
                     {
-                        Console.WriteLine($"Невозможно завершить путь: точки не соседние.");
                         return false;
                     }
                 }
@@ -174,7 +166,6 @@ namespace ConnectDotsGame.Utils
                     var (isInPath, _) = gameState.CheckPointInPath(clickedPoint);
                     if (isInPath)
                     {
-                        Console.WriteLine($"Недопустимый ход: Точка {clickedPoint.Row},{clickedPoint.Column} уже есть в текущем рисуемом пути.");
                         return false;
                     }
                     
@@ -184,7 +175,6 @@ namespace ConnectDotsGame.Utils
                         var startPoint = gameState.CurrentPath[0];
                         if (startPoint.Row == clickedPoint.Row && startPoint.Column == clickedPoint.Column)
                         {
-                            Console.WriteLine($"Недопустимый ход: Нельзя вернуться в начальную точку пути {clickedPoint.Row},{clickedPoint.Column}.");
                             return false;
                         }
                     }
@@ -200,7 +190,6 @@ namespace ConnectDotsGame.Utils
                                 if ((line.StartPoint.Row == clickedPoint.Row && line.StartPoint.Column == clickedPoint.Column) ||
                                     (line.EndPoint.Row == clickedPoint.Row && line.EndPoint.Column == clickedPoint.Column))
                                 {
-                                    Console.WriteLine($"Недопустимый ход: Точка {clickedPoint.Row},{clickedPoint.Column} уже занята линией того же цвета.");
                                     return false;
                                 }
                             }
@@ -216,23 +205,19 @@ namespace ConnectDotsGame.Utils
                         if (AreBrushesEqual(occupyingLine.Color, gameState.CurrentPathColor))
                         {
                             // Цвета совпадают - недопустимый ход
-                            Console.WriteLine($"Недопустимый ход: Точка {clickedPoint.Row},{clickedPoint.Column} уже занята сегментом пути того же цвета (PathId: {occupyingLine.PathId}).");
                             return false;
                         }
                         else
                         {
                             // Цвета разные - стираем путь другого цвета
-                            Console.WriteLine($"Пересечение пути {occupyingLine.PathId} (Цвет: {occupyingLine.Color}) в точке {clickedPoint.Row},{clickedPoint.Column}. Стираем его.");
                             currentLevel.ClearPath(occupyingLine.PathId);
                         }
                     }
 
                     // Добавляем новый сегмент линии
-                    Console.WriteLine($"Добавляем линию к точке {clickedPoint.Row},{clickedPoint.Column}");
 
                     // Проверяем наличие ID текущего пути
                     if (gameState.CurrentPathId == null) {
-                        Console.WriteLine("Ошибка: Невозможно добавить линию, отсутствует ID текущего пути в GameState.");
                         return false;
                     }
 
@@ -247,7 +232,6 @@ namespace ConnectDotsGame.Utils
                 }
                 else 
                 {
-                    Console.WriteLine($"Недопустимый ход: Точки не являются соседними.");
                     return false;
                 }
             }
