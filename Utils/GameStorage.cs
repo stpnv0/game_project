@@ -39,14 +39,13 @@ namespace ConnectDotsGame.Utils
                     progressData.Add(new LevelProgressData
                     {
                         Id = level.Id,
-                        IsCompleted = level.IsCompleted
+                        IsCompleted = level.IsCompleted,
+                        WasEverCompleted = level.WasEverCompleted
                     });
                 }
                 
-                // Сериализуем и сохраняем
                 string json = JsonSerializer.Serialize(progressData);
                 File.WriteAllText(_savePath, json);
-                
                 Console.WriteLine($"Прогресс успешно сохранен: {_savePath}");
             }
             catch (Exception ex)
@@ -74,13 +73,13 @@ namespace ConnectDotsGame.Utils
                     return;
                 }
                 
-                // Применяем сохраненное состояние к уровням
                 foreach (var levelProgress in progressData)
                 {
                     var level = levels.Find(l => l.Id == levelProgress.Id);
                     if (level != null)
                     {
                         level.IsCompleted = levelProgress.IsCompleted;
+                        level.WasEverCompleted = levelProgress.WasEverCompleted;
                         Console.WriteLine($"Загружен прогресс для уровня {level.Id}: пройден = {level.IsCompleted}");
                     }
                 }
@@ -92,12 +91,13 @@ namespace ConnectDotsGame.Utils
                 Console.WriteLine($"Ошибка при загрузке прогресса: {ex.Message}");
             }
         }
-        
+
         // Класс для сериализации данных о прогрессе
         private class LevelProgressData
         {
             public int Id { get; set; }
             public bool IsCompleted { get; set; }
+            public bool WasEverCompleted { get; set; }
         }
     }
 } 
