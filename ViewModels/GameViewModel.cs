@@ -208,6 +208,40 @@ namespace ConnectDotsGame.ViewModels
             if (!IsNeighbor(lastPoint, point))
                 return;
 
+            foreach (var path in CurrentLevel.Paths.ToList())
+            {
+                // Пропускаем проверку для нашего собственного пути
+                if (path.Key == $"{colorKey}-path")
+                    continue;
+
+                // Проверяем, проходит ли путь через текущую точку
+                bool pointInPath = path.Value.Any(line => 
+                    (line.StartPoint.Row == point.Row && line.StartPoint.Column == point.Column) ||
+                    (line.EndPoint.Row == point.Row && line.EndPoint.Column == point.Column));
+
+                if (pointInPath)
+                {
+                    // Получаем цвет пересекаемого пути
+                    string intersectedPathColor = path.Key.Replace("-path", "");
+                    
+                    // Удаляем пересекаемый путь
+                    CurrentLevel.ClearPath(path.Key);
+                    
+                    // Сбрасываем соединение точек пересекаемого пути
+                    var pointsToReset = CurrentLevel.Points
+                        .Where(p => p.HasColor && p.Color?.ToString() == intersectedPathColor)
+                        .ToList();
+                        
+                    foreach (var pointToReset in pointsToReset)
+                    {
+                        pointToReset.IsConnected = false;
+                    }
+                    
+                    // Удаляем путь из словаря текущих путей
+                    _currentPaths.Remove(intersectedPathColor);
+                }
+            }
+
             // Проверяем, не возвращаемся ли мы к какой-либо точке пути
             int returnIndex = currentPath.FindIndex(p => p.Row == point.Row && p.Column == point.Column);
             if (returnIndex != -1)
