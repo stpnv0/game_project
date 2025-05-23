@@ -11,7 +11,7 @@ namespace ConnectDotsGame.Models
     public class GameState
     {
         private readonly GameStorage _gameStorage;
-        
+
         public string? CurrentPathId { get; private set; } // Сделаем private set
         public List<Level> Levels { get; set; }
         public int CurrentLevelIndex { get; set; }
@@ -28,26 +28,22 @@ namespace ConnectDotsGame.Models
             _gameStorage = new GameStorage();
         }
         
-        // Загрузка прогресса игры
         public void LoadProgress()
         {
             _gameStorage.LoadProgress(Levels);
         }
         
-        // Сохранение прогресса игры
         public void SaveProgress()
         {
             _gameStorage.SaveProgress(Levels);
         }
 
-        // Встроенный класс GameStorage для сохранения и загрузки прогресса
         private class GameStorage
         {
             private readonly string _savePath;
 
             public GameStorage()
             {
-                // Путь к файлу сохранения в папке с данными приложения
                 string appDataPath = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     "ConnectDotsGame"
@@ -66,7 +62,7 @@ namespace ConnectDotsGame.Models
             {
                 try
                 {
-                    // Создаем упрощенную версию прогресса для сохранения
+                    // версия прогресса для сохранения
                     var progressData = new List<LevelProgressData>();
                     
                     foreach (var level in levels)
@@ -110,7 +106,7 @@ namespace ConnectDotsGame.Models
                         return;
                     }
                     
-                    // Применяем сохраненное состояние к уровням
+                    //сохранения прменяются к уровням
                     foreach (var levelProgress in progressData)
                     {
                         var level = levels.Find(l => l.Id == levelProgress.Id);
@@ -145,8 +141,6 @@ namespace ConnectDotsGame.Models
             {
                 if (CurrentLevelIndex >= 0 && CurrentLevelIndex < Levels.Count)
                 {
-                    // Загружаем актуальный прогресс при каждом обращении к текущему уровню
-                    LoadProgress();
                     return Levels[CurrentLevelIndex];
                 }
                 return null;
@@ -191,68 +185,59 @@ namespace ConnectDotsGame.Models
             LastSelectedPoint = null;
             CurrentPathColor = null;
             CurrentPath.Clear();
-            CurrentPathId = null; // Сбрасываем ID
+            CurrentPathId = null; 
         }
         
         public void StartNewPath(ModelPoint point)
         {
+
             ResetPathState();
             LastSelectedPoint = point;
             CurrentPathColor = point.Color;
-            // Генерируем УНИКАЛЬНЫЙ PathId
-            CurrentPathId = $"{point.Color}-{point.Row}-{point.Column}-path"; // Пример уникального ID
+            CurrentPathId = $"{point.Color}-path";
             point.IsConnected = true;
             CurrentPath.Add(point);
-            Console.WriteLine($"Started new path with ID: {CurrentPathId}"); // Для отладки
         }
-        
-        public bool IsPointInCurrentPath(ModelPoint point)
-        {
-            return CurrentPath.Any(p => p.Row == point.Row && p.Column == point.Column);
+
+        public (bool isInPath, int index) CheckPointInPath(ModelPoint point)
+        {            
+            int index = CurrentPath.FindIndex(p => p.Row == point.Row && p.Column == point.Column);
+            return (index != -1, index);
         }
         
         public bool RemoveLastPointFromPath()
-        {
+        {            
             if (CurrentPath.Count <= 1)
                 return false;
                 
             CurrentPath.RemoveAt(CurrentPath.Count - 1);
+            LastSelectedPoint = CurrentPath.Count > 0 ? CurrentPath.Last() : null;
             
-            LastSelectedPoint = CurrentPath.Last();
+            return true;
+        }
+        
+        public bool RemovePointsAfter(int index)
+        {            
+            if (index < 0 || index >= CurrentPath.Count - 1)
+                return false;
+                
+            CurrentPath.RemoveRange(index + 1, CurrentPath.Count - index - 1);
+            LastSelectedPoint = CurrentPath.Count > 0 ? CurrentPath.Last() : null;
             
             return true;
         }
         
         public void CheckCompletedPaths()
         {
-            if (CurrentLevel == null)
-                return;
-                
-            bool allCompleted = true;
+            if (CurrentLevel == null) return;
             
-            var colorGroups = CurrentLevel.Points
-                .Where(p => p.HasColor)
-                .GroupBy(p => p.Color.ToString())
-                .ToList();
-                
-            foreach (var group in colorGroups)
+            bool isNowCompleted = CurrentLevel.CheckCompletion();
+            
+            CurrentLevel.IsCompleted = isNowCompleted;
+            
+            if (isNowCompleted)
             {
-                bool colorCompleted = CurrentLevel.IsPathComplete(group.First().Color);
-                if (!colorCompleted)
-                {
-                    allCompleted = false;
-                }
-            }
-            
-            bool wasCompleted = CurrentLevel.IsCompleted;
-            CurrentLevel.IsCompleted = allCompleted;
-            
-            // Если уровень завершен
-            if (allCompleted)
-            {
-                CurrentLevel.WasEverCompleted = true; // Отмечаем как пройденный хотя бы раз
-                
-                // Сохраняем прогресс в любом случае, чтобы обновить WasEverCompleted
+                CurrentLevel.WasEverCompleted = true;
                 SaveProgress();
             }
         }

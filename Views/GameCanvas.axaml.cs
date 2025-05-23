@@ -465,7 +465,7 @@ namespace ConnectDotsGame.Views
                 // Отрисовка линий
                 foreach (var line in level.Lines)
                 {
-                    if (line.IsVisible && line.StartPoint != null && line.EndPoint != null)
+                    if (line.StartPoint != null && line.EndPoint != null)
                     {
                         var startX = line.StartPoint.Column * CellSize + CellSize / 2;
                         var startY = line.StartPoint.Row * CellSize + CellSize / 2;

@@ -147,7 +147,6 @@ namespace ConnectDotsGame.Utils
 
                         // Создаем последнюю линию пути
                         var finalLine = new Line(gameState.LastSelectedPoint, clickedPoint, gameState.CurrentPathColor, gameState.CurrentPathId);
-                        finalLine.IsVisible = true;
                         currentLevel.Lines.Add(finalLine);
                         currentLevel.AddLineToPaths(finalLine);
 
@@ -172,7 +171,8 @@ namespace ConnectDotsGame.Utils
                 if (CanConnectPoints(currentLevel, gameState.LastSelectedPoint, clickedPoint))
                 {
                     // Проверка 1: Точка уже является частью текущего рисуемого пути?
-                    if (gameState.IsPointInCurrentPath(clickedPoint))
+                    var (isInPath, _) = gameState.CheckPointInPath(clickedPoint);
+                    if (isInPath)
                     {
                         Console.WriteLine($"Недопустимый ход: Точка {clickedPoint.Row},{clickedPoint.Column} уже есть в текущем рисуемом пути.");
                         return false;
@@ -238,7 +238,6 @@ namespace ConnectDotsGame.Utils
 
                     // Создаем новую линию
                     var newLine = new Line(gameState.LastSelectedPoint, clickedPoint, gameState.CurrentPathColor, gameState.CurrentPathId);
-                    newLine.IsVisible = true;
                     currentLevel.Lines.Add(newLine);
                     currentLevel.AddLineToPaths(newLine);
 

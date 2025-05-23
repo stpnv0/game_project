@@ -11,18 +11,5 @@
                 PointerPressed="Canvas_PointerPressed"
                 PointerMoved="Canvas_PointerMoved"
                 PointerReleased="Canvas_PointerReleased"/>
-                
-        <!-- Добавляем текстовое сообщение для дополнительной диагностики (скрыто) -->
-        <TextBlock x:Name="DebugText"
-                  Foreground="Yellow"
-                  Background="#80000000"
-                  Padding="10"
-                  MaxWidth="400"
-                  TextWrapping="Wrap"
-                  VerticalAlignment="Top"
-                  HorizontalAlignment="Left"
-                  Margin="10"
-                  IsVisible="False"
-                  FontSize="14"/>
     </Grid>
 </UserControl> 
