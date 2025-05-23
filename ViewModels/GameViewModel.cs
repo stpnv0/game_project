@@ -23,7 +23,6 @@ namespace ConnectDotsGame.ViewModels
         private bool _isDrawingPath;
         private ModelPoint? _activePoint;
         private IBrush? _activeColor;
-        private bool _hitWrongColor; // Новый флаг
         private readonly Dictionary<string, List<ModelPoint>> _currentPaths = new Dictionary<string, List<ModelPoint>>();
         
         public string LevelName => _gameState.CurrentLevel?.Name ?? "Нет уровня";
@@ -174,7 +173,6 @@ namespace ConnectDotsGame.ViewModels
             _activePoint = point;
             _activeColor = point.Color;
             IsDrawingPath = true;
-            _hitWrongColor = false; // Сбрасываем флаг при начале нового пути
             
             // Добавляем точку в текущий путь
             var path = new List<ModelPoint> { point };
@@ -364,7 +362,6 @@ namespace ConnectDotsGame.ViewModels
                 var endPoint = pathPoints[i + 1];
                 
                 var line = new Line(startPoint, endPoint, GetBrushByName(colorKey), $"{colorKey}-path");
-                line.IsVisible = true;
                 line.PathId = $"{colorKey}-path";
                 
                 CurrentLevel.Lines.Add(line);
@@ -388,7 +385,6 @@ namespace ConnectDotsGame.ViewModels
                 var endPoint = pathPoints[i + 1];
                 
                 var line = new Line(startPoint, endPoint, GetBrushByName(colorKey), $"{colorKey}-path");
-                line.IsVisible = true;
                 line.PathId = $"{colorKey}-path";
                 
                 CurrentLevel.Lines.Add(line);
