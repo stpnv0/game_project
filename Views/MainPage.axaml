@@ -7,57 +7,77 @@
              x:Class="ConnectDotsGame.Views.MainPage"
              x:DataType="vm:MainPageViewModel">
 
-    <Design.DataContext>
-        <vm:MainPageViewModel/>
-    </Design.DataContext>
+  <Design.DataContext>
+    <vm:MainPageViewModel/>
+  </Design.DataContext>
     
-    <Grid>
-        <Grid.Background>
-            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                <GradientStop Color="#151515" Offset="0"/>
-                <GradientStop Color="#303030" Offset="1"/>
-            </LinearGradientBrush>
-        </Grid.Background>
+  <Grid>
+    <Grid.Background>
+      <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Color="#151515" Offset="0"/>
+        <GradientStop Color="#303030" Offset="1"/>
+      </LinearGradientBrush>
+    </Grid.Background>
 
-        <Grid RowDefinitions="Auto,*,Auto">
-            <!-- Заголовок игры -->
-            <StackPanel Grid.Row="0" Margin="0,60,0,20">
-                <TextBlock Text="ЭМО ТРУБОЧИСТЫ" 
-                          FontSize="72" 
-                          FontWeight="Bold" 
-                          HorizontalAlignment="Center"
-                          Foreground="#E106D9"/>
-                <TextBlock Text="Чини трубы и кайфуй" 
-                          FontSize="18" 
-                          HorizontalAlignment="Center"
-                          Foreground="White"
-                          Margin="0,10,0,0"/>
-            </StackPanel>
+    <Grid RowDefinitions="Auto,*,Auto">
 
-            <!-- Кнопки меню -->
-            <StackPanel Grid.Row="1" 
-                      VerticalAlignment="Center" 
-                      Spacing="20"
-                      Width="280">
-                <Button Content="Играть" 
-                        Command="{Binding PlayCommand}"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Center"
-                        Height="60"
-                        FontSize="24"/>
-                <Button Content="О игре" 
-                        Command="{Binding AboutCommand}"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Center"
-                        Height="60"
-                        FontSize="24"/>
-                <Button Content="Обратный Вход" 
-                        Command="{Binding ExitCommand}"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Center"
-                        Height="60"
-                        FontSize="24"/>
-            </StackPanel>
-        </Grid>
+      <StackPanel Grid.Row="0" Margin="0,60,0,20">
+        <TextBlock Text="ЭМО ТРУБОЧИСТЫ" 
+                   FontSize="72" 
+                   FontWeight="Bold" 
+                   HorizontalAlignment="Center"
+                   Foreground="#E106D9"/>
+        <TextBlock Text="Проект мирового масштаба" 
+                   FontSize="18" 
+                   HorizontalAlignment="Center"
+                   Foreground="White"
+                   Margin="0,10,0,0"/>
+      </StackPanel>
+
+      <Grid Grid.Row="1"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            ColumnDefinitions="Auto,20,Auto">
+        <Image Grid.Column="0"
+               Source="avares://ConnectDotsGame/Images/елкипалки).png"
+               Width="400" Height="400"
+               VerticalAlignment="Center"/>
+        <TextBlock Text="ёлки палки" 
+                   FontSize="18" 
+                   HorizontalAlignment="Center"
+                   Foreground="White"
+                   Margin="0,450,0,0"/>
+
+        <StackPanel Grid.Column="2"
+                    VerticalAlignment="Center"
+                    Spacing="20"
+                    Width="280">
+          <Button Content="Играть" 
+                  Command="{Binding PlayCommand}"
+                  HorizontalAlignment="Stretch"
+                  HorizontalContentAlignment="Center"
+                  Height="60"
+                  FontSize="24"/>
+          <Button Content="О игре" 
+                  Command="{Binding AboutCommand}"
+                  HorizontalAlignment="Stretch"
+                  HorizontalContentAlignment="Center"
+                  Height="60"
+                  FontSize="24"/>
+          <Button Content="Выход" 
+                  Command="{Binding ExitCommand}"
+                  HorizontalAlignment="Stretch"
+                  HorizontalContentAlignment="Center"
+                  Height="60"
+                  FontSize="24"/>
+        </StackPanel>
+      </Grid>
+
+      <!-- 3. (опциональный) футер -->
+      <StackPanel Grid.Row="2" Margin="0,20">
+        <!-- Здесь можно разместить что-то внизу -->
+      </StackPanel>
+
     </Grid>
-</UserControl> 
+  </Grid>
+</UserControl>
