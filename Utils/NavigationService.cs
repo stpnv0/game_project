@@ -4,7 +4,6 @@ using Avalonia.Controls;
 using ConnectDotsGame.Models;
 using ConnectDotsGame.Navigation;
 using ConnectDotsGame.ViewModels;
-using System.Reflection;
 using System.Linq;
 
 namespace ConnectDotsGame.Utils
@@ -38,32 +37,32 @@ namespace ConnectDotsGame.Utils
                 throw new InvalidOperationException($"Представление для {viewModelType.Name} не зарегистрировано.");
             }
 
-            // Если параметр - это GameState, сохраняем его
+            
             if (parameter is GameState gameState)
             {
                 _gameState = gameState;
             }
 
-            // Создаем экземпляр ViewModel
+            
             var viewModel = CreateViewModel(viewModelType, parameter);
             
-            // Сохраняем текущее состояние в стек навигации, если оно существует
+            
             if (_contentControl.Content != null)
             {
                 _navigationStack.Push(_contentControl.Content);
             }
             
-            // Создаем экземпляр View и устанавливаем ViewModel в качестве DataContext
+            
             var view = (Control)Activator.CreateInstance(viewType)!;
             view.DataContext = viewModel;
             
-            // Если переходим на экран выбора уровней, обновляем список
+            
             if (viewModel is LevelSelectViewModel levelSelectViewModel)
             {
                 levelSelectViewModel.UpdateLevels();
             }
             
-            // Устанавливаем View в качестве содержимого ContentControl
+           
             _contentControl.Content = view;
         }
 
@@ -74,7 +73,7 @@ namespace ConnectDotsGame.Utils
                 var previousContent = _navigationStack.Pop();
                 _contentControl.Content = previousContent;
                 
-                // Если возвращаемся к экрану выбора уровней, обновляем список
+               
                 if (previousContent is Control control && 
                     control.DataContext is LevelSelectViewModel levelSelectViewModel)
                 {
@@ -83,8 +82,6 @@ namespace ConnectDotsGame.Utils
             }
             else if (_gameState != null)
             {
-                // Если стек навигации пуст, но у нас есть GameState, 
-                // то идем на главную страницу
                 NavigateToViewModel(typeof(MainPageViewModel), _gameState);
             }
         }
@@ -94,7 +91,7 @@ namespace ConnectDotsGame.Utils
             if (viewModelType == null)
                 throw new ArgumentNullException(nameof(viewModelType));
                 
-            // Ищем конструктор, который принимает INavigation
+            
             var constructor = viewModelType.GetConstructors()
                 .FirstOrDefault(c => 
                 {
@@ -108,27 +105,26 @@ namespace ConnectDotsGame.Utils
             {
                 var parameters = constructor.GetParameters();
                 
-                // Проверяем количество параметров
                 if (parameters.Length == 1)
                 {
-                    // Конструктор принимает только INavigation
+                    
                     return Activator.CreateInstance(viewModelType, this)!;
                 }
                 else if (parameters.Length == 2 && parameters[1].ParameterType == typeof(GameState))
                 {
-                    // Проверяем, что есть GameState
+                   
                     var gameState = _gameState ?? parameter as GameState;
                     if (gameState == null)
                     {
                         throw new InvalidOperationException($"Для создания {viewModelType.Name} требуется GameState, но он не был предоставлен.");
                     }
                     
-                    // Конструктор принимает INavigation и GameState
+                    
                     return Activator.CreateInstance(viewModelType, this, gameState)!;
                 }
             }
 
-            // Если не нашли подходящий конструктор, пробуем создать по умолчанию
+            
             try
             {
                 return Activator.CreateInstance(viewModelType)!;
