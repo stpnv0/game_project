@@ -115,7 +115,8 @@ namespace ConnectDotsGame.ViewModels
                 return;
                 
             // Если точка уже в пути, проверяем, не движение ли это назад
-            if (_gameState.IsPointInCurrentPath(point))
+            var (isInPath, _) = _gameState.CheckPointInPath(point);
+            if (isInPath)
             {
                 // Если это предпоследняя точка пути, значит, мы движемся назад
                 if (_gameState.CurrentPath.Count >= 2 && 
@@ -224,7 +225,6 @@ namespace ConnectDotsGame.ViewModels
                 var nextPoint = _gameState.CurrentPath[i + 1];
                 
                 var line = new Line(startPoint, nextPoint, _gameState.CurrentPathColor, _gameState.CurrentPathId);
-                line.IsVisible = true;
                 
                 _gameState.CurrentLevel.Lines.Add(line);
                 _gameState.CurrentLevel.AddLineToPaths(line);
@@ -302,7 +302,8 @@ namespace ConnectDotsGame.ViewModels
         
         public bool IsPointInCurrentPath(ModelPoint point)
         {
-            return _gameState.IsPointInCurrentPath(point);
+            var (isInPath, _) = _gameState.CheckPointInPath(point);
+            return isInPath;
         }
         
         #region INotifyPropertyChanged

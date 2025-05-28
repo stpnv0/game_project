@@ -1,8 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
 using Avalonia.Media;
 using ConnectDotsGame.Models;
 
@@ -16,7 +13,6 @@ namespace ConnectDotsGame.Levels
             
             try
             {
-                // Загружаем все уровни
                 levels.Add(CreateLevel1());
                 levels.Add(CreateLevel2());
                 levels.Add(CreateLevel3());
@@ -38,7 +34,6 @@ namespace ConnectDotsGame.Levels
             return levels;
         }
 
-        // Вспомогательный метод для получения точки по координатам
         private Point GetPointAt(Level level, int row, int col)
         {
             return level.Points.Find(p => p.Row == row && p.Column == col)
@@ -175,13 +170,12 @@ namespace ConnectDotsGame.Levels
             return level;
         }
         
-        // Уровень 4: Сложный (8x8)
         private Level CreateLevel4()
         {
             var level = new Level
             {
                 Id = 4,
-                Name = "Сложный",
+                Name = "Уровень 4",
                 Rows = 8,
                 Columns = 8,
                 Points = new List<Point>(),
@@ -228,13 +222,12 @@ namespace ConnectDotsGame.Levels
             return level;
         }
         
-        // Уровень 5: Эксперт (9x9)
         private Level CreateLevel5()
         {
             var level = new Level
             {
                 Id = 5,
-                Name = "Эксперт",
+                Name = "Уровень 5",
                 Rows = 9,
                 Columns = 9,
                 Points = new List<Point>(),
@@ -280,15 +273,12 @@ namespace ConnectDotsGame.Levels
             return level;
         }
         
-        
-        
-        // Уровень 6: Мастер (9x9)
         private Level CreateLevel6()
         {
             var level = new Level
             {
                 Id = 6,
-                Name = "Мастер",
+                Name = "Уровень 6",
                 Rows = 9,
                 Columns = 9,
                 Points = new List<Point>(),
@@ -337,13 +327,12 @@ namespace ConnectDotsGame.Levels
             return level;
         }
         
-        // Уровень 7: Профи (10x10)
         private Level CreateLevel7()
         {
             var level = new Level
             {
                 Id = 7,
-                Name = "Профи",
+                Name = "Уровень 7",
                 Rows = 10,
                 Columns = 10,
                 Points = new List<Point>(),
@@ -398,13 +387,12 @@ namespace ConnectDotsGame.Levels
             return level;
         }
         
-        // Уровень 8: Вызов (10x10)
         private Level CreateLevel8()
         {
             var level = new Level
             {
                 Id = 8,
-                Name = "Вызов",
+                Name = "Уровень 8",
                 Rows = 10,
                 Columns = 10,
                 Points = new List<Point>(),
@@ -460,13 +448,12 @@ namespace ConnectDotsGame.Levels
             return level;
         }
         
-        // Уровень 9: Гуру (11x11)
         private Level CreateLevel9()
         {
             var level = new Level
             {
                 Id = 9,
-                Name = "Гуру",
+                Name = "Уровень 9",
                 Rows = 11,
                 Columns = 11,
                 Points = new List<Point>(),
@@ -524,13 +511,12 @@ namespace ConnectDotsGame.Levels
             return level;
         }
         
-        // Уровень 10: Невозможный (12x12)
         private Level CreateLevel10()
         {
             var level = new Level
             {
                 Id = 10,
-                Name = "Невозможный",
+                Name = "Уровень 10",
                 Rows = 12,
                 Columns = 12,
                 Points = new List<Point>(),
