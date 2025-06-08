@@ -5,8 +5,8 @@ using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using ConnectDotsGame.Utils;
-using ConnectDotsGame.Commands;
-using ConnectDotsGame.Navigation;
+using ConnectDotsGame.Services;
+using ConnectDotsGame.Models;
 
 namespace ConnectDotsGame.ViewModels
 {
@@ -28,9 +28,6 @@ namespace ConnectDotsGame.ViewModels
             AboutCommand = new RelayCommand(() => { /* Показать информацию об игре */ });
             ExitCommand = new RelayCommand(Exit);
         }
-
-        // Для работы с Design Time
-        public MainPageViewModel() : this(new DummyNavigation()) { }
 
         private void Exit()
         {

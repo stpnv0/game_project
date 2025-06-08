@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using Point = Avalonia.Point;
 using ModelPoint = ConnectDotsGame.Models.Point;
+using static ConnectDotsGame.Utils.PointLocator;
 
 namespace ConnectDotsGame.Views
 {
@@ -172,7 +173,7 @@ namespace ConnectDotsGame.Views
                 }
                     
                 // Находим точку в сетке по координатам
-                var clickedPoint = GameLogic.FindPointAtPosition(level, position.X, position.Y, CellSize);
+                var clickedPoint = FindPointAtPosition(level, position.X, position.Y, CellSize);
                 
                 if (clickedPoint != null)
                 {
@@ -227,7 +228,7 @@ namespace ConnectDotsGame.Views
                 }
                 
                 // Находим точку под курсором
-                var hoveredPoint = GameLogic.FindPointAtPosition(level, position.X, position.Y, CellSize);
+                var hoveredPoint = FindPointAtPosition(level, position.X, position.Y, CellSize);
                 
                 if (hoveredPoint != null)
                 {
@@ -279,7 +280,7 @@ namespace ConnectDotsGame.Views
                 }
                 
                 // Находим точку под курсором
-                var releasedPoint = GameLogic.FindPointAtPosition(level, position.X, position.Y, CellSize);
+                var releasedPoint = FindPointAtPosition(level, position.X, position.Y, CellSize);
                 
                 if (releasedPoint != null && releasedPoint.HasColor)
                 {
@@ -446,7 +447,7 @@ namespace ConnectDotsGame.Views
                             try 
                             { 
                                 currentPath = _viewModel.CurrentPath; 
-                                pathColor = _viewModel.CurrentPathColor ?? _viewModel.ActiveColor; 
+                                pathColor = _viewModel.CurrentPathColor; 
                             } 
                             catch {}
                             

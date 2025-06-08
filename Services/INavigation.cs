@@ -1,6 +1,6 @@
 using ConnectDotsGame.Models;
 
-namespace ConnectDotsGame.Navigation
+namespace ConnectDotsGame.Services
 {
     public interface INavigation
     {

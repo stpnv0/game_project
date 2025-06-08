@@ -34,7 +34,7 @@
                         <Button Command="{Binding $parent[UserControl].((vm:LevelSelectViewModel)DataContext).SelectLevelCommand}"
                                 CommandParameter="{Binding Id}"
                                 Width="150" Height="150" Margin="15"
-                                Background="{Binding IsLocked, Converter={StaticResource LockedToBrushConverter}, ConverterParameter=Inverse}"
+                                Background="{Binding IsLocked, Converter={x:Static vm:LevelSelectViewModel.LevelToBrushConverter}}"
                                 IsEnabled="{Binding !IsLocked}">
                             <Grid RowDefinitions="2*,*">
                                 <TextBlock Grid.Row="0" 

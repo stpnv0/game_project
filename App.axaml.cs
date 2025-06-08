@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using ConnectDotsGame.Models;
-using ConnectDotsGame.Utils;
+using ConnectDotsGame.Services;
 using ConnectDotsGame.ViewModels;
 using ConnectDotsGame.Views;
 using System;

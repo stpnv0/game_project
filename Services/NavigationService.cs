@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
 using ConnectDotsGame.Models;
-using ConnectDotsGame.Navigation;
 using ConnectDotsGame.ViewModels;
 using System.Reflection;
 using System.Linq;
+using ConnectDotsGame.Services;
 
-namespace ConnectDotsGame.Utils
+namespace ConnectDotsGame.Services
 {
     public class NavigationService : INavigation
     {

@@ -3,7 +3,9 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using ConnectDotsGame.Models;
-using ConnectDotsGame.Navigation;
+using ConnectDotsGame.Services;
+using Avalonia.Data.Converters;
+using Avalonia.Media;
 
 namespace ConnectDotsGame.ViewModels
 {
@@ -16,6 +18,9 @@ namespace ConnectDotsGame.ViewModels
 
         public ICommand SelectLevelCommand { get; }
         public ICommand BackToMainCommand { get; }
+
+        public static readonly IValueConverter LevelToBrushConverter = new FuncValueConverter<bool, IBrush>(isLocked =>
+            isLocked ? Brushes.Gray : new SolidColorBrush(Color.Parse("#A3079D")));
 
         public LevelSelectViewModel(INavigation navigation, GameState gameState)
         {
@@ -30,9 +35,9 @@ namespace ConnectDotsGame.ViewModels
         }
 
         // Обновляет список уровней на основе текущего состояния игры
-    public void UpdateLevels()
-    {
-        Levels.Clear();
+        public void UpdateLevels()
+        {
+            Levels.Clear();
             
             for (int i = 0; i < _gameState.Levels.Count; i++)
             {
