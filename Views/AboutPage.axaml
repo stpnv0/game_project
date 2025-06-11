@@ -1,25 +1,51 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="ConnectDotsGame.Views.AboutPage">
-  <ScrollViewer>
-    <StackPanel Margin="30" Spacing="16">
-      <TextBlock Text="О игре" FontSize="32" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,16"/>
-      <TextBlock TextWrapping="Wrap" FontSize="18">
-        <Run Text="Правила:"/>
-        <LineBreak/>
-        <Run Text="1. На каждом уровне есть сетка с точками разных цветов"/>
-        <LineBreak/>
-        <Run Text="2. Ваша задача — соединить пары точек одного цвета линиями"/>
-        <LineBreak/>
-        <Run Text="3. Линии не должны пересекаться и не могут проходить по одной клетке дважды"/>
-        <LineBreak/>
-        <Run Text="4. Чтобы соединить точки, кликайте по ним и тяните линию"/>
-        <LineBreak/>
-        <Run Text="5. Когда все пары соединены и вся сетка заполнена — уровень пройден!"/>
-        <LineBreak/>
-        <LineBreak/>
-        <Run Text="Удачи, лох!"/>
-      </TextBlock>
-    </StackPanel>
-  </ScrollViewer>
+             xmlns:vm="clr-namespace:ConnectDotsGame.ViewModels"
+             x:Class="ConnectDotsGame.Views.AboutPage"
+             x:DataType="vm:AboutPageViewModel">
+    <Grid RowDefinitions="Auto,*,Auto" Background="#151515">
+        <!-- Заголовок -->
+        <TextBlock Grid.Row="0"
+                   Text="О игре"
+                   FontSize="48"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"
+                   Foreground="#E106D9"
+                   Margin="0,30,0,16"/>
+
+        <!-- Основной текст -->
+        <ScrollViewer Grid.Row="1" Margin="30">
+            <StackPanel Spacing="16">
+                <TextBlock TextWrapping="Wrap" FontSize="20" Foreground="White">
+                    <Run Text="Правила:" FontWeight="Bold"/>
+                    <LineBreak/>
+                    <Run Text="1. На каждом уровне есть сетка с точками разных цветов"/>
+                    <LineBreak/>
+                    <Run Text="2. Ваша задача — соединить пары точек одного цвета линиями"/>
+                    <LineBreak/>
+                    <Run Text="3. Линии не должны пересекаться и не могут проходить по одной клетке дважды"/>
+                    <LineBreak/>
+                    <Run Text="4. Чтобы соединить точки, кликайте по ним и тяните линию"/>
+                    <LineBreak/>
+                    <Run Text="5. Когда все пары соединены и вся сетка заполнена — уровень пройден!"/>
+                    <LineBreak/>
+                    <LineBreak/>
+                    <Run Text="Удачи!"/>
+                </TextBlock>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Кнопка возврата -->
+        <Button Grid.Row="2"
+                Content="В меню"
+                Command="{Binding NavigateToMenuCommand}"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                Height="60"
+                FontSize="24"
+                Background="#E106D9"
+                Foreground="White"
+                CornerRadius="10"
+                Margin="30,20,30,20"/>
+    </Grid>
 </UserControl>

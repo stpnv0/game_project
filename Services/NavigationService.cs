@@ -8,7 +8,10 @@ using System.Linq;
 using ConnectDotsGame.Services;
 using Avalonia.Controls; 
 using Avalonia.Layout;  
-using Avalonia;          
+using Avalonia;
+using Avalonia.Media;
+using Avalonia.Controls;
+using Avalonia.Platform;
 
 namespace ConnectDotsGame.Services
 {
@@ -29,25 +32,41 @@ namespace ConnectDotsGame.Services
             var modalWindow = new Window
             {
                 Title = title,
-                Width = 400,
-                Height = 200,
+                Width = 395,
+                Height = 175,
                 WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                SystemDecorations = SystemDecorations.None, // Убираем рамку Windows
+                Background = new SolidColorBrush(Colors.Black),
+                CornerRadius = new CornerRadius(150),
                 Content = new StackPanel
                 {
+                    Spacing = 20,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
                     Children =
                     {
                         new TextBlock
                         {
                             Text = message,
+                            FontSize = 20,
+                            FontWeight = FontWeight.Bold,
+                            Foreground = Brushes.White,
+                            TextAlignment = TextAlignment.Center,
                             HorizontalAlignment = HorizontalAlignment.Center,
-                            VerticalAlignment = VerticalAlignment.Center,
-                            Margin = new Thickness(0, 20, 0, 20)
+                            VerticalAlignment = VerticalAlignment.Center
                         },
                         new Button
                         {
                             Content = buttonText,
+                            Width = 197,
+                            Height = 35,
+                            FontSize = 17,
+                            FontWeight = FontWeight.Bold,
+                            Margin = new Thickness(0, 10, 0, 10),
+                            Background = new SolidColorBrush(Color.Parse("#E106D9")),
+                            Foreground = Brushes.White,
                             HorizontalAlignment = HorizontalAlignment.Center,
-                            Width = 100
+                            CornerRadius = new CornerRadius(10)
                         }
                     }
                 }
@@ -182,3 +201,4 @@ namespace ConnectDotsGame.Services
         }
     }
 } 
+

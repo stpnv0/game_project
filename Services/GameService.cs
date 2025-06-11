@@ -1,9 +1,11 @@
 using ConnectDotsGame.Models;
 using ConnectDotsGame.Utils;
 using ConnectDotsGame.Services; // Убедитесь, что используется правильный интерфейс INavigation
+using ConnectDotsGame.ViewModels; // Добавьте этот using для доступа к GameViewModel
 using Avalonia.Media;
 using System.Collections.Generic;
 using System.Linq;
+using Avalonia.Layout;
 using static ConnectDotsGame.Utils.PointLocator;
 
 namespace ConnectDotsGame.Services
@@ -175,9 +177,16 @@ namespace ConnectDotsGame.Services
                 gameState.SaveProgress();
                 _navigation.ShowModal(
                     "Уровень завершён!",
-                    $"Вы успешно завершили уровень {gameState.CurrentLevel.Name}.",
+                    $"Вы успешно завершили {gameState.CurrentLevel.Name}",
                     "Следующий уровень",
-                    () => gameState.GoToNextLevel()
+                    
+                    () =>
+                    {
+                        if (gameState.GoToNextLevel())
+                        {
+                            _navigation.NavigateTo<GameViewModel>(gameState);
+                        }
+                    }
                 );
             }
             return allCompleted;

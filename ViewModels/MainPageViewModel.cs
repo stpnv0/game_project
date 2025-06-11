@@ -18,6 +18,7 @@ namespace ConnectDotsGame.ViewModels
         public ICommand SettingsCommand { get; }
         public ICommand AboutCommand { get; }
         public ICommand ExitCommand { get; }
+        public ICommand NavigateToMenuCommand { get; }
 
         public MainPageViewModel(INavigation navigation)
         {
@@ -35,6 +36,11 @@ namespace ConnectDotsGame.ViewModels
             {
                 lifetime.Shutdown();
             }
+        }
+        
+        private void NavigateToMenu()
+        {
+            _navigation.NavigateTo<MainPageViewModel>();
         }
 
         #region INotifyPropertyChanged
