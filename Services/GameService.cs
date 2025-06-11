@@ -1,5 +1,6 @@
 using ConnectDotsGame.Models;
 using ConnectDotsGame.Utils;
+using ConnectDotsGame.Services; // Убедитесь, что используется правильный интерфейс INavigation
 using Avalonia.Media;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,12 @@ namespace ConnectDotsGame.Services
 {
     public class GameService : IGameService
     {
-        public GameService() { }
+        private readonly INavigation _navigation; // Исправлено на INavigation
+
+        public GameService(INavigation navigation) // Исправлено на INavigation
+        {
+            _navigation = navigation;
+        }
 
         // Пытается соединить две точки на игровом поле.
         public bool TryConnectPoints(GameState gameState, Point clickedPoint)
@@ -167,6 +173,12 @@ namespace ConnectDotsGame.Services
             {
                 gameState.CurrentLevel.WasEverCompleted = true;
                 gameState.SaveProgress();
+                _navigation.ShowModal(
+                    "Уровень завершён!",
+                    $"Вы успешно завершили уровень {gameState.CurrentLevel.Name}.",
+                    "Следующий уровень",
+                    () => gameState.GoToNextLevel()
+                );
             }
             return allCompleted;
         }

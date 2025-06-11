@@ -1,23 +1,21 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:converter="clr-namespace:ConnectDotsGame.Converters"
              x:Class="ConnectDotsGame.App"
              RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.Styles>
         <FluentTheme />
+        <Style Selector="Window">
+            <Setter Property="Width" Value="400"/>
+            <Setter Property="Height" Value="200"/>
+            <Setter Property="WindowStartupLocation" Value="CenterScreen"/>
+        </Style>
     </Application.Styles>
-    
+
     <Application.Resources>
         <ResourceDictionary>
             <x:Boolean x:Key="True">True</x:Boolean>
             <x:Boolean x:Key="False">False</x:Boolean>
-            
-            <!-- Преобразование IsCompleted в цвет -->
-            <!-- converter:BoolToColorConverter x:Key="CompletedToBrushConverter" TrueValue="#a3079d" FalseValue="#a3079d"/ -->
-            <!-- Преобразование IsLocked в цвет -->
-            <!-- converter:BoolToColorConverter x:Key="LockedToBrushConverter" TrueValue="#A3079D" FalseValue="#A3079D"/ -->
         </ResourceDictionary>
     </Application.Resources>
 </Application>

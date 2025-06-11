@@ -98,24 +98,19 @@ namespace ConnectDotsGame.ViewModels
         
         public GameViewModel(INavigation navigation, GameState gameState)
         {
-            _navigation = navigation;
-            _gameState = gameState;
-            _gameService = new GameService();
-            
-            // Загружаем сохраненный прогресс
+            _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
+            _gameState = gameState ?? throw new ArgumentNullException(nameof(gameState));
+            _gameService = new GameService(navigation);
+
             _gameState.LoadProgress();
-            
-            // Кнопка следующего уровня доступна, если уровень был когда-либо пройден
+
             NextLevelCommand = new RelayCommand(NextLevel, () => CurrentLevel?.WasEverCompleted == true && HasNextLevel);
             ResetLevelCommand = new RelayCommand(ResetLevel, () => _gameState.CurrentLevel != null);
             BackToMenuCommand = new RelayCommand(() => _navigation.GoBack());
             BackToLevelsCommand = new RelayCommand(() => _navigation.NavigateTo<LevelSelectViewModel>());
-            
-            // Устанавливаем начальное состояние
+
             HasNextLevel = _gameState.HasNextLevel;
-            // IsLevelCompleted = CurrentLevel?.IsCompleted ?? false;
-            
-            // Обновляем статус и состояние кнопок
+
             UpdateGameState();
             ((RelayCommand)NextLevelCommand).RaiseCanExecuteChanged();
         }

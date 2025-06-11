@@ -1,0 +1,25 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ConnectDotsGame.Views.AboutPage">
+  <ScrollViewer>
+    <StackPanel Margin="30" Spacing="16">
+      <TextBlock Text="О игре" FontSize="32" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,16"/>
+      <TextBlock TextWrapping="Wrap" FontSize="18">
+        <Run Text="Правила:"/>
+        <LineBreak/>
+        <Run Text="1. На каждом уровне есть сетка с точками разных цветов."/>
+        <LineBreak/>
+        <Run Text="2. Ваша задача — соединить пары точек одного цвета линиями."/>
+        <LineBreak/>
+        <Run Text="3. Линии не должны пересекаться и не могут проходить по одной клетке дважды."/>
+        <LineBreak/>
+        <Run Text="4. Чтобы соединить точки, кликайте по ним и тяните линию."/>
+        <LineBreak/>
+        <Run Text="5. Когда все пары соединены и вся сетка заполнена — уровень пройден!"/>
+        <LineBreak/>
+        <LineBreak/>
+        <Run Text="Удачи, гузлик!"/>
+      </TextBlock>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

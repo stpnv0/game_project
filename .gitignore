@@ -25,3 +25,7 @@ Thumbs.db
 
 # User-specific files
 *.userprefs
+
+# Artefacts
+bin 
+obj

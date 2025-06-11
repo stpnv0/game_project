@@ -25,7 +25,7 @@ namespace ConnectDotsGame.ViewModels
 
             PlayCommand = new RelayCommand(() => _navigation.NavigateTo<LevelSelectViewModel>());
             SettingsCommand = new RelayCommand(() => { /* Переход на экран настроек */ });
-            AboutCommand = new RelayCommand(() => { /* Показать информацию об игре */ });
+            AboutCommand = new RelayCommand(() => _navigation.NavigateTo<AboutPageViewModel>()); // Исправлено
             ExitCommand = new RelayCommand(Exit);
         }
 
@@ -48,4 +48,4 @@ namespace ConnectDotsGame.ViewModels
 
         #endregion
     }
-} 
+}

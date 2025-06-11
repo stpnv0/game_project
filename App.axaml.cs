@@ -9,55 +9,56 @@ using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
 
-namespace ConnectDotsGame;
-
-public partial class App : Application
+namespace ConnectDotsGame
 {
-    private NavigationService? _navigationService;
-
-    public override void Initialize()
+    public partial class App : Application
     {
-        AvaloniaXamlLoader.Load(this);
-    }
-
-    public override void OnFrameworkInitializationCompleted()
-    {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        public override void Initialize()
         {
-            var mainWindow = new MainWindow();
-            var gameState = new GameState();
-            
-            // Загружаем уровни
-            var levelLoader = new Levels.LevelLoader();
-            gameState.Levels = levelLoader.LoadLevels();
-            
-            // Загружаем сохраненные данные
-            gameState.LoadProgress();
-            
-            // Теперь находим ContentArea
-            var contentArea = mainWindow.FindControl<ContentControl>("ContentArea");
-            if (contentArea == null)
-            {
-                throw new InvalidOperationException("ContentArea не найден в MainWindow");
-            }
-            
-            // Инициализация навигационной службы
-            _navigationService = new NavigationService(contentArea);
-            
-            // Зарегистрировать все страницы
-            _navigationService.RegisterView<MainPageViewModel, MainPage>();
-            _navigationService.RegisterView<LevelSelectViewModel, LevelSelectPage>();
-            _navigationService.RegisterView<GameViewModel, GamePage>();
-            
-            // Задать начальное представление
-            _navigationService.NavigateTo<MainPageViewModel>(gameState);
-            
-            desktop.MainWindow = mainWindow;
-            
-            // Необходимо сначала показать окно, иначе элементы управления могут быть не инициализированы
-            mainWindow.Show();
+            AvaloniaXamlLoader.Load(this);
         }
 
-        base.OnFrameworkInitializationCompleted();
+        public override void OnFrameworkInitializationCompleted()
+        {
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                var mainWindow = new MainWindow();
+                var gameState = new GameState();
+
+                // Загружаем уровни
+                var levelLoader = new Levels.LevelLoader();
+                gameState.Levels = levelLoader.LoadLevels();
+
+                // Загружаем сохраненные данные
+                gameState.LoadProgress();
+
+                // Находим ContentArea
+                var contentArea = mainWindow.FindControl<ContentControl>("ContentArea");
+                if (contentArea == null)
+                {
+                    throw new InvalidOperationException("ContentArea не найден в MainWindow");
+                }
+
+                // Инициализация навигационной службы
+                var navigationService = new NavigationService(contentArea);
+
+                // Создание GameService с передачей navigationService
+                var gameService = new GameService(navigationService);
+
+                // Регистрация всех страниц
+                navigationService.RegisterView<MainPageViewModel, MainPage>();
+                navigationService.RegisterView<LevelSelectViewModel, LevelSelectPage>();
+                navigationService.RegisterView<GameViewModel, GamePage>();
+                navigationService.RegisterView<AboutPageViewModel, AboutPage>();
+
+                // Задать начальное представление
+                navigationService.NavigateTo<MainPageViewModel>(gameState);
+
+                desktop.MainWindow = mainWindow;
+                mainWindow.Show();
+            }
+
+            base.OnFrameworkInitializationCompleted();
+        }
     }
 }

@@ -6,6 +6,9 @@ using ConnectDotsGame.ViewModels;
 using System.Reflection;
 using System.Linq;
 using ConnectDotsGame.Services;
+using Avalonia.Controls; 
+using Avalonia.Layout;  
+using Avalonia;          
 
 namespace ConnectDotsGame.Services
 {
@@ -19,6 +22,45 @@ namespace ConnectDotsGame.Services
         public NavigationService(ContentControl contentControl)
         {
             _contentControl = contentControl ?? throw new ArgumentNullException(nameof(contentControl));
+        }
+        
+        public void ShowModal(string title, string message, string buttonText, Action onButtonClick)
+        {
+            var modalWindow = new Window
+            {
+                Title = title,
+                Width = 400,
+                Height = 200,
+                WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                Content = new StackPanel
+                {
+                    Children =
+                    {
+                        new TextBlock
+                        {
+                            Text = message,
+                            HorizontalAlignment = HorizontalAlignment.Center,
+                            VerticalAlignment = VerticalAlignment.Center,
+                            Margin = new Thickness(0, 20, 0, 20)
+                        },
+                        new Button
+                        {
+                            Content = buttonText,
+                            HorizontalAlignment = HorizontalAlignment.Center,
+                            Width = 100
+                        }
+                    }
+                }
+            };
+
+            var button = ((StackPanel)modalWindow.Content).Children.OfType<Button>().First();
+            button.Click += (_, _) =>
+            {
+                modalWindow.Close();
+                onButtonClick?.Invoke();
+            };
+
+            modalWindow.ShowDialog((Window)_contentControl.Parent);
         }
 
         public void RegisterView<TViewModel, TView>()
