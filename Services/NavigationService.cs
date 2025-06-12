@@ -21,65 +21,12 @@ namespace ConnectDotsGame.Services
         private readonly Dictionary<Type, Type> _viewModelViewMappings = new();
         private readonly Stack<object> _navigationStack = new();
         private GameState? _gameState;
+        private readonly IModalService _modalService;
 
-        public NavigationService(ContentControl contentControl)
+        public NavigationService(ContentControl contentControl, IModalService modalService)
         {
             _contentControl = contentControl ?? throw new ArgumentNullException(nameof(contentControl));
-        }
-        
-        public void ShowModal(string title, string message, string buttonText, Action onButtonClick)
-        {
-            var modalWindow = new Window
-            {
-                Title = title,
-                Width = 395,
-                Height = 175,
-                WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                SystemDecorations = SystemDecorations.None, // Убираем рамку Windows
-                Background = new SolidColorBrush(Colors.Black),
-                CornerRadius = new CornerRadius(150),
-                Content = new StackPanel
-                {
-                    Spacing = 20,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Children =
-                    {
-                        new TextBlock
-                        {
-                            Text = message,
-                            FontSize = 20,
-                            FontWeight = FontWeight.Bold,
-                            Foreground = Brushes.White,
-                            TextAlignment = TextAlignment.Center,
-                            HorizontalAlignment = HorizontalAlignment.Center,
-                            VerticalAlignment = VerticalAlignment.Center
-                        },
-                        new Button
-                        {
-                            Content = buttonText,
-                            Width = 197,
-                            Height = 35,
-                            FontSize = 17,
-                            FontWeight = FontWeight.Bold,
-                            Margin = new Thickness(0, 10, 0, 10),
-                            Background = new SolidColorBrush(Color.Parse("#E106D9")),
-                            Foreground = Brushes.White,
-                            HorizontalAlignment = HorizontalAlignment.Center,
-                            CornerRadius = new CornerRadius(10)
-                        }
-                    }
-                }
-            };
-
-            var button = ((StackPanel)modalWindow.Content).Children.OfType<Button>().First();
-            button.Click += (_, _) =>
-            {
-                modalWindow.Close();
-                onButtonClick?.Invoke();
-            };
-
-            modalWindow.ShowDialog((Window)_contentControl.Parent);
+            _modalService = modalService ?? throw new ArgumentNullException(nameof(modalService));
         }
 
         public void RegisterView<TViewModel, TView>()
@@ -186,6 +133,15 @@ namespace ConnectDotsGame.Services
                     
                     // Конструктор принимает INavigation и GameState
                     return Activator.CreateInstance(viewModelType, this, gameState)!;
+                }
+                else if (parameters.Length == 3 && parameters[1].ParameterType == typeof(GameState) && parameters[2].ParameterType == typeof(IModalService))
+                {
+                    var gameState = _gameState ?? parameter as GameState;
+                    if (gameState == null)
+                    {
+                        throw new InvalidOperationException($"Для создания {viewModelType.Name} требуется GameState, но он не был предоставлен.");
+                    }
+                    return Activator.CreateInstance(viewModelType, this, gameState, _modalService)!;
                 }
             }
 

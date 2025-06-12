@@ -95,19 +95,27 @@ namespace ConnectDotsGame.ViewModels
         public ICommand ResetLevelCommand { get; }
         public ICommand BackToMenuCommand { get; }
         public ICommand BackToLevelsCommand { get; }
+        public ICommand PrevLevelCommand { get; }
         
-        public GameViewModel(INavigation navigation, GameState gameState)
+        public GameViewModel(INavigation navigation, GameState gameState, IModalService modalService)
         {
             _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
             _gameState = gameState ?? throw new ArgumentNullException(nameof(gameState));
-            _gameService = new GameService(navigation);
+            _gameService = new GameService(navigation, modalService);
 
             _gameState.LoadProgress();
 
             NextLevelCommand = new RelayCommand(NextLevel, () => CurrentLevel?.WasEverCompleted == true && HasNextLevel);
             ResetLevelCommand = new RelayCommand(ResetLevel, () => _gameState.CurrentLevel != null);
-            BackToMenuCommand = new RelayCommand(() => _navigation.GoBack());
-            BackToLevelsCommand = new RelayCommand(() => _navigation.NavigateTo<LevelSelectViewModel>());
+            BackToMenuCommand = new RelayCommand(() => {
+                _gameState.ResetAllPathsAndLines();
+                _navigation.NavigateTo<LevelSelectViewModel>();
+            });
+            BackToLevelsCommand = new RelayCommand(() => {
+                _gameState.ResetAllPathsAndLines();
+                _navigation.NavigateTo<LevelSelectViewModel>();
+            });
+            PrevLevelCommand = new RelayCommand(PrevLevel, () => _gameState.CurrentLevelIndex > 0);
 
             HasNextLevel = _gameState.HasNextLevel;
 
@@ -192,11 +200,15 @@ namespace ConnectDotsGame.ViewModels
         
         private void NextLevel()
         {
-            _gameService.NextLevel(_gameState);
-            IsLevelCompleted = true;
-            UpdateGameState();
-            OnPropertyChanged(nameof(CurrentPath));
-            OnPropertyChanged(nameof(CurrentPathColor));
+            if (_gameState.HasNextLevel)
+            {
+                _gameService.NextLevel(_gameState);
+                _gameState.ResetCurrentLevel();
+                IsLevelCompleted = true;
+                UpdateGameState();
+                OnPropertyChanged(nameof(CurrentPath));
+                OnPropertyChanged(nameof(CurrentPathColor));
+            }
         }
         
         private void ResetLevel()
@@ -230,6 +242,18 @@ namespace ConnectDotsGame.ViewModels
             UpdateGameState();
             OnPropertyChanged(nameof(CurrentPath));
             OnPropertyChanged(nameof(CurrentPathColor));
+        }
+        
+        private void PrevLevel()
+        {
+            if (_gameState.CurrentLevelIndex > 0)
+            {
+                _gameState.CurrentLevelIndex--;
+                _gameState.ResetCurrentLevel();
+                UpdateGameState();
+                OnPropertyChanged(nameof(CurrentPath));
+                OnPropertyChanged(nameof(CurrentPathColor));
+            }
         }
         
         #region INotifyPropertyChanged

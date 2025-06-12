@@ -145,5 +145,17 @@ namespace ConnectDotsGame.Models
                 SaveProgress();
             }
         }
+        public void ResetAllPathsAndLines()
+        {
+            foreach (var level in Levels)
+            {
+                level.Lines.Clear();
+                level.Paths.Clear();
+                foreach (var point in level.Points)
+                {
+                    point.IsConnected = false;
+                }
+            }
+        }
     }
 }

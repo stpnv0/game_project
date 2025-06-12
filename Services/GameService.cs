@@ -1,7 +1,7 @@
 using ConnectDotsGame.Models;
 using ConnectDotsGame.Utils;
-using ConnectDotsGame.Services; // Убедитесь, что используется правильный интерфейс INavigation
-using ConnectDotsGame.ViewModels; // Добавьте этот using для доступа к GameViewModel
+using ConnectDotsGame.Services;
+using ConnectDotsGame.ViewModels;
 using Avalonia.Media;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,11 +12,13 @@ namespace ConnectDotsGame.Services
 {
     public class GameService : IGameService
     {
-        private readonly INavigation _navigation; // Исправлено на INavigation
+        private readonly INavigation _navigation;
+        private readonly IModalService _modalService;
 
-        public GameService(INavigation navigation) // Исправлено на INavigation
+        public GameService(INavigation navigation, IModalService modalService)
         {
             _navigation = navigation;
+            _modalService = modalService;
         }
 
         // Пытается соединить две точки на игровом поле.
@@ -175,19 +177,30 @@ namespace ConnectDotsGame.Services
             {
                 gameState.CurrentLevel.WasEverCompleted = true;
                 gameState.SaveProgress();
-                _navigation.ShowModal(
-                    "Уровень завершён!",
-                    $"Вы успешно завершили {gameState.CurrentLevel.Name}",
-                    "Следующий уровень",
-                    
-                    () =>
-                    {
-                        if (gameState.GoToNextLevel())
+                if (!gameState.HasNextLevel)
+                {
+                    _modalService.ShowModal(
+                        "Поздравляем!",
+                        "Вы прошли все уровни!",
+                        "В меню",
+                        () => _navigation.NavigateTo<LevelSelectViewModel>()
+                    );
+                }
+                else
+                {
+                    _modalService.ShowModal(
+                        "Уровень завершён!",
+                        $"Вы успешно завершили {gameState.CurrentLevel.Name}",
+                        "Следующий уровень",
+                        () =>
                         {
-                            _navigation.NavigateTo<GameViewModel>(gameState);
+                            if (gameState.GoToNextLevel())
+                            {
+                                _navigation.NavigateTo<GameViewModel>(gameState);
+                            }
                         }
-                    }
-                );
+                    );
+                }
             }
             return allCompleted;
         }

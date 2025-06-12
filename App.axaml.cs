@@ -8,6 +8,7 @@ using ConnectDotsGame.Views;
 using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
+using ConnectDotsGame.Services;
 
 namespace ConnectDotsGame
 {
@@ -39,11 +40,10 @@ namespace ConnectDotsGame
                     throw new InvalidOperationException("ContentArea не найден в MainWindow");
                 }
 
-                // Инициализация навигационной службы
-                var navigationService = new NavigationService(contentArea);
-
-                // Создание GameService с передачей navigationService
-                var gameService = new GameService(navigationService);
+                // Инициализация сервисов
+                var modalService = new ModalService(contentArea);
+                var navigationService = new NavigationService(contentArea, modalService);
+                var gameService = new GameService(navigationService, modalService);
 
                 // Регистрация всех страниц
                 navigationService.RegisterView<MainPageViewModel, MainPage>();
