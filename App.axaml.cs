@@ -6,9 +6,7 @@ using ConnectDotsGame.Services;
 using ConnectDotsGame.ViewModels;
 using ConnectDotsGame.Views;
 using System;
-using System.Collections.Generic;
 using Avalonia.Controls;
-using ConnectDotsGame.Services;
 
 namespace ConnectDotsGame
 {
@@ -24,7 +22,10 @@ namespace ConnectDotsGame
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 var mainWindow = new MainWindow();
-                var gameState = new GameState();
+
+                // Инициализация сервисов
+                var gameStorageService = new GameStorageService();
+                var gameState = new GameState(gameStorageService);
 
                 // Загружаем уровни
                 var levelLoader = new Levels.LevelLoader();
@@ -43,7 +44,9 @@ namespace ConnectDotsGame
                 // Инициализация сервисов
                 var modalService = new ModalService(contentArea);
                 var navigationService = new NavigationService(contentArea, modalService);
-                var gameService = new GameService(navigationService, modalService);
+                var pathManager = new PathManager();
+                var levelManager = new LevelManager(navigationService, modalService);
+                var gameService = new GameService(navigationService, modalService, pathManager, levelManager);
 
                 // Регистрация всех страниц
                 navigationService.RegisterView<MainPageViewModel, MainPage>();

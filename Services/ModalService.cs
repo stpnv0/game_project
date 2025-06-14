@@ -94,7 +94,7 @@ namespace ConnectDotsGame.Services
             button.Click += (_, _) =>
             {
                 modalWindow.Close();
-                onButtonClick?.Invoke();
+                onButtonClick();
             };
 
             if (_contentControl.Parent is Window parentWindow)

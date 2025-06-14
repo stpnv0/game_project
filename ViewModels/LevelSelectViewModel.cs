@@ -31,7 +31,7 @@ namespace ConnectDotsGame.ViewModels
             UpdateLevels();
 
             SelectLevelCommand = new RelayCommand<int>(SelectLevel, CanSelectLevel);
-            BackToMainCommand = new RelayCommand(() => _navigation.GoBack());
+            BackToMainCommand = new RelayCommand(() => _navigation.NavigateTo<MainPageViewModel>());
         }
 
         // Обновляет список уровней на основе текущего состояния игры

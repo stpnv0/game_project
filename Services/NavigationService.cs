@@ -1,17 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Layout;
+using Avalonia.Media;
+using Avalonia.Platform;
 using ConnectDotsGame.Models;
 using ConnectDotsGame.ViewModels;
-using System.Reflection;
-using System.Linq;
 using ConnectDotsGame.Services;
-using Avalonia.Controls; 
-using Avalonia.Layout;  
-using Avalonia;
-using Avalonia.Media;
-using Avalonia.Controls;
-using Avalonia.Platform;
 
 namespace ConnectDotsGame.Services
 {

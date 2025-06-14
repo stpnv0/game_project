@@ -13,6 +13,7 @@ namespace ConnectDotsGame.Models
         public bool IsConnected { get; set; }
         public IBrush Color { get; set; } = Brushes.Transparent;
         public bool HasColor => Color != Brushes.Transparent;
+
         public Point(int id, int row, int column, IBrush color)
         {
             Id = id;
@@ -21,6 +22,7 @@ namespace ConnectDotsGame.Models
             Color = color;
             IsConnected = false;
         }
+
         public Point(int id, int row, int column)
         {
             Id = id;
@@ -28,7 +30,9 @@ namespace ConnectDotsGame.Models
             Column = column;
             IsConnected = false;
         }
+
         public Point() { }
+
         public Point Clone() => new()
         {
             Id = Id,

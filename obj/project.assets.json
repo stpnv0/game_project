@@ -1284,19 +1284,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\choko\\.nuget\\packages\\": {}
+    "/Users/dmtr/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\choko\\RiderProjects\\game\\ConnectDotsGame.csproj",
+      "projectUniqueName": "/Users/dmtr/Desktop/projects/game_project/ConnectDotsGame.csproj",
       "projectName": "ConnectDotsGame",
-      "projectPath": "C:\\Users\\choko\\RiderProjects\\game\\ConnectDotsGame.csproj",
-      "packagesPath": "C:\\Users\\choko\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\choko\\RiderProjects\\game\\obj\\",
+      "projectPath": "/Users/dmtr/Desktop/projects/game_project/ConnectDotsGame.csproj",
+      "packagesPath": "/Users/dmtr/.nuget/packages/",
+      "outputPath": "/Users/dmtr/Desktop/projects/game_project/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\choko\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "/Users/dmtr/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -1320,7 +1320,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.100"
+      "SdkAnalysisLevel": "9.0.200"
     },
     "frameworks": {
       "net9.0": {
@@ -1359,7 +1359,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.105/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.201/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

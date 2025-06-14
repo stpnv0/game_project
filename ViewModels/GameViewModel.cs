@@ -81,15 +81,8 @@ namespace ConnectDotsGame.ViewModels
         
         public Level? CurrentLevel => _gameState.CurrentLevel;
         
-        public List<ModelPoint> CurrentPath 
-        { 
-            get 
-            {
-                return new List<ModelPoint>();
-            }
-        }
-        
-        public IBrush? CurrentPathColor => null;
+        public List<ModelPoint> CurrentPath => _gameState.CurrentPath;
+        public IBrush? CurrentPathColor => _gameState.CurrentPathColor;
         
         public ICommand NextLevelCommand { get; }
         public ICommand ResetLevelCommand { get; }
@@ -101,7 +94,10 @@ namespace ConnectDotsGame.ViewModels
         {
             _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
             _gameState = gameState ?? throw new ArgumentNullException(nameof(gameState));
-            _gameService = new GameService(navigation, modalService);
+            
+            var pathManager = new PathManager();
+            var levelManager = new LevelManager(navigation, modalService);
+            _gameService = new GameService(navigation, modalService, pathManager, levelManager);
 
             _gameState.LoadProgress();
 
@@ -204,10 +200,11 @@ namespace ConnectDotsGame.ViewModels
             {
                 _gameService.NextLevel(_gameState);
                 _gameState.ResetCurrentLevel();
-                IsLevelCompleted = true;
+                IsLevelCompleted = false;
                 UpdateGameState();
                 OnPropertyChanged(nameof(CurrentPath));
                 OnPropertyChanged(nameof(CurrentPathColor));
+                ((RelayCommand)PrevLevelCommand).RaiseCanExecuteChanged();
             }
         }
         
@@ -227,6 +224,7 @@ namespace ConnectDotsGame.ViewModels
             OnPropertyChanged(nameof(LevelName));
             OnPropertyChanged(nameof(CurrentLevel));
             ((RelayCommand)NextLevelCommand).RaiseCanExecuteChanged();
+            ((RelayCommand)PrevLevelCommand).RaiseCanExecuteChanged();
         }
         
         // Завершение пути
@@ -239,6 +237,7 @@ namespace ConnectDotsGame.ViewModels
         public void EndPath(ModelPoint? endPoint)
         {
             _gameService.EndPath(_gameState, endPoint);
+            _gameService.CheckLevelCompletion(_gameState);
             UpdateGameState();
             OnPropertyChanged(nameof(CurrentPath));
             OnPropertyChanged(nameof(CurrentPathColor));
@@ -250,9 +249,11 @@ namespace ConnectDotsGame.ViewModels
             {
                 _gameState.CurrentLevelIndex--;
                 _gameState.ResetCurrentLevel();
+                IsLevelCompleted = false;
                 UpdateGameState();
                 OnPropertyChanged(nameof(CurrentPath));
                 OnPropertyChanged(nameof(CurrentPathColor));
+                ((RelayCommand)PrevLevelCommand).RaiseCanExecuteChanged();
             }
         }
         

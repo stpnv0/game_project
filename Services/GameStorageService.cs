@@ -1,16 +1,16 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using System.Collections.Generic;
 using ConnectDotsGame.Models;
 
-namespace ConnectDotsGame.Utils
+namespace ConnectDotsGame.Services
 {
-    public class GameStorage
+    public class GameStorageService : IGameStorageService
     {
         private readonly string _savePath;
 
-        public GameStorage()
+        public GameStorageService()
         {
             // Путь к файлу сохранения в папке с данными приложения
             string appDataPath = Path.Combine(
@@ -80,7 +80,7 @@ namespace ConnectDotsGame.Utils
                     {
                         level.IsCompleted = levelProgress.IsCompleted;
                         level.WasEverCompleted = levelProgress.WasEverCompleted;
-                        Console.WriteLine($"Загружен прогресс для уровня {level.Id}: пройден = {level.IsCompleted}");
+                        Console.WriteLine($"Загружен прогресс для уровня {level.Id}: пройден = {level.WasEverCompleted}");
                     }
                 }
                 
