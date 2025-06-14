@@ -10,38 +10,39 @@ namespace ConnectDotsGame.Models
     public class GameState
     {
         private readonly IGameStorageService _gameStorage;
-        internal readonly PathState _pathState;
+        private readonly IPathManager _pathManager;
 
         public List<Level> Levels { get; set; }
         public int CurrentLevelIndex { get; set; }
-
-        public GameState(IGameStorageService gameStorage)
+        public Point? LastSelectedPoint { get; set; }
+        
+        public GameState(IGameStorageService gameStorage, IPathManager pathManager)
         {
             _gameStorage = gameStorage ?? throw new ArgumentNullException(nameof(gameStorage));
-            _pathState = new PathState();
+            _pathManager = pathManager ?? throw new ArgumentNullException(nameof(pathManager));
             Levels = new List<Level>();
             CurrentLevelIndex = 0;
         }
-
+        
         public void LoadProgress() => _gameStorage.LoadProgress(Levels);
         public void SaveProgress() => _gameStorage.SaveProgress(Levels);
-
+        
         public Level? CurrentLevel => 
             CurrentLevelIndex >= 0 && CurrentLevelIndex < Levels.Count 
                 ? Levels[CurrentLevelIndex] 
                 : null;
 
         public bool HasNextLevel => CurrentLevelIndex < Levels.Count - 1;
-
+        
         public bool GoToNextLevel()
         {
             if (!HasNextLevel) return false;
             
+            ResetCurrentLevel();
             CurrentLevelIndex++;
-            ResetPathState();
             return true;
         }
-
+        
         public void ResetCurrentLevel()
         {
             if (CurrentLevel == null) return;
@@ -52,28 +53,21 @@ namespace ConnectDotsGame.Models
             {
                 point.IsConnected = false;
             }
-
+            
             CurrentLevel.Lines.Clear();
             CurrentLevel.Paths.Clear();
-
-            ResetPathState();
-            CurrentLevel.IsCompleted = false;
+            
+            _pathManager.CancelPath(this);
+            LastSelectedPoint = null;
             CurrentLevel.WasEverCompleted = wasEverCompleted;
         }
-
-        public void ResetPathState()
-        {
-            _pathState.Reset();
-            LastSelectedPoint = null;
-        }
-
+        
         public void CheckCompletedPaths()
         {
             if (CurrentLevel == null) return;
-
+            
             bool isNowCompleted = CurrentLevel.CheckCompletion();
-            CurrentLevel.IsCompleted = isNowCompleted;
-
+            
             if (isNowCompleted)
             {
                 CurrentLevel.WasEverCompleted = true;
@@ -94,10 +88,18 @@ namespace ConnectDotsGame.Models
             }
         }
 
-        // Публичные свойства для доступа к состоянию пути
-        public string? CurrentPathId => _pathState.PathId;
-        public Point? LastSelectedPoint { get; set; }
-        public IBrush? CurrentPathColor => _pathState.PathColor;
-        public List<Point> CurrentPath => _pathState.Points;
+        // Публичные свойства для доступа к состоянию пути через PathManager
+        public string? CurrentPathId => _pathManager.CurrentPathId;
+        public IBrush? CurrentPathColor => _pathManager.CurrentPathColor;
+        public List<Point> CurrentPath => _pathManager.CurrentPath;
+
+        public void GoToPreviousLevel()
+        {
+            if (CurrentLevelIndex > 0)
+            {
+                ResetCurrentLevel();
+                CurrentLevelIndex--;
+            }
+        }
     }
 }

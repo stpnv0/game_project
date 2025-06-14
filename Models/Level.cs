@@ -13,14 +13,12 @@ namespace ConnectDotsGame.Models
         public List<Point> Points { get; set; }
         public List<Line> Lines { get; set; }
         public Dictionary<string, List<Line>> Paths { get; set; } = new Dictionary<string, List<Line>>();
-        public bool IsCompleted { get; set; }
         public bool WasEverCompleted { get; set; }
 
         public Level()
         {
             Points = new List<Point>();
             Lines = new List<Line>();
-            IsCompleted = false;
             WasEverCompleted = false;
         }
 
@@ -38,17 +36,20 @@ namespace ConnectDotsGame.Models
                     kvp => kvp.Key,
                     kvp => kvp.Value.Select(l => l.Clone()).ToList()
                 ) ?? new Dictionary<string, List<Line>>(),
-                IsCompleted = this.IsCompleted
+                WasEverCompleted = this.WasEverCompleted
             };
         }
 
         public bool IsPathComplete(IBrush? color)
         {
+            if (color == null)
+                return false;
+
             string pathId = $"{color}-path";
             if (!Paths.ContainsKey(pathId))
                 return false;
                 
-            var colorPoints = Points.Where(p => p.Color != null && p.Color.Equals(color)).ToList();
+            var colorPoints = Points.Where(p => p.Color != null && p.Color.ToString() == color.ToString()).ToList();
             
             if (colorPoints.Count != 2)
                 return false;
@@ -58,7 +59,7 @@ namespace ConnectDotsGame.Models
 
         public bool CheckCompletion()
         {
-            var colorGroups = Points.Where(p => p.HasColor)
+            var colorGroups = Points.Where(p => p.HasColor && p.Color != null)
                                   .GroupBy(p => p.Color);
                                   
             return colorGroups.All(group => IsPathComplete(group.Key));

@@ -13,7 +13,7 @@ namespace ConnectDotsGame.Services
         public GameStorageService()
         {
             // Путь к файлу сохранения в папке с данными приложения
-            string appDataPath = Path.Combine(
+            string appDataPath = System.IO.Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 "ConnectDotsGame"
             );
@@ -24,7 +24,7 @@ namespace ConnectDotsGame.Services
                 Directory.CreateDirectory(appDataPath);
             }
             
-            _savePath = Path.Combine(appDataPath, "progress.json");
+            _savePath = System.IO.Path.Combine(appDataPath, "progress.json");
         }
         
         public void SaveProgress(List<Level> levels)
@@ -39,7 +39,6 @@ namespace ConnectDotsGame.Services
                     progressData.Add(new LevelProgressData
                     {
                         Id = level.Id,
-                        IsCompleted = level.IsCompleted,
                         WasEverCompleted = level.WasEverCompleted
                     });
                 }
@@ -78,7 +77,6 @@ namespace ConnectDotsGame.Services
                     var level = levels.Find(l => l.Id == levelProgress.Id);
                     if (level != null)
                     {
-                        level.IsCompleted = levelProgress.IsCompleted;
                         level.WasEverCompleted = levelProgress.WasEverCompleted;
                         Console.WriteLine($"Загружен прогресс для уровня {level.Id}: пройден = {level.WasEverCompleted}");
                     }
@@ -96,7 +94,6 @@ namespace ConnectDotsGame.Services
         private class LevelProgressData
         {
             public int Id { get; set; }
-            public bool IsCompleted { get; set; }
             public bool WasEverCompleted { get; set; }
         }
     }

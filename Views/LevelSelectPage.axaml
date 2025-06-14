@@ -11,61 +11,85 @@
         <vm:LevelSelectViewModel/>
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto,*,Auto">
-        <!-- Заголовок -->
-        <TextBlock Grid.Row="0" Text="Выберите уровень" 
-                  HorizontalAlignment="Center" 
-                  VerticalAlignment="Center"
-                  FontSize="32" 
-                  Margin="0,20,0,30" 
-                  Foreground="White"/>
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Color="#151515" Offset="0"/>
+                <GradientStop Color="#252525" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
 
-        <!-- Сетка уровней -->
-        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" 
-                      VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding Levels}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel HorizontalAlignment="Center"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="vm:LevelInfo">
-                        <Button Command="{Binding $parent[UserControl].((vm:LevelSelectViewModel)DataContext).SelectLevelCommand}"
-                                CommandParameter="{Binding Id}"
-                                Width="150" Height="150" Margin="15"
-                                Background="{Binding IsLocked, Converter={x:Static vm:LevelSelectViewModel.LevelToBrushConverter}}"
-                                IsEnabled="{Binding !IsLocked}">
-                            <Grid RowDefinitions="2*,*">
-                                <TextBlock Grid.Row="0" 
-                                           Text="{Binding Id}" 
-                                           FontSize="48" 
-                                           HorizontalAlignment="Center" 
-                                           VerticalAlignment="Center"/>
-                                <TextBlock Grid.Row="1" 
-                                           Text="{Binding Name}" 
-                                           HorizontalAlignment="Center" 
-                                           VerticalAlignment="Center"/>
-                                <!-- Иконка замка для заблокированных уровней -->
-                                <TextBlock Grid.Row="0" Grid.RowSpan="2"
-                                           Text="🔒" 
-                                           FontSize="64"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"
-                                           IsVisible="{Binding IsLocked}"/>
+        <Grid RowDefinitions="Auto,*,Auto" Margin="40,20">
+            <!-- Заголовок -->
+            <TextBlock Grid.Row="0" 
+                      Text="ВЫБЕРИТЕ УРОВЕНЬ" 
+                      FontSize="64"
+                      FontWeight="Bold"
+                      HorizontalAlignment="Center"
+                      Foreground="#E106D9"
+                      Margin="0,20,0,40"/>
 
-                            </Grid>
-                        </Button>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+            <!-- Сетка уровней -->
+            <Border Grid.Row="1"
+                    Background="#1A1A1A"
+                    CornerRadius="20"
+                    Padding="30"
+                    BoxShadow="0 4 20 0 #000000">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" 
+                            VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Levels}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel HorizontalAlignment="Center"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:LevelInfo">
+                                <Button Command="{Binding $parent[UserControl].((vm:LevelSelectViewModel)DataContext).SelectLevelCommand}"
+                                        CommandParameter="{Binding Id}"
+                                        Width="150" Height="150" 
+                                        Margin="15"
+                                        Background="{Binding IsLocked, Converter={x:Static vm:LevelSelectViewModel.LevelToBrushConverter}}"
+                                        IsEnabled="{Binding !IsLocked}">
+                                    <Grid RowDefinitions="*,Auto">
+                                        <TextBlock Grid.Row="0" 
+                                                 Text="{Binding Id}" 
+                                                 FontSize="48" 
+                                                 HorizontalAlignment="Center" 
+                                                 VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Row="1" 
+                                                 Text="{Binding Name}" 
+                                                 HorizontalAlignment="Center" 
+                                                 VerticalAlignment="Center"/>
+                                        <!-- Иконка замка для заблокированных уровней -->
+                                        <TextBlock Grid.Row="0" Grid.RowSpan="2"
+                                                 Text="🔒" 
+                                                 FontSize="64"
+                                                 HorizontalAlignment="Center"
+                                                 VerticalAlignment="Center"
+                                                 IsVisible="{Binding IsLocked}"/>
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Border>
 
-        <!-- Кнопка назад -->
-        <Button Grid.Row="2" Content="Назад" 
-                Command="{Binding BackToMainCommand}"
-                HorizontalAlignment="Center" 
-                Margin="0,20,0,20"/>
-
+            <!-- Кнопка назад -->
+            <Button Grid.Row="2" 
+                    Content="В меню"
+                    Command="{Binding BackToMainCommand}"
+                    HorizontalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    MinWidth="180"
+                    Height="60"
+                    FontSize="24"
+                    Background="#E106D9"
+                    Foreground="White"
+                    CornerRadius="5"
+                    Margin="0,20"/>
+        </Grid>
     </Grid>
 </UserControl> 

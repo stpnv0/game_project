@@ -1,94 +1,95 @@
+using System;
 using ConnectDotsGame.Models;
-using ConnectDotsGame.Utils;
-using ConnectDotsGame.Services;
 using ConnectDotsGame.ViewModels;
-using Avalonia.Media;
-using System.Collections.Generic;
-using System.Linq;
-using Avalonia.Layout;
-using static ConnectDotsGame.Utils.PointLocator;
 
 namespace ConnectDotsGame.Services
 {
     public class GameService : IGameService
     {
-        private readonly INavigation _navigation;
+        private INavigation? _navigation;
         private readonly IModalService _modalService;
-        private readonly IPathManager _pathManager;
-        private readonly ILevelManager _levelManager;
 
-        public GameService(INavigation navigation, IModalService modalService, IPathManager pathManager, ILevelManager levelManager)
+        public GameService(IModalService modalService)
         {
-            _navigation = navigation;
-            _modalService = modalService;
-            _pathManager = pathManager;
-            _levelManager = levelManager;
+            _modalService = modalService ?? throw new ArgumentNullException(nameof(modalService));
         }
 
-        // Пытается соединить две точки на игровом поле.
-        public bool TryConnectPoints(GameState gameState, Point clickedPoint)
+        public void SetNavigation(INavigation navigation)
         {
-            return _pathManager.TryConnectPoints(gameState, clickedPoint);
+            _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
         }
 
-        // Начинает новый путь от точки.
-        public void StartPath(GameState gameState, Point point)
-        {
-            _pathManager.StartPath(gameState, point);
-        }
-
-        // Продолжает путь через точку.
-        public void ContinuePath(GameState gameState, Point point)
-        {
-            _pathManager.ContinuePath(gameState, point);
-        }
-
-        /// Завершает путь на указанной точке.
-        public void EndPath(GameState gameState, Point? endPoint = null)
-        {
-            _pathManager.EndPath(gameState, endPoint);
-        }
-
-        /// Отменяет текущий путь.
-        public void CancelPath(GameState gameState)
-        {
-            _pathManager.CancelPath(gameState);
-        }
-
-        /// Сбрасывает состояние текущего уровня.
         public void ResetLevel(GameState gameState)
         {
-            _levelManager.ResetLevel(gameState);
+            gameState.ResetCurrentLevel();
         }
 
-        /// Переходит к следующему уровню.
         public void NextLevel(GameState gameState)
         {
-            _levelManager.NextLevel(gameState);
+            gameState.GoToNextLevel();
         }
 
-        // Проверяет завершён ли уровень.
         public bool CheckLevelCompletion(GameState gameState)
         {
-            return _levelManager.CheckLevelCompletion(gameState);
+            if (gameState.CurrentLevel == null)
+                return false;
+
+            bool allCompleted = gameState.CurrentLevel.CheckCompletion();
+            if (allCompleted)
+            {
+                HandleLevelCompletion(gameState);
+            }
+            return allCompleted;
         }
 
-        /// Перерисовывает текущий путь на игровом поле.
-        public void RedrawCurrentPath(GameState gameState, string colorKey, List<Point> pathPoints)
+        private void HandleLevelCompletion(GameState gameState)
         {
-            _pathManager.RedrawCurrentPath(gameState, colorKey, pathPoints);
+            if (_navigation == null)
+                throw new InvalidOperationException("Navigation service is not set");
+
+            gameState.CurrentLevel!.WasEverCompleted = true;
+                gameState.SaveProgress();
+
+                if (!gameState.HasNextLevel)
+                {
+                ShowGameCompletionModal();
+            }
+            else
+            {
+                ShowLevelCompletionModal(gameState);
+            }
         }
 
-        /// Создаёт линии для пути на игровом поле.
-        public void CreatePathLines(GameState gameState, string colorKey, List<Point> pathPoints)
+        private void ShowGameCompletionModal()
         {
-            _pathManager.CreatePathLines(gameState, colorKey, pathPoints);
-        }
+            if (_navigation == null)
+                throw new InvalidOperationException("Navigation service is not set");
 
-        /// Находит идентификатор пути, проходящего через точку.
-        public string? FindCrossingPath(Level level, Point point)
-        {
-            return _pathManager.FindCrossingPath(level, point);
+                    _modalService.ShowModal(
+                        "Поздравляем!",
+                        "Вы прошли все уровни!",
+                        "В меню",
+                        () => _navigation.NavigateTo<LevelSelectViewModel>()
+                    );
+                }
+
+        private void ShowLevelCompletionModal(GameState gameState)
+                {
+            if (_navigation == null)
+                throw new InvalidOperationException("Navigation service is not set");
+
+                    _modalService.ShowModal(
+                        "Уровень завершён!",
+                $"Вы успешно завершили {gameState.CurrentLevel!.Name}",
+                        "Следующий уровень",
+                        () =>
+                        {
+                            if (gameState.GoToNextLevel())
+                            {
+                                _navigation.NavigateTo<GameViewModel>(gameState);
+                            }
+                        }
+                    );
         }
     }
 } 

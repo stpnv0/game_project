@@ -67,7 +67,7 @@ namespace ConnectDotsGame.ViewModels
             if (levelId >= 1 && levelId <= _gameState.Levels.Count && !IsLevelLocked(levelId))
             {
                 _gameState.CurrentLevelIndex = levelId - 1;
-                _navigation.NavigateTo<GameViewModel>();
+                _navigation.NavigateTo<GameViewModel>(_gameState);
             }
         }
         

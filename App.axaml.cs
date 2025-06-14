@@ -1,12 +1,14 @@
+using System;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using ConnectDotsGame.Models;
-using ConnectDotsGame.Services;
 using ConnectDotsGame.ViewModels;
 using ConnectDotsGame.Views;
-using System;
-using Avalonia.Controls;
+using ConnectDotsGame.Services;
+using ConnectDotsGame.Models;
+using ConnectDotsGame.Levels;
+using ConnectDotsGame.Utils;
 
 namespace ConnectDotsGame
 {
@@ -21,44 +23,43 @@ namespace ConnectDotsGame
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                var mainWindow = new MainWindow();
-
-                // Инициализация сервисов
-                var gameStorageService = new GameStorageService();
-                var gameState = new GameState(gameStorageService);
-
-                // Загружаем уровни
-                var levelLoader = new Levels.LevelLoader();
-                gameState.Levels = levelLoader.LoadLevels();
-
-                // Загружаем сохраненные данные
-                gameState.LoadProgress();
-
-                // Находим ContentArea
-                var contentArea = mainWindow.FindControl<ContentControl>("ContentArea");
-                if (contentArea == null)
+                var window = new MainWindow();
+                var contentControl = window.FindControl<ContentControl>("ContentArea");
+                if (contentControl == null)
                 {
                     throw new InvalidOperationException("ContentArea не найден в MainWindow");
                 }
 
-                // Инициализация сервисов
-                var modalService = new ModalService(contentArea);
-                var navigationService = new NavigationService(contentArea, modalService);
+                // Создаем базовые сервисы
+                var modalService = new ModalService(contentControl);
+                var gameStorage = new GameStorageService();
                 var pathManager = new PathManager();
-                var levelManager = new LevelManager(navigationService, modalService);
-                var gameService = new GameService(navigationService, modalService, pathManager, levelManager);
+                var gameState = new GameState(gameStorage, pathManager);
 
-                // Регистрация всех страниц
+                // Загружаем уровни
+                var levelLoader = new LevelLoader();
+                gameState.Levels = levelLoader.LoadLevels();
+                gameState.LoadProgress();
+
+                // Создаем сервисы
+                var gameService = new GameService(modalService);
+
+                // Создаем NavigationService
+                var navigationService = new NavigationService(contentControl, modalService, gameState, gameService, pathManager);
+
+                // Устанавливаем навигацию
+                gameService.SetNavigation(navigationService);
+
+                // Регистрация представлений
                 navigationService.RegisterView<MainPageViewModel, MainPage>();
                 navigationService.RegisterView<LevelSelectViewModel, LevelSelectPage>();
                 navigationService.RegisterView<GameViewModel, GamePage>();
                 navigationService.RegisterView<AboutPageViewModel, AboutPage>();
 
                 // Задать начальное представление
-                navigationService.NavigateTo<MainPageViewModel>(gameState);
+                navigationService.NavigateTo<MainPageViewModel>();
 
-                desktop.MainWindow = mainWindow;
-                mainWindow.Show();
+                desktop.MainWindow = window;
             }
 
             base.OnFrameworkInitializationCompleted();

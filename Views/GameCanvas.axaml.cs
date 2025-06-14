@@ -496,23 +496,23 @@ namespace ConnectDotsGame.Views
                     if (point.HasColor)
                     {
                         // Создаем внешний круг (белая обводка)
-                        var outerCircle = new Avalonia.Controls.Shapes.Ellipse
-                        {
-                            Width = CellSize * 0.8,
-                            Height = CellSize * 0.8,
-                            Fill = Brushes.White
-                        };
+                        // var outerCircle = new Avalonia.Controls.Shapes.Ellipse
+                        // {
+                        //     Width = CellSize * 0.8,
+                        //     Height = CellSize * 0.8,
+                        //     Fill = Brushes.White
+                        // };
                         
-                        Canvas.SetLeft(outerCircle, point.X - outerCircle.Width / 2);
-                        Canvas.SetTop(outerCircle, point.Y - outerCircle.Height / 2);
+                        // Canvas.SetLeft(outerCircle, point.X - outerCircle.Width / 2);
+                        // Canvas.SetTop(outerCircle, point.Y - outerCircle.Height / 2);
                         
-                        _drawingCanvas.Children.Add(outerCircle);
+                        // _drawingCanvas.Children.Add(outerCircle);
                         
                         // Создаем внутренний круг (цветная точка)
                         var innerCircle = new Avalonia.Controls.Shapes.Ellipse
                         {
-                            Width = CellSize * 0.7,
-                            Height = CellSize * 0.7,
+                            Width = CellSize * 0.8,
+                            Height = CellSize * 0.8,
                             Fill = point.Color
                         };
                         

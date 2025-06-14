@@ -10,53 +10,15 @@
             <Setter Property="Height" Value="150"/>
             <Setter Property="WindowStartupLocation" Value="CenterScreen"/>
         </Style>
-        
-        <!-- Стиль для модального окна -->
-        <Style Selector="Window.modal">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#FF2D2D72" Offset="0"/>
-                        <GradientStop Color="#FF6A82FB" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="FontFamily" Value="Inter, Segoe UI, Arial, sans-serif"/>
-            <Setter Property="Foreground" Value="Purple"/>
-            <Setter Property="CornerRadius" Value="20"/>
-            <Setter Property="Effect">
-                <Setter.Value>
-                    <DropShadowEffect Color="#80000000" BlurRadius="18"/>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <!-- Явно задаём стиль для Button внутри модального окна -->
-        <!-- Стиль для кнопки внутри модального окна -->
-        <Style Selector="Window.modal Button">
-            <Setter Property="FontSize" Value="60"/> <!-- Увеличен шрифт -->
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Background" Value="#E106D9"/>
-            <Setter Property="CornerRadius" Value="20"/> <!-- Закругление увеличено -->
-            <Setter Property="Padding" Value="30,12"/> <!-- Размер кнопки увеличен -->
-            <Setter Property="BorderThickness" Value="0"/> <!-- Убрана белая рамка -->
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-        </Style>
-
-        <!-- Стиль для текста в модальном окне -->
-        <Style Selector="Window.modal TextBlock">
-            <Setter Property="FontSize" Value="60"/> <!-- Увеличен шрифт -->
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="TextAlignment" Value="Center"/>
-            <Setter Property="FontFamily" Value="Inter, Segoe UI, Arial, sans-serif"/>
-        </Style>
     </Application.Styles>
 
     <Application.Resources>
         <ResourceDictionary>
+            <Color x:Key="PrimaryColor">#E106D9</Color>
+            <Color x:Key="PrimaryHoverColor">#F516E6</Color>
+            <Color x:Key="BackgroundColor">#1A1A1A</Color>
+            <Color x:Key="BorderColor">#2A2A2A</Color>
+            
             <x:Boolean x:Key="True">True</x:Boolean>
             <x:Boolean x:Key="False">False</x:Boolean>
         </ResourceDictionary>

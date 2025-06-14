@@ -20,11 +20,17 @@ namespace ConnectDotsGame.Services
         private readonly Stack<object> _navigationStack = new();
         private GameState? _gameState;
         private readonly IModalService _modalService;
+        private readonly IGameService? _gameService;
+        private readonly IPathManager? _pathManager;
 
-        public NavigationService(ContentControl contentControl, IModalService modalService)
+        public NavigationService(ContentControl contentControl, IModalService modalService, GameState gameState, 
+            IGameService gameService, IPathManager pathManager)
         {
             _contentControl = contentControl ?? throw new ArgumentNullException(nameof(contentControl));
             _modalService = modalService ?? throw new ArgumentNullException(nameof(modalService));
+            _gameState = gameState ?? throw new ArgumentNullException(nameof(gameState));
+            _gameService = gameService ?? throw new ArgumentNullException(nameof(gameService));
+            _pathManager = pathManager ?? throw new ArgumentNullException(nameof(pathManager));
         }
 
         public void RegisterView<TViewModel, TView>()
@@ -73,32 +79,22 @@ namespace ConnectDotsGame.Services
             _contentControl.Content = view;
         }
 
-        public void GoBack()
-        {
-            if (_navigationStack.Count > 0)
-            {
-                var previousContent = _navigationStack.Pop();
-                _contentControl.Content = previousContent;
-                
-                // Если возвращаемся к экрану выбора уровней, обновляем список
-                if (previousContent is Control control && 
-                    control.DataContext is LevelSelectViewModel levelSelectViewModel)
-                {
-                    levelSelectViewModel.UpdateLevels();
-                }
-            }
-            else if (_gameState != null)
-            {
-                // Если стек навигации пуст, но у нас есть GameState, 
-                // то идем на главную страницу
-                NavigateToViewModel(typeof(MainPageViewModel), _gameState);
-            }
-        }
+        
 
         private object CreateViewModel(Type viewModelType, object? parameter)
         {
             if (viewModelType == null)
                 throw new ArgumentNullException(nameof(viewModelType));
+
+            // Специальная обработка для GameViewModel
+            if (viewModelType == typeof(GameViewModel))
+            {
+                if (_gameState == null || _gameService == null || _pathManager == null)
+                {
+                    throw new InvalidOperationException($"Для создания {viewModelType.Name} требуются все необходимые сервисы.");
+                }
+                return new GameViewModel(this, _gameState, _modalService, _gameService, _pathManager);
+            }
                 
             // Ищем конструктор, который принимает INavigation
             var constructor = viewModelType.GetConstructors()
@@ -131,15 +127,6 @@ namespace ConnectDotsGame.Services
                     
                     // Конструктор принимает INavigation и GameState
                     return Activator.CreateInstance(viewModelType, this, gameState)!;
-                }
-                else if (parameters.Length == 3 && parameters[1].ParameterType == typeof(GameState) && parameters[2].ParameterType == typeof(IModalService))
-                {
-                    var gameState = _gameState ?? parameter as GameState;
-                    if (gameState == null)
-                    {
-                        throw new InvalidOperationException($"Для создания {viewModelType.Name} требуется GameState, но он не был предоставлен.");
-                    }
-                    return Activator.CreateInstance(viewModelType, this, gameState, _modalService)!;
                 }
             }
 

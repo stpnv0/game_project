@@ -3,25 +3,30 @@ using ConnectDotsGame.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using static ConnectDotsGame.Utils.PointLocator;
+using Avalonia.Media;
+using BrushExt = ConnectDotsGame.Utils.BrushExtensions;
+using GamePath = ConnectDotsGame.Models.Path;
 
 namespace ConnectDotsGame.Services
 {
     public class PathManager : IPathManager
     {
+        private readonly GamePath _currentPath = new GamePath();
+
         public bool TryConnectPoints(GameState gameState, Point clickedPoint)
         {
-            if (gameState.CurrentPathColor == null || clickedPoint.Color == null)
+            if (_currentPath.PathColor == null || clickedPoint.Color == null)
                 return false;
 
-            if (!BrushExtensions.AreBrushesEqual(gameState.CurrentPathColor, clickedPoint.Color) || 
-                gameState.LastSelectedPoint == clickedPoint)
+            if (!BrushExt.AreBrushesEqual(_currentPath.PathColor, clickedPoint.Color) || 
+                _currentPath.LastSelectedPoint == clickedPoint)
                 return false;
 
-            if (gameState.LastSelectedPoint == null || !IsNeighbor(gameState.LastSelectedPoint, clickedPoint))
+            if (_currentPath.LastSelectedPoint == null || !IsNeighbor(_currentPath.LastSelectedPoint, clickedPoint))
                 return false;
 
             gameState.CheckCompletedPaths();
-            gameState.ResetPathState();
+            ResetPath();
             return true;
         }
 
@@ -30,17 +35,23 @@ namespace ConnectDotsGame.Services
             if (gameState.CurrentLevel == null || !point.HasColor || point.Color == null)
                 return;
 
-            gameState._pathState.StartNewPath(point);
+            ResetPath();
+            _currentPath.LastSelectedPoint = point;
+            _currentPath.PathColor = point.Color;
+            _currentPath.PathId = $"{point.Color}-path";
+            point.IsConnected = true;
+            _currentPath.Points.Add(point);
+            
             gameState.LastSelectedPoint = point;
         }
 
         public void ContinuePath(GameState gameState, Point point)
         {
             var level = gameState.CurrentLevel;
-            if (level == null || gameState.CurrentPathColor == null || gameState.CurrentPath.Count == 0)
+            if (level == null || _currentPath.PathColor == null || _currentPath.Points.Count == 0)
                 return;
 
-            var lastPoint = gameState.CurrentPath[^1];
+            var lastPoint = _currentPath.Points[^1];
             if (lastPoint.Row == point.Row && lastPoint.Column == point.Column)
                 return;
 
@@ -53,7 +64,7 @@ namespace ConnectDotsGame.Services
         private void HandlePathContinuation(GameState gameState, Point point)
         {
             // Проверка на возврат по пути
-            var (isInPath, returnIndex) = gameState._pathState.CheckPointInPath(point);
+            var (isInPath, returnIndex) = CheckPointInPath(point);
             if (isInPath)
             {
                 HandlePathReturn(gameState, returnIndex, point);
@@ -67,10 +78,10 @@ namespace ConnectDotsGame.Services
                 gameState.CurrentLevel!.ClearPath(crossingPath);
             }
 
-            if (!CanContinuePath(gameState, point))
+            if (!CanContinuePath(point))
                 return;
 
-            if (IsEndPoint(gameState, point))
+            if (IsEndPoint(point))
             {
                 CompletePath(gameState, point);
                 return;
@@ -81,55 +92,62 @@ namespace ConnectDotsGame.Services
 
         private void HandlePathReturn(GameState gameState, int returnIndex, Point point)
         {
-            gameState._pathState.RemovePointsAfter(returnIndex);
+            RemovePointsAfter(returnIndex);
+            _currentPath.LastSelectedPoint = point;
             gameState.LastSelectedPoint = point;
-            RedrawCurrentPath(gameState, gameState.CurrentPathColor!.ToString()!, gameState.CurrentPath);
+            RedrawCurrentPath(gameState, _currentPath.PathColor!.ToString()!, _currentPath.Points);
         }
 
-        private bool CanContinuePath(GameState gameState, Point point)
+        private bool CanContinuePath(Point point)
         {
             if (!point.HasColor)
                 return true;
 
-            return BrushExtensions.AreBrushesEqual(point.Color, gameState.CurrentPathColor);
+            return BrushExt.AreBrushesEqual(point.Color, _currentPath.PathColor);
         }
 
-        private bool IsEndPoint(GameState gameState, Point point)
+        private bool IsEndPoint(Point point)
         {
             return point.HasColor && 
-                   BrushExtensions.AreBrushesEqual(point.Color, gameState.CurrentPathColor) && 
-                   point != gameState.CurrentPath[0];
+                   BrushExt.AreBrushesEqual(point.Color, _currentPath.PathColor) && 
+                   point != _currentPath.Points[0];
         }
 
         private void CompletePath(GameState gameState, Point point)
         {
-            gameState._pathState.Points.Add(point);
-            CreatePathLines(gameState, gameState.CurrentPathColor!.ToString()!, gameState.CurrentPath);
+            _currentPath.Points.Add(point);
+            CreatePathLines(gameState, _currentPath.PathColor!.ToString()!, _currentPath.Points);
             
-            foreach (var pathPoint in gameState.CurrentPath)
+            // Находим и помечаем обе конечные точки как соединенные
+            var startPoint = _currentPath.Points[0];
+            var endPoint = point;
+            
+            if (startPoint.HasColor && endPoint.HasColor && 
+                BrushExt.AreBrushesEqual(startPoint.Color, _currentPath.PathColor) &&
+                BrushExt.AreBrushesEqual(endPoint.Color, _currentPath.PathColor))
             {
-                if (pathPoint.HasColor && BrushExtensions.AreBrushesEqual(pathPoint.Color, gameState.CurrentPathColor))
-                {
-                    pathPoint.IsConnected = true;
-                }
+                startPoint.IsConnected = true;
+                endPoint.IsConnected = true;
             }
             
-            gameState.ResetPathState();
+            ResetPath();
+            gameState.LastSelectedPoint = null;
         }
 
         private void AddPointToPath(GameState gameState, Point point)
         {
-            gameState._pathState.Points.Add(point);
+            _currentPath.Points.Add(point);
+            _currentPath.LastSelectedPoint = point;
             gameState.LastSelectedPoint = point;
-            RedrawCurrentPath(gameState, gameState.CurrentPathColor!.ToString()!, gameState.CurrentPath);
+            RedrawCurrentPath(gameState, _currentPath.PathColor!.ToString()!, _currentPath.Points);
         }
 
         public void EndPath(GameState gameState, Point? endPoint = null)
         {
-            if (gameState.CurrentLevel == null || gameState.CurrentPathColor == null || gameState.CurrentPath.Count == 0)
+            if (gameState.CurrentLevel == null || _currentPath.PathColor == null || _currentPath.Points.Count == 0)
                 return;
 
-            if (endPoint == null || !IsValidEndPoint(gameState, endPoint))
+            if (endPoint == null || !IsValidEndPoint(endPoint))
             {
                 CancelPath(gameState);
                 return;
@@ -138,25 +156,26 @@ namespace ConnectDotsGame.Services
             CompletePath(gameState, endPoint);
         }
 
-        private bool IsValidEndPoint(GameState gameState, Point endPoint)
+        private bool IsValidEndPoint(Point endPoint)
         {
-            if (!endPoint.HasColor || !BrushExtensions.AreBrushesEqual(endPoint.Color, gameState.CurrentPathColor))
+            if (!endPoint.HasColor || !BrushExt.AreBrushesEqual(endPoint.Color, _currentPath.PathColor))
                 return false;
 
-            if (gameState.CurrentPath[0] == endPoint)
+            if (_currentPath.Points[0] == endPoint)
                 return false;
 
-            var lastPoint = gameState.CurrentPath[^1];
+            var lastPoint = _currentPath.Points[^1];
             return IsNeighbor(lastPoint, endPoint);
         }
 
         public void CancelPath(GameState gameState)
         {
-            if (gameState.CurrentLevel == null || gameState.CurrentPathColor == null)
+            if (gameState.CurrentLevel == null || _currentPath.PathColor == null)
                 return;
 
-            gameState.CurrentLevel.ClearPath(gameState.CurrentPathId ?? "");
-            gameState.ResetPathState();
+            gameState.CurrentLevel.ClearPath(_currentPath.PathId ?? "");
+            ResetPath();
+            gameState.LastSelectedPoint = null;
         }
 
         public void RedrawCurrentPath(GameState gameState, string colorKey, List<Point> pathPoints)
@@ -165,7 +184,7 @@ namespace ConnectDotsGame.Services
             if (level == null || pathPoints.Count < 2)
                 return;
 
-            level.ClearPath(gameState.CurrentPathId ?? "");
+            level.ClearPath(_currentPath.PathId ?? "");
             CreatePathLines(gameState, colorKey, pathPoints);
         }
 
@@ -179,9 +198,9 @@ namespace ConnectDotsGame.Services
             {
                 var startPoint = pathPoints[i];
                 var endPoint = pathPoints[i + 1];
-                var line = new Line(startPoint, endPoint, gameState.CurrentPathColor, gameState.CurrentPathId)
+                var line = new Line(startPoint, endPoint, _currentPath.PathColor, _currentPath.PathId)
                 {
-                    PathId = gameState.CurrentPathId ?? ""
+                    PathId = _currentPath.PathId ?? ""
                 };
                 
                 level.Lines.Add(line);
@@ -197,5 +216,35 @@ namespace ConnectDotsGame.Services
                     (line.EndPoint.Row == point.Row && line.EndPoint.Column == point.Column)))
                 .Key;
         }
+
+        private void ResetPath()
+        {
+            _currentPath.LastSelectedPoint = null;
+            _currentPath.PathColor = null;
+            _currentPath.Points.Clear();
+            _currentPath.PathId = null;
+        }
+
+        private (bool isInPath, int index) CheckPointInPath(Point point)
+        {
+            int index = _currentPath.Points.FindIndex(p => p.Row == point.Row && p.Column == point.Column);
+            return (index != -1, index);
+        }
+
+        private bool RemovePointsAfter(int index)
+        {
+            if (index < 0 || index >= _currentPath.Points.Count - 1)
+                return false;
+
+            _currentPath.Points.RemoveRange(index + 1, _currentPath.Points.Count - index - 1);
+            _currentPath.LastSelectedPoint = _currentPath.Points.Count > 0 ? _currentPath.Points[^1] : null;
+
+            return true;
+        }
+
+        // Публичные свойства для доступа к текущему пути
+        public string? CurrentPathId => _currentPath.PathId;
+        public IBrush? CurrentPathColor => _currentPath.PathColor;
+        public List<Point> CurrentPath => _currentPath.Points;
     }
 } 
