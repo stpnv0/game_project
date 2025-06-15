@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -14,24 +15,28 @@ namespace ConnectDotsGame.ViewModels
         private readonly INavigation _navigation;
         private readonly GameState _gameState;
 
-        public ObservableCollection<LevelInfo> Levels { get; } = new ObservableCollection<LevelInfo>();
+        // Статические кисти для всех экземпляров класса
+        private static readonly IBrush LockedLevelBrush = new SolidColorBrush(Color.Parse("#808080"));
+        private static readonly IBrush UnlockedLevelBrush = new SolidColorBrush(Color.Parse("#A3079D"));
+
+        public ObservableCollection<LevelInfo> Levels { get; } = new();
 
         public ICommand SelectLevelCommand { get; }
         public ICommand BackToMainCommand { get; }
 
-        public static readonly IValueConverter LevelToBrushConverter = new FuncValueConverter<bool, IBrush>(isLocked =>
-            isLocked ? Brushes.Gray : new SolidColorBrush(Color.Parse("#A3079D")));
+        // Используем статические кисти в конвертере
+        public static IValueConverter LevelToBrushConverter { get; } = 
+            new FuncValueConverter<bool, IBrush>(isLocked => isLocked ? LockedLevelBrush : UnlockedLevelBrush);
 
         public LevelSelectViewModel(INavigation navigation, GameState gameState)
         {
-            _navigation = navigation;
-            _gameState = gameState;
-
-            // Заполняем список уровней
-            UpdateLevels();
+            _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
+            _gameState = gameState ?? throw new ArgumentNullException(nameof(gameState));
 
             SelectLevelCommand = new RelayCommand<int>(SelectLevel, CanSelectLevel);
             BackToMainCommand = new RelayCommand(() => _navigation.NavigateTo<MainPageViewModel>());
+            
+            UpdateLevels();
         }
 
         // Обновляет список уровней на основе текущего состояния игры
@@ -42,16 +47,7 @@ namespace ConnectDotsGame.ViewModels
             for (int i = 0; i < _gameState.Levels.Count; i++)
             {
                 var level = _gameState.Levels[i];
-                bool isLocked = i > 0;
-                
-                // Проверяем, был ли когда-либо пройден предыдущий уровень
-                if (i > 0 && _gameState.Levels[i - 1].WasEverCompleted)
-                {
-                    isLocked = false;
-                }
-                
-                // Первый уровень всегда разблокирован
-                if (i == 0) isLocked = false;
+                var isLocked = ShouldLevelBeLocked(i);
                 
                 Levels.Add(new LevelInfo 
                 {
@@ -62,9 +58,15 @@ namespace ConnectDotsGame.ViewModels
             }
         }
 
+        private bool ShouldLevelBeLocked(int levelIndex)
+        {
+            if (levelIndex == 0) return false; // Первый уровень всегда разблокирован
+            return !_gameState.Levels[levelIndex - 1].WasEverCompleted;
+        }
+
         private void SelectLevel(int levelId)
         {
-            if (levelId >= 1 && levelId <= _gameState.Levels.Count && !IsLevelLocked(levelId))
+            if (CanSelectLevel(levelId))
             {
                 _gameState.CurrentLevelIndex = levelId - 1;
                 _navigation.NavigateTo<GameViewModel>(_gameState);
@@ -73,25 +75,15 @@ namespace ConnectDotsGame.ViewModels
         
         private bool CanSelectLevel(int levelId)
         {
-            return !IsLevelLocked(levelId);
+            return levelId > 0 && 
+                   levelId <= Levels.Count && 
+                   !Levels[levelId - 1].IsLocked;
         }
-        
-        private bool IsLevelLocked(int levelId)
-        {
-            if (levelId <= 0 || levelId > Levels.Count) return true;
-            return Levels[levelId - 1].IsLocked;
-        }
-
-        #region INotifyPropertyChanged
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        #endregion
     }
 
     public class LevelInfo

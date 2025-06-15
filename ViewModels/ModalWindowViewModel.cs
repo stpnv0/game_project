@@ -11,18 +11,15 @@ namespace ConnectDotsGame.ViewModels
         private string _title = string.Empty;
         private string _message = string.Empty;
         private string _buttonText = string.Empty;
-        private Action? _onButtonClick;
+        private readonly Action _onButtonClick;
 
         public string Title
         {
             get => _title;
             set
             {
-                if (_title != value)
-                {
-                    _title = value;
-                    OnPropertyChanged();
-                }
+                _title = value;
+                OnPropertyChanged();
             }
         }
 
@@ -31,11 +28,8 @@ namespace ConnectDotsGame.ViewModels
             get => _message;
             set
             {
-                if (_message != value)
-                {
-                    _message = value;
-                    OnPropertyChanged();
-                }
+                _message = value;
+                OnPropertyChanged();
             }
         }
 
@@ -44,11 +38,8 @@ namespace ConnectDotsGame.ViewModels
             get => _buttonText;
             set
             {
-                if (_buttonText != value)
-                {
-                    _buttonText = value;
-                    OnPropertyChanged();
-                }
+                _buttonText = value;
+                OnPropertyChanged();
             }
         }
 
@@ -56,22 +47,18 @@ namespace ConnectDotsGame.ViewModels
 
         public ModalWindowViewModel(string title, string message, string buttonText, Action onButtonClick)
         {
+            _onButtonClick = onButtonClick ?? throw new ArgumentNullException(nameof(onButtonClick));
+            
             Title = title;
             Message = message;
             ButtonText = buttonText;
-            _onButtonClick = onButtonClick;
 
-            CloseCommand = new RelayCommand(ExecuteClose);
-        }
-
-        private void ExecuteClose()
-        {
-            _onButtonClick?.Invoke();
+            CloseCommand = new RelayCommand(_onButtonClick);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
