@@ -21,16 +21,16 @@ namespace ConnectDotsGame.Services
         private GameState? _gameState;
         private readonly IModalService _modalService;
         private readonly IGameService? _gameService;
-        private readonly IPathManager? _pathManager;
+        private readonly IPathService? _pathService;
 
         public NavigationService(ContentControl contentControl, IModalService modalService, GameState gameState, 
-            IGameService gameService, IPathManager pathManager)
+            IGameService gameService, IPathService pathService)
         {
             _contentControl = contentControl ?? throw new ArgumentNullException(nameof(contentControl));
             _modalService = modalService ?? throw new ArgumentNullException(nameof(modalService));
             _gameState = gameState ?? throw new ArgumentNullException(nameof(gameState));
             _gameService = gameService ?? throw new ArgumentNullException(nameof(gameService));
-            _pathManager = pathManager ?? throw new ArgumentNullException(nameof(pathManager));
+            _pathService = pathService ?? throw new ArgumentNullException(nameof(pathService));
         }
 
         public void RegisterView<TViewModel, TView>()
@@ -89,11 +89,11 @@ namespace ConnectDotsGame.Services
             // Специальная обработка для GameViewModel
             if (viewModelType == typeof(GameViewModel))
             {
-                if (_gameState == null || _gameService == null || _pathManager == null)
+                if (_gameState == null || _gameService == null || _pathService == null)
                 {
                     throw new InvalidOperationException($"Для создания {viewModelType.Name} требуются все необходимые сервисы.");
                 }
-                return new GameViewModel(this, _gameState, _modalService, _gameService, _pathManager);
+                return new GameViewModel(this, _gameState, _modalService, _gameService, _pathService);
             }
                 
             // Ищем конструктор, который принимает INavigation

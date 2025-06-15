@@ -4,7 +4,7 @@ using Avalonia.Media;
 
 namespace ConnectDotsGame.Services
 {
-    public interface IPathManager
+    public interface IPathService
     {
         string? CurrentPathId { get; }
         IBrush? CurrentPathColor { get; }

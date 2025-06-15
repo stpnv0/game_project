@@ -14,12 +14,12 @@ namespace ConnectDotsGame.ViewModels
         private readonly GameState _gameState;
         private readonly INavigation _navigation;
         private readonly IGameService _gameService;
-        private readonly IPathManager _pathManager;
+        private readonly IPathService _pathService;
         
         public string LevelName => _gameState.CurrentLevel?.Name ?? "Нет уровня";
         public Level? CurrentLevel => _gameState.CurrentLevel;
-        public List<Point> CurrentPath => _pathManager.CurrentPath;
-        public IBrush? CurrentPathColor => _pathManager.CurrentPathColor;
+        public List<Point> CurrentPath => _pathService.CurrentPath;
+        public IBrush? CurrentPathColor => _pathService.CurrentPathColor;
         
         public ICommand NextLevelCommand { get; }
         public ICommand ResetLevelCommand { get; }
@@ -27,12 +27,12 @@ namespace ConnectDotsGame.ViewModels
         public ICommand PrevLevelCommand { get; }
         
         public GameViewModel(INavigation navigation, GameState gameState, IModalService modalService, 
-            IGameService gameService, IPathManager pathManager)
+            IGameService gameService, IPathService pathService)
         {
             _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
             _gameState = gameState ?? throw new ArgumentNullException(nameof(gameState));
             _gameService = gameService ?? throw new ArgumentNullException(nameof(gameService));
-            _pathManager = pathManager ?? throw new ArgumentNullException(nameof(pathManager));
+            _pathService = pathService ?? throw new ArgumentNullException(nameof(pathService));
 
             NextLevelCommand = new RelayCommand(NextLevel, () => CurrentLevel?.WasEverCompleted == true && _gameState.HasNextLevel);
             ResetLevelCommand = new RelayCommand(ResetLevel, () => CurrentLevel != null);
@@ -50,25 +50,25 @@ namespace ConnectDotsGame.ViewModels
         
         public void StartPath(Point point)
         {
-            _pathManager.StartPath(_gameState, point);
+            _pathService.StartPath(_gameState, point);
             UpdatePathState();
         }
 
         public void ContinuePath(Point point)
         {
-            _pathManager.ContinuePath(_gameState, point);
+            _pathService.ContinuePath(_gameState, point);
             UpdatePathState();
         }
 
         public void CancelPath()
         {
-            _pathManager.CancelPath(_gameState);
+            _pathService.CancelPath(_gameState);
             UpdatePathState();
         }
         
         public void EndPath(Point? endPoint = null)
         {
-            _pathManager.EndPath(_gameState, endPoint);
+            _pathService.EndPath(_gameState, endPoint);
             CheckLevelCompletion();
             UpdatePathState();
         }
@@ -86,7 +86,7 @@ namespace ConnectDotsGame.ViewModels
         
         public Point? GetPointByPosition(int row, int column)
                 {
-            return CurrentLevel != null ? _pathManager.GetPointByPosition(CurrentLevel, row, column) : null;
+            return CurrentLevel != null ? _pathService.GetPointByPosition(CurrentLevel, row, column) : null;
         }
         
         private void NextLevel()

@@ -8,13 +8,13 @@ namespace ConnectDotsGame.Services
     {
         private INavigation? _navigation;
         private readonly IModalService _modalService;
-        private readonly IPathManager _pathManager;
+        private readonly IPathService _pathService;
         private readonly IGameStorageService _gameStorage;
 
-        public GameService(IModalService modalService, IPathManager pathManager, IGameStorageService gameStorage)
+        public GameService(IModalService modalService, IPathService pathService, IGameStorageService gameStorage)
         {
             _modalService = modalService ?? throw new ArgumentNullException(nameof(modalService));
-            _pathManager = pathManager ?? throw new ArgumentNullException(nameof(pathManager));
+            _pathService = pathService ?? throw new ArgumentNullException(nameof(pathService));
             _gameStorage = gameStorage ?? throw new ArgumentNullException(nameof(gameStorage));
         }
 
@@ -38,7 +38,7 @@ namespace ConnectDotsGame.Services
 
             if (gameState.CurrentLevel != null)
             {
-                _pathManager.CancelPath(gameState);
+                _pathService.CancelPath(gameState);
             }
         }
 
@@ -56,7 +56,7 @@ namespace ConnectDotsGame.Services
             if (gameState.CurrentLevel == null)
                 return false;
 
-            bool allCompleted = _pathManager.CheckCompletion(gameState.CurrentLevel);
+            bool allCompleted = _pathService.CheckCompletion(gameState.CurrentLevel);
             
             if (allCompleted)
             {

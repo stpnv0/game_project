@@ -10,14 +10,14 @@ namespace ConnectDotsGame.Models
     // Хранит текущее состояние игры, включая список уровней и текущий уровень
     public class GameState
     {
-        private readonly IPathManager _pathManager;
+        private readonly IPathService _pathService;
 
         public List<Level> Levels { get; set; }
         public int CurrentLevelIndex { get; set; }
         
-        public GameState(IPathManager pathManager)
+        public GameState(IPathService pathService)
         {
-            _pathManager = pathManager ?? throw new ArgumentNullException(nameof(pathManager));
+            _pathService = pathService ?? throw new ArgumentNullException(nameof(pathService));
             Levels = new List<Level>();
             CurrentLevelIndex = 0;
         }

@@ -6,7 +6,7 @@ using Avalonia.Media;
 
 namespace ConnectDotsGame.Services
 {
-    public class PathManager : IPathManager
+    public class PathService : IPathService
     {
         private readonly Path _currentPath = new Path();
 
