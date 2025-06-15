@@ -18,8 +18,8 @@ namespace ConnectDotsGame.ViewModels
         
         public string LevelName => _gameState.CurrentLevel?.Name ?? "Нет уровня";
         public Level? CurrentLevel => _gameState.CurrentLevel;
-        public List<Point> CurrentPath => _gameState.CurrentPath;
-        public IBrush? CurrentPathColor => _gameState.CurrentPathColor;
+        public List<Point> CurrentPath => _pathManager.CurrentPath;
+        public IBrush? CurrentPathColor => _pathManager.CurrentPathColor;
         
         public ICommand NextLevelCommand { get; }
         public ICommand ResetLevelCommand { get; }
@@ -34,8 +34,6 @@ namespace ConnectDotsGame.ViewModels
             _gameService = gameService ?? throw new ArgumentNullException(nameof(gameService));
             _pathManager = pathManager ?? throw new ArgumentNullException(nameof(pathManager));
 
-            _gameState.LoadProgress();
-
             NextLevelCommand = new RelayCommand(NextLevel, () => CurrentLevel?.WasEverCompleted == true && _gameState.HasNextLevel);
             ResetLevelCommand = new RelayCommand(ResetLevel, () => CurrentLevel != null);
             BackToMenuCommand = new RelayCommand(NavigateToMenu);
@@ -46,7 +44,7 @@ namespace ConnectDotsGame.ViewModels
 
         private void NavigateToMenu()
         {
-            _gameState.ResetAllPathsAndLines();
+            _gameService.ResetAllPaths(_gameState);
             _navigation.NavigateTo<LevelSelectViewModel>();
         }
         
@@ -86,6 +84,11 @@ namespace ConnectDotsGame.ViewModels
             }
         }
         
+        public Point? GetPointByPosition(int row, int column)
+                {
+            return CurrentLevel != null ? _pathManager.GetPointByPosition(CurrentLevel, row, column) : null;
+        }
+        
         private void NextLevel()
         {
             _gameService.NextLevel(_gameState);
@@ -96,14 +99,15 @@ namespace ConnectDotsGame.ViewModels
         {
             if (_gameState.CurrentLevelIndex > 0)
             {
-                _gameState.GoToPreviousLevel();
+                _gameState.CurrentLevelIndex--;
+                _gameService.ResetAllPaths(_gameState);
                 UpdateLevelState();
             }
         }
         
         private void ResetLevel()
         {
-            _gameService.ResetLevel(_gameState);
+            _gameService.ResetAllPaths(_gameState);
             UpdateLevelState();
         }
         

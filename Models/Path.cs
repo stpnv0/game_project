@@ -3,6 +3,7 @@ using Avalonia.Media;
 
 namespace ConnectDotsGame.Models
 {
+    // Представляет путь между точками одного цвета с сохранением последней выбранной точки
     public class Path
     {
         public string? PathId { get; set; }

@@ -92,7 +92,7 @@ namespace ConnectDotsGame.Views
 
         // Получение точки по координатам
         private Point? GetPoint(Avalonia.Point pos) =>
-            _viewModel?.CurrentLevel?.GetPointByPosition((int)(pos.Y / CellSize), (int)(pos.X / CellSize));
+            _viewModel?.CurrentLevel != null ? _viewModel.GetPointByPosition((int)(pos.Y / CellSize), (int)(pos.X / CellSize)) : null;
 
         // Обработка нажатия и движения
         private void OnPointer(Avalonia.Point pos, bool isPress)

@@ -33,17 +33,15 @@ namespace ConnectDotsGame
                 var modalService = new ModalService(contentControl);
                 var gameStorage = new GameStorageService();
                 var pathManager = new PathManager();
-                var gameState = new GameState(gameStorage, pathManager);
+                var gameState = new GameState(pathManager);
 
                 // Загружаем уровни
                 var levelLoader = new LevelLoader();
                 gameState.Levels = levelLoader.LoadLevels();
-                gameState.LoadProgress();
+                var gameService = new GameService(modalService, pathManager, gameStorage);
+                gameService.LoadProgress(gameState);
 
                 // Создаем сервисы
-                var gameService = new GameService(modalService);
-
-                // Создаем NavigationService
                 var navigationService = new NavigationService(contentControl, modalService, gameState, gameService, pathManager);
 
                 // Устанавливаем навигацию

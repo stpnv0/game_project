@@ -8,25 +8,47 @@ namespace ConnectDotsGame.Services
     {
         private INavigation? _navigation;
         private readonly IModalService _modalService;
+        private readonly IPathManager _pathManager;
+        private readonly IGameStorageService _gameStorage;
 
-        public GameService(IModalService modalService)
+        public GameService(IModalService modalService, IPathManager pathManager, IGameStorageService gameStorage)
         {
             _modalService = modalService ?? throw new ArgumentNullException(nameof(modalService));
+            _pathManager = pathManager ?? throw new ArgumentNullException(nameof(pathManager));
+            _gameStorage = gameStorage ?? throw new ArgumentNullException(nameof(gameStorage));
         }
 
         public void SetNavigation(INavigation navigation)
-        {
+            {
             _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
         }
 
-        public void ResetLevel(GameState gameState)
-        {
-            gameState.ResetCurrentLevel();
+        public void ResetAllPaths(GameState gameState)
+            {
+            foreach (var level in gameState.Levels)
+            {
+                foreach (var point in level.Points)
+                    {
+                    point.IsConnected = false;
+                    }
+                
+                level.Lines.Clear();
+                level.Paths.Clear();
+        }
+
+            if (gameState.CurrentLevel != null)
+            {
+                _pathManager.CancelPath(gameState);
+            }
         }
 
         public void NextLevel(GameState gameState)
         {
-            gameState.GoToNextLevel();
+            if (gameState.HasNextLevel)
+            {
+                ResetAllPaths(gameState);
+                gameState.CurrentLevelIndex++;
+        }
         }
 
         public bool CheckLevelCompletion(GameState gameState)
@@ -34,7 +56,8 @@ namespace ConnectDotsGame.Services
             if (gameState.CurrentLevel == null)
                 return false;
 
-            bool allCompleted = gameState.CurrentLevel.CheckCompletion();
+            bool allCompleted = _pathManager.CheckCompletion(gameState.CurrentLevel);
+            
             if (allCompleted)
             {
                 HandleLevelCompletion(gameState);
@@ -48,7 +71,7 @@ namespace ConnectDotsGame.Services
                 throw new InvalidOperationException("Navigation service is not set");
 
             gameState.CurrentLevel!.WasEverCompleted = true;
-                gameState.SaveProgress();
+            SaveProgress(gameState);
 
                 if (!gameState.HasNextLevel)
                 {
@@ -84,12 +107,20 @@ namespace ConnectDotsGame.Services
                         "Следующий уровень",
                         () =>
                         {
-                            if (gameState.GoToNextLevel())
-                            {
+                    NextLevel(gameState);
                                 _navigation.NavigateTo<GameViewModel>(gameState);
                             }
-                        }
                     );
+                }
+
+        public void LoadProgress(GameState gameState)
+        {
+            _gameStorage.LoadProgress(gameState.Levels);
+            }
+
+        public void SaveProgress(GameState gameState)
+        {
+            _gameStorage.SaveProgress(gameState.Levels);
         }
     }
 } 

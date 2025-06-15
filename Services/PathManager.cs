@@ -10,21 +10,6 @@ namespace ConnectDotsGame.Services
     {
         private readonly Path _currentPath = new Path();
 
-        // Находит точку по координатам на игровом поле
-        private static Point? FindPointAtPosition(Level level, double x, double y, double cellSize)
-        {
-            double clickRadius = cellSize;
-            foreach (var point in level.Points)
-            {
-                double pointX = point.Column * cellSize + cellSize / 2;
-                double pointY = point.Row * cellSize + cellSize / 2;
-                double distance = Math.Sqrt(Math.Pow(x - pointX, 2) + Math.Pow(y - pointY, 2));
-                if (distance <= clickRadius)
-                    return point;
-            }
-            return null;
-        }
-
         // Проверяет, являются ли две точки соседями по сетке
         private static bool IsNeighbor(Point a, Point b)
         {
@@ -54,7 +39,14 @@ namespace ConnectDotsGame.Services
             if (_currentPath.LastSelectedPoint == null || !IsNeighbor(_currentPath.LastSelectedPoint, clickedPoint))
                 return false;
 
-            gameState.CheckCompletedPaths();
+            if (gameState.CurrentLevel == null)
+                return false;
+
+            bool isCompleted = CheckCompletion(gameState.CurrentLevel);
+            if (isCompleted)
+            {
+                gameState.CurrentLevel.WasEverCompleted = true;
+            }
             ResetPath();
             return true;
         }
@@ -70,8 +62,6 @@ namespace ConnectDotsGame.Services
             _currentPath.PathId = $"{point.Color}-path";
             point.IsConnected = true;
             _currentPath.Points.Add(point);
-            
-            gameState.LastSelectedPoint = point;
         }
 
         public void ContinuePath(GameState gameState, Point point)
@@ -104,7 +94,7 @@ namespace ConnectDotsGame.Services
             var crossingPath = FindCrossingPath(gameState.CurrentLevel!, point);
             if (crossingPath != null)
             {
-                gameState.CurrentLevel!.ClearPath(crossingPath);
+                ClearPath(gameState.CurrentLevel!, crossingPath);
             }
 
             if (!CanContinuePath(point))
@@ -123,7 +113,6 @@ namespace ConnectDotsGame.Services
         {
             RemovePointsAfter(returnIndex);
             _currentPath.LastSelectedPoint = point;
-            gameState.LastSelectedPoint = point;
             RedrawCurrentPath(gameState, _currentPath.PathColor!.ToString()!, _currentPath.Points);
         }
 
@@ -160,14 +149,12 @@ namespace ConnectDotsGame.Services
             }
             
             ResetPath();
-            gameState.LastSelectedPoint = null;
         }
 
         private void AddPointToPath(GameState gameState, Point point)
         {
             _currentPath.Points.Add(point);
             _currentPath.LastSelectedPoint = point;
-            gameState.LastSelectedPoint = point;
             RedrawCurrentPath(gameState, _currentPath.PathColor!.ToString()!, _currentPath.Points);
         }
 
@@ -202,9 +189,8 @@ namespace ConnectDotsGame.Services
             if (gameState.CurrentLevel == null || _currentPath.PathColor == null)
                 return;
 
-            gameState.CurrentLevel.ClearPath(_currentPath.PathId ?? "");
+            ClearPath(gameState.CurrentLevel, _currentPath.PathId ?? "");
             ResetPath();
-            gameState.LastSelectedPoint = null;
         }
 
         public void RedrawCurrentPath(GameState gameState, string colorKey, List<Point> pathPoints)
@@ -213,7 +199,7 @@ namespace ConnectDotsGame.Services
             if (level == null || pathPoints.Count < 2)
                 return;
 
-            level.ClearPath(_currentPath.PathId ?? "");
+            ClearPath(level, _currentPath.PathId ?? "");
             CreatePathLines(gameState, colorKey, pathPoints);
         }
 
@@ -227,13 +213,10 @@ namespace ConnectDotsGame.Services
             {
                 var startPoint = pathPoints[i];
                 var endPoint = pathPoints[i + 1];
-                var line = new Line(startPoint, endPoint, _currentPath.PathColor, _currentPath.PathId)
-                {
-                    PathId = _currentPath.PathId ?? ""
-                };
+                var line = new Line(startPoint, endPoint, _currentPath.PathColor, _currentPath.PathId);
                 
                 level.Lines.Add(line);
-                level.AddLineToPaths(line);
+                AddLineToPaths(level, line);
             }
         }
 
@@ -275,5 +258,73 @@ namespace ConnectDotsGame.Services
         public string? CurrentPathId => _currentPath.PathId;
         public IBrush? CurrentPathColor => _currentPath.PathColor;
         public List<Point> CurrentPath => _currentPath.Points;
+        public Point? LastSelectedPoint => _currentPath.LastSelectedPoint;
+
+        public bool IsPathComplete(Level level, IBrush? color)
+        {
+            if (color == null)
+                return false;
+
+            string pathId = $"{color}-path";
+            if (!level.Paths.ContainsKey(pathId))
+                return false;
+                
+            var colorPoints = level.Points.Where(p => p.Color != null && p.Color.ToString() == color.ToString()).ToList();
+            
+            if (colorPoints.Count != 2)
+                return false;
+                
+            return colorPoints.All(p => p.IsConnected);
+        }
+
+        public bool CheckCompletion(Level level)
+        {
+            var colorGroups = level.Points.Where(p => p.HasColor && p.Color != null)
+                                  .GroupBy(p => p.Color);
+                                  
+            return colorGroups.All(group => IsPathComplete(level, group.Key));
+        }
+
+        public void AddLineToPaths(Level level, Line line)
+        {
+            if (line == null)
+                return;
+                
+            if (!level.Paths.ContainsKey(line.PathId))
+            {
+                level.Paths[line.PathId] = new List<Line>();
+            }
+            
+            level.Paths[line.PathId].Add(line);
+        }
+
+        public void ClearPath(Level level, string pathId)
+        {
+            if (level.Paths.ContainsKey(pathId))
+            {
+                var linesToRemove = level.Paths[pathId].ToList();
+                
+                foreach (var line in linesToRemove)
+                {
+                    level.Lines.Remove(line);
+                }
+                
+                level.Paths.Remove(pathId);
+                
+                // Сброс статуса соединения
+                var color = pathId.Replace("-path", "");
+                var colorPoints = level.Points.Where(p => p.HasColor && p.Color != null && 
+                                                p.Color.ToString() == color).ToList();
+                foreach (var point in colorPoints)
+                {
+                    point.IsConnected = false;
+                }
+            }
+        }
+
+        public Point? GetPointByPosition(Level level, int row, int column)
+        {
+            return level.Points.FirstOrDefault(p => p.Row == row && p.Column == column);
+        }
     }
 } 
