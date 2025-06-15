@@ -8,7 +8,6 @@ using ConnectDotsGame.Views;
 using ConnectDotsGame.Services;
 using ConnectDotsGame.Models;
 using ConnectDotsGame.Levels;
-using ConnectDotsGame.Utils;
 
 namespace ConnectDotsGame
 {

@@ -1,6 +1,6 @@
 # Build results
-bin/
-obj/
+[Bb]in/
+[Oo]bj/
 
 # Rider
 .idea/

@@ -1,24 +1,53 @@
 using ConnectDotsGame.Models;
-using ConnectDotsGame.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using static ConnectDotsGame.Utils.PointLocator;
 using Avalonia.Media;
-using BrushExt = ConnectDotsGame.Utils.BrushExtensions;
-using GamePath = ConnectDotsGame.Models.Path;
 
 namespace ConnectDotsGame.Services
 {
     public class PathManager : IPathManager
     {
-        private readonly GamePath _currentPath = new GamePath();
+        private readonly Path _currentPath = new Path();
+
+        // Находит точку по координатам на игровом поле
+        private static Point? FindPointAtPosition(Level level, double x, double y, double cellSize)
+        {
+            double clickRadius = cellSize;
+            foreach (var point in level.Points)
+            {
+                double pointX = point.Column * cellSize + cellSize / 2;
+                double pointY = point.Row * cellSize + cellSize / 2;
+                double distance = Math.Sqrt(Math.Pow(x - pointX, 2) + Math.Pow(y - pointY, 2));
+                if (distance <= clickRadius)
+                    return point;
+            }
+            return null;
+        }
+
+        // Проверяет, являются ли две точки соседями по сетке
+        private static bool IsNeighbor(Point a, Point b)
+        {
+            return (Math.Abs(a.Row - b.Row) == 1 && a.Column == b.Column) ||
+                   (Math.Abs(a.Column - b.Column) == 1 && a.Row == b.Row);
+        }
+
+        // Сравнивает две кисти на равенство с учетом их типов и значений
+        private static bool AreBrushesEqual(IBrush? brush1, IBrush? brush2)
+        {
+            if (ReferenceEquals(brush1, brush2)) return true;
+            if (brush1 == null || brush2 == null) return false;
+            if (brush1 is SolidColorBrush solid1 && brush2 is SolidColorBrush solid2)
+                return solid1.Color == solid2.Color;
+            return brush1.Equals(brush2);
+        }
 
         public bool TryConnectPoints(GameState gameState, Point clickedPoint)
         {
             if (_currentPath.PathColor == null || clickedPoint.Color == null)
                 return false;
 
-            if (!BrushExt.AreBrushesEqual(_currentPath.PathColor, clickedPoint.Color) || 
+            if (!AreBrushesEqual(_currentPath.PathColor, clickedPoint.Color) || 
                 _currentPath.LastSelectedPoint == clickedPoint)
                 return false;
 
@@ -103,13 +132,13 @@ namespace ConnectDotsGame.Services
             if (!point.HasColor)
                 return true;
 
-            return BrushExt.AreBrushesEqual(point.Color, _currentPath.PathColor);
+            return AreBrushesEqual(point.Color, _currentPath.PathColor);
         }
 
         private bool IsEndPoint(Point point)
         {
             return point.HasColor && 
-                   BrushExt.AreBrushesEqual(point.Color, _currentPath.PathColor) && 
+                   AreBrushesEqual(point.Color, _currentPath.PathColor) && 
                    point != _currentPath.Points[0];
         }
 
@@ -123,8 +152,8 @@ namespace ConnectDotsGame.Services
             var endPoint = point;
             
             if (startPoint.HasColor && endPoint.HasColor && 
-                BrushExt.AreBrushesEqual(startPoint.Color, _currentPath.PathColor) &&
-                BrushExt.AreBrushesEqual(endPoint.Color, _currentPath.PathColor))
+                AreBrushesEqual(startPoint.Color, _currentPath.PathColor) &&
+                AreBrushesEqual(endPoint.Color, _currentPath.PathColor))
             {
                 startPoint.IsConnected = true;
                 endPoint.IsConnected = true;
@@ -158,7 +187,7 @@ namespace ConnectDotsGame.Services
 
         private bool IsValidEndPoint(Point endPoint)
         {
-            if (!endPoint.HasColor || !BrushExt.AreBrushesEqual(endPoint.Color, _currentPath.PathColor))
+            if (!endPoint.HasColor || !AreBrushesEqual(endPoint.Color, _currentPath.PathColor))
                 return false;
 
             if (_currentPath.Points[0] == endPoint)

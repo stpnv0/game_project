@@ -1,8 +1,7 @@
 using System;
-using System.Windows.Input;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using ConnectDotsGame.Utils;
+using System.Windows.Input;
 
 namespace ConnectDotsGame.ViewModels
 {

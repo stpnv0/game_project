@@ -1,12 +1,12 @@
 using System;
+using System.Windows.Input;
+using Avalonia.Data.Converters;
+using Avalonia.Media;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Input;
 using ConnectDotsGame.Models;
 using ConnectDotsGame.Services;
-using Avalonia.Data.Converters;
-using Avalonia.Media;
 
 namespace ConnectDotsGame.ViewModels
 {

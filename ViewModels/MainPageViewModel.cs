@@ -2,7 +2,6 @@ using System;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using ConnectDotsGame.Utils;
 using ConnectDotsGame.Services;
 
 namespace ConnectDotsGame.ViewModels
