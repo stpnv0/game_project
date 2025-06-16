@@ -18,23 +18,21 @@ namespace ConnectDotsGame.Services
             _gameStorage = gameStorage ?? throw new ArgumentNullException(nameof(gameStorage));
         }
 
+        // Устанавливает сервис навигации
         public void SetNavigation(INavigation navigation)
-            {
+        {
             _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
         }
 
+        // Сбрасывает все пути на всех уровнях
         public void ResetAllPaths(GameState gameState)
-            {
+        {
             foreach (var level in gameState.Levels)
             {
-                foreach (var point in level.Points)
-                    {
-                    point.IsConnected = false;
-                    }
-                
+                level.Points.ForEach(p => p.IsConnected = false);
                 level.Lines.Clear();
                 level.Paths.Clear();
-        }
+            }
 
             if (gameState.CurrentLevel != null)
             {
@@ -42,85 +40,78 @@ namespace ConnectDotsGame.Services
             }
         }
 
+        // Переходит к следующему уровню
         public void NextLevel(GameState gameState)
         {
             if (gameState.HasNextLevel)
             {
                 ResetAllPaths(gameState);
                 gameState.CurrentLevelIndex++;
-        }
+            }
         }
 
+        // Проверяет завершение уровня
         public bool CheckLevelCompletion(GameState gameState)
         {
             if (gameState.CurrentLevel == null)
                 return false;
 
-            bool allCompleted = _pathService.CheckCompletion(gameState.CurrentLevel);
-            
-            if (allCompleted)
-            {
+            bool isCompleted = _pathService.CheckCompletion(gameState.CurrentLevel);
+            if (isCompleted)
                 HandleLevelCompletion(gameState);
-            }
-            return allCompleted;
+                
+            return isCompleted;
         }
 
+        // Обрабатывает успешное завершение уровня
         private void HandleLevelCompletion(GameState gameState)
         {
-            if (_navigation == null)
-                throw new InvalidOperationException("Navigation service is not set");
-
-            gameState.CurrentLevel!.WasEverCompleted = true;
-            SaveProgress(gameState);
-
-                if (!gameState.HasNextLevel)
-                {
-                ShowGameCompletionModal();
-            }
-            else
+            if (!gameState.CurrentLevel!.WasEverCompleted)
             {
+                gameState.CurrentLevel!.WasEverCompleted = true;
+                SaveProgress(gameState);
+            }
+
+            if (gameState.HasNextLevel)
                 ShowLevelCompletionModal(gameState);
-            }
+            else
+                ShowGameCompletionModal();
         }
 
-        private void ShowGameCompletionModal()
-        {
-            if (_navigation == null)
-                throw new InvalidOperationException("Navigation service is not set");
+        // Модальное окно завершения игры
+        private void ShowGameCompletionModal() =>
+            ShowModal(
+                "Поздравляем!",
+                "Вы прошли все уровни!",
+                "В меню",
+                () => _navigation!.NavigateTo<LevelSelectViewModel>()
+            );
 
-                    _modalService.ShowModal(
-                        "Поздравляем!",
-                        "Вы прошли все уровни!",
-                        "В меню",
-                        () => _navigation.NavigateTo<LevelSelectViewModel>()
-                    );
-                }
-
-        private void ShowLevelCompletionModal(GameState gameState)
-                {
-            if (_navigation == null)
-                throw new InvalidOperationException("Navigation service is not set");
-
-                    _modalService.ShowModal(
-                        "Уровень завершён!",
+        // Модальное окно завершения уровня
+        private void ShowLevelCompletionModal(GameState gameState) =>
+            ShowModal(
+                "Уровень завершён!",
                 $"Вы успешно завершили {gameState.CurrentLevel!.Name}",
-                        "Следующий уровень",
-                        () =>
-                        {
+                "Следующий уровень",
+                () =>
+                {
                     NextLevel(gameState);
-                                _navigation.NavigateTo<GameViewModel>(gameState);
-                            }
-                    );
+                    _navigation!.NavigateTo<GameViewModel>(gameState);
                 }
+            );
 
-        public void LoadProgress(GameState gameState)
+        // Метод для показа модальных окон
+        private void ShowModal(string title, string message, string buttonText, Action action)
         {
-            _gameStorage.LoadProgress(gameState.Levels);
-            }
-
-        public void SaveProgress(GameState gameState)
-        {
-            _gameStorage.SaveProgress(gameState.Levels);
+            _modalService.ShowModal(title, message, buttonText, action);
         }
+
+        // Загружает прогресс
+        public void LoadProgress(GameState gameState) =>
+            _gameStorage.LoadProgress(gameState.Levels);
+
+        // Сохраняет прогресс
+        public void SaveProgress(GameState gameState) =>
+            _gameStorage.SaveProgress(gameState.Levels);
     }
 } 

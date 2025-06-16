@@ -7,28 +7,22 @@ namespace ConnectDotsGame.Services
 {
     public class ModalService : IModalService
     {
-        private readonly ContentControl _contentControl;
-        public ModalService(ContentControl contentControl)
+        private readonly Window _parentWindow;
+        
+        public ModalService(Window parentWindow)
         {
-            _contentControl = contentControl ?? throw new ArgumentNullException(nameof(contentControl));
+            _parentWindow = parentWindow ?? throw new ArgumentNullException(nameof(parentWindow));
         }
 
+        // Отображает модальное окно с параметрами
         public void ShowModal(string title, string message, string buttonText, Action onButtonClick)
         {
-            var viewModel = new ModalWindowViewModel(title, message, buttonText, onButtonClick);
             var modalWindow = new ModalWindow
             {
-                DataContext = viewModel
+                DataContext = new ModalWindowViewModel(title, message, buttonText, onButtonClick)
             };
-
-            if (_contentControl.Parent is Window parentWindow)
-            {
-                modalWindow.ShowDialog(parentWindow);
-            }
-            else
-            {
-                modalWindow.Show();
-            }
+            
+            modalWindow.ShowDialog(_parentWindow);
         }
     }
 } 

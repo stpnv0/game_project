@@ -30,7 +30,7 @@ namespace ConnectDotsGame
                 }
 
                 // Создаем базовые сервисы
-                var modalService = new ModalService(contentControl);
+                var modalService = new ModalService(window);
                 var gameStorage = new GameStorageService();
                 var pathService = new PathService();
                 var gameState = new GameState(pathService);
