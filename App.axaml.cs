@@ -1,63 +1,65 @@
+using System;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using ConnectDotsGame.Models;
-using ConnectDotsGame.Utils;
 using ConnectDotsGame.ViewModels;
 using ConnectDotsGame.Views;
-using System;
-using System.Collections.Generic;
-using Avalonia.Controls;
+using ConnectDotsGame.Services;
+using ConnectDotsGame.Models;
+using ConnectDotsGame.Levels;
 
-namespace ConnectDotsGame;
-
-public partial class App : Application
+namespace ConnectDotsGame
 {
-    private NavigationService? _navigationService;
-
-    public override void Initialize()
+    public partial class App : Application
     {
-        AvaloniaXamlLoader.Load(this);
-    }
-
-    public override void OnFrameworkInitializationCompleted()
-    {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        public override void Initialize()
         {
-            var mainWindow = new MainWindow();
-            var gameState = new GameState();
-            
-            // Загружаем уровни
-            var levelLoader = new Levels.LevelLoader();
-            gameState.Levels = levelLoader.LoadLevels();
-            
-            // Загружаем сохраненные данные
-            gameState.LoadProgress();
-            
-            // Теперь находим ContentArea
-            var contentArea = mainWindow.FindControl<ContentControl>("ContentArea");
-            if (contentArea == null)
-            {
-                throw new InvalidOperationException("ContentArea не найден в MainWindow");
-            }
-            
-            // Инициализация навигационной службы
-            _navigationService = new NavigationService(contentArea);
-            
-            // Зарегистрировать все страницы
-            _navigationService.RegisterView<MainPageViewModel, MainPage>();
-            _navigationService.RegisterView<LevelSelectViewModel, LevelSelectPage>();
-            _navigationService.RegisterView<GameViewModel, GamePage>();
-            
-            // Задать начальное представление
-            _navigationService.NavigateTo<MainPageViewModel>(gameState);
-            
-            desktop.MainWindow = mainWindow;
-            
-            // Необходимо сначала показать окно, иначе элементы управления могут быть не инициализированы
-            mainWindow.Show();
+            AvaloniaXamlLoader.Load(this);
         }
 
-        base.OnFrameworkInitializationCompleted();
+        public override void OnFrameworkInitializationCompleted()
+        {
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                var window = new MainWindow();
+                var contentControl = window.FindControl<ContentControl>("ContentArea");
+                if (contentControl == null)
+                {
+                    throw new InvalidOperationException("ContentArea не найден в MainWindow");
+                }
+
+                // Создаем базовые сервисы
+                var modalService = new ModalService(window);
+                var gameStorage = new GameStorageService();
+                var pathService = new PathService();
+                var gameState = new GameState(pathService);
+
+                // Загружаем уровни
+                var levelLoader = new LevelLoader();
+                gameState.Levels = levelLoader.LoadLevels();
+                var gameService = new GameService(modalService, pathService, gameStorage);
+                gameService.LoadProgress(gameState);
+
+                // Создаем сервисы
+                var navigationService = new NavigationService(contentControl, modalService, gameState, gameService, pathService);
+
+                // Устанавливаем навигацию
+                gameService.SetNavigation(navigationService);
+
+                // Регистрация представлений
+                navigationService.RegisterView<MainPageViewModel, MainPage>();
+                navigationService.RegisterView<LevelSelectViewModel, LevelSelectPage>();
+                navigationService.RegisterView<GameViewModel, GamePage>();
+                navigationService.RegisterView<AboutPageViewModel, AboutPage>();
+
+                // Задать начальное представление
+                navigationService.NavigateTo<MainPageViewModel>();
+
+                desktop.MainWindow = window;
+            }
+
+            base.OnFrameworkInitializationCompleted();
+        }
     }
 }

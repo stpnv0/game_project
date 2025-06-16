@@ -1,0 +1,31 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+
+# Rider
+.idea/
+
+# VS
+.vs/
+*.user
+*.suo
+
+# VS Code
+.vscode/
+
+# Avalonia designer
+*.axaml.cs.designer.cs
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# User-specific files
+*.userprefs
+
+# Artefacts
+bin 
+obj

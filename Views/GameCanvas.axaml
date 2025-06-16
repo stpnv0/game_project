@@ -3,26 +3,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="ConnectDotsGame.Views.GameCanvas"
-             AttachedToVisualTree="UserControl_AttachedToVisualTree">
+             x:Class="ConnectDotsGame.Views.GameCanvas">
     <Grid Background="Black">
         <Canvas Name="DrawingCanvas" 
-                Background="Black"
-                PointerPressed="Canvas_PointerPressed"
-                PointerMoved="Canvas_PointerMoved"
-                PointerReleased="Canvas_PointerReleased"/>
-                
-        <!-- Добавляем текстовое сообщение для дополнительной диагностики (скрыто) -->
-        <TextBlock x:Name="DebugText"
-                  Foreground="Yellow"
-                  Background="#80000000"
-                  Padding="10"
-                  MaxWidth="400"
-                  TextWrapping="Wrap"
-                  VerticalAlignment="Top"
-                  HorizontalAlignment="Left"
-                  Margin="10"
-                  IsVisible="False"
-                  FontSize="14"/>
+                Background="Black"/>
     </Grid>
 </UserControl> 

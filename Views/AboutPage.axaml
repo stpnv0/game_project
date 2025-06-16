@@ -1,0 +1,95 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:ConnectDotsGame.ViewModels"
+             x:Class="ConnectDotsGame.Views.AboutPage"
+             x:DataType="vm:AboutPageViewModel">
+             
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Color="#151515" Offset="0"/>
+                <GradientStop Color="#252525" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <Grid RowDefinitions="Auto,*,Auto" Margin="40,20">
+            <!-- Заголовок -->
+            <TextBlock Grid.Row="0" 
+                      Text="О ИГРЕ"
+                      FontSize="64"
+                      FontWeight="Bold"
+                      HorizontalAlignment="Center"
+                      Foreground="#E106D9"
+                      Margin="0,20,0,40"/>
+
+            <!-- Основной контент -->
+            <Border Grid.Row="1" 
+                    Background="#1A1A1A" 
+                    CornerRadius="20" 
+                    Padding="30"
+                    BoxShadow="0 4 20 0 #000000">
+                    
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" 
+                            VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="25">
+                        <!-- Правила -->
+                        <StackPanel Spacing="15">
+                            <TextBlock Text="ПРАВИЛА ИГРЫ"
+                                     FontSize="24"
+                                     FontWeight="Bold"
+                                     Foreground="#E106D9"/>
+                                     
+                            <ItemsControl Margin="10,0,0,0">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Spacing="15"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                
+                                <TextBlock Text="1. На каждом уровне есть сетка с точками разных цветов"
+                                         FontSize="18"
+                                         Foreground="White"
+                                         TextWrapping="Wrap"/>
+                                         
+                                <TextBlock Text="2. Ваша задача — соединить пары точек одного цвета линиями"
+                                         FontSize="18"
+                                         Foreground="White"
+                                         TextWrapping="Wrap"/>
+                                         
+                                <TextBlock Text="3. Линии не должны пересекаться и не могут проходить по одной клетке дважды"
+                                         FontSize="18"
+                                         Foreground="White"
+                                         TextWrapping="Wrap"/>
+                                         
+                                <TextBlock Text="4. Чтобы соединить точки, кликайте по ним и тяните линию"
+                                         FontSize="18"
+                                         Foreground="White"
+                                         TextWrapping="Wrap"/>
+                                         
+                                <TextBlock Text="5. Когда все пары соединены и вся сетка заполнена — уровень пройден!"
+                                         FontSize="18"
+                                         Foreground="White"
+                                         TextWrapping="Wrap"/>
+                            </ItemsControl>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+
+            <Button Grid.Row="2"
+                    Content="В меню"
+                    Command="{Binding NavigateToMenuCommand}"
+                    HorizontalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    MinWidth="180"
+                    Height="60"
+                    FontSize="24"
+                    Background="#E106D9"
+                    Foreground="White"
+                    CornerRadius="5"
+                    Margin="0,20"/>
+        </Grid>
+    </Grid>
+</UserControl>

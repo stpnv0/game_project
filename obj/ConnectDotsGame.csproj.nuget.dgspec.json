@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/dmtr/Desktop/projects/game_project/game_project/ConnectDotsGame.csproj": {}
+    "/Users/dmtr/Desktop/projects/game_project/ConnectDotsGame.csproj": {}
   },
   "projects": {
-    "/Users/dmtr/Desktop/projects/game_project/game_project/ConnectDotsGame.csproj": {
+    "/Users/dmtr/Desktop/projects/game_project/ConnectDotsGame.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/dmtr/Desktop/projects/game_project/game_project/ConnectDotsGame.csproj",
+        "projectUniqueName": "/Users/dmtr/Desktop/projects/game_project/ConnectDotsGame.csproj",
         "projectName": "ConnectDotsGame",
-        "projectPath": "/Users/dmtr/Desktop/projects/game_project/game_project/ConnectDotsGame.csproj",
+        "projectPath": "/Users/dmtr/Desktop/projects/game_project/ConnectDotsGame.csproj",
         "packagesPath": "/Users/dmtr/.nuget/packages/",
-        "outputPath": "/Users/dmtr/Desktop/projects/game_project/game_project/obj/",
+        "outputPath": "/Users/dmtr/Desktop/projects/game_project/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/dmtr/.nuget/NuGet/NuGet.Config"
@@ -49,10 +49,6 @@
               "version": "[11.2.1, )"
             },
             "Avalonia.Desktop": {
-              "target": "Package",
-              "version": "[11.2.1, )"
-            },
-            "Avalonia.Diagnostics": {
               "target": "Package",
               "version": "[11.2.1, )"
             },

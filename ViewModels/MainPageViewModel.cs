@@ -1,36 +1,27 @@
 using System;
 using System.Windows.Input;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using ConnectDotsGame.Utils;
-using ConnectDotsGame.Commands;
-using ConnectDotsGame.Navigation;
+using ConnectDotsGame.Services;
 
 namespace ConnectDotsGame.ViewModels
 {
-    public class MainPageViewModel : INotifyPropertyChanged
+    public class MainPageViewModel
     {
         private readonly INavigation _navigation;
 
         public ICommand PlayCommand { get; }
-        public ICommand SettingsCommand { get; }
         public ICommand AboutCommand { get; }
         public ICommand ExitCommand { get; }
 
         public MainPageViewModel(INavigation navigation)
         {
-            _navigation = navigation;
+            _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
 
             PlayCommand = new RelayCommand(() => _navigation.NavigateTo<LevelSelectViewModel>());
-            SettingsCommand = new RelayCommand(() => { /* Переход на экран настроек */ });
-            AboutCommand = new RelayCommand(() => { /* Показать информацию об игре */ });
+            AboutCommand = new RelayCommand(() => _navigation.NavigateTo<AboutPageViewModel>());
             ExitCommand = new RelayCommand(Exit);
         }
-
-        // Для работы с Design Time
-        public MainPageViewModel() : this(new DummyNavigation()) { }
 
         private void Exit()
         {
@@ -39,16 +30,5 @@ namespace ConnectDotsGame.ViewModels
                 lifetime.Shutdown();
             }
         }
-
-        #region INotifyPropertyChanged
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        #endregion
     }
-} 
+}
