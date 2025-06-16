@@ -44,7 +44,7 @@
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="vm:LevelInfo">
+                            <DataTemplate x:DataType="vm:LevelDisplayInfo">
                                 <Button Command="{Binding $parent[UserControl].((vm:LevelSelectViewModel)DataContext).SelectLevelCommand}"
                                         CommandParameter="{Binding Id}"
                                         Width="150" Height="150" 

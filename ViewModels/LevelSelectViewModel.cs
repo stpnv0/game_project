@@ -19,7 +19,7 @@ namespace ConnectDotsGame.ViewModels
         private static readonly IBrush LockedLevelBrush = new SolidColorBrush(Color.Parse("#808080"));
         private static readonly IBrush UnlockedLevelBrush = new SolidColorBrush(Color.Parse("#A3079D"));
 
-        public ObservableCollection<LevelInfo> Levels { get; } = new();
+        public ObservableCollection<LevelDisplayInfo> Levels { get; } = new();
 
         public ICommand SelectLevelCommand { get; }
         public ICommand BackToMainCommand { get; }
@@ -49,7 +49,7 @@ namespace ConnectDotsGame.ViewModels
                 var level = _gameState.Levels[i];
                 var isLocked = ShouldLevelBeLocked(i);
                 
-                Levels.Add(new LevelInfo 
+                Levels.Add(new LevelDisplayInfo 
                 {
                     Id = i + 1,
                     Name = level.Name,
@@ -86,7 +86,8 @@ namespace ConnectDotsGame.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public class LevelInfo
+    // Информация об уровне для отображения в UI
+    public class LevelDisplayInfo
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
