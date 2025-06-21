@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Avalonia.Media;
+using Path = ConnectDotsGame.Models.Path;
+using Point = ConnectDotsGame.Models.Point;
 
 namespace ConnectDotsGame.Services
 {
@@ -128,7 +130,7 @@ namespace ConnectDotsGame.Services
                 
                 level.Paths.TryAdd(_currentPath.PathId!, new List<Line>());
                 level.Paths[_currentPath.PathId!].Add(line);
-            }
+            }   
         }
 
         // Очищает путь с указанным id
