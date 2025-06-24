@@ -19,4 +19,10 @@
     <!-- Упакуем все PNG из папки Images как AvaloniaResource -->
     <AvaloniaResource Include="Images\**\*.png" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Levels\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
