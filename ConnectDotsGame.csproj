@@ -25,4 +25,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="obj\Debug\net9.0\ConnectDotsGame.dll" />
+    <Content Include="obj\Debug\net9.0\ConnectDotsGame.pdb" />
+  </ItemGroup>
 </Project>

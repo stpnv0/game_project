@@ -26,7 +26,8 @@ namespace ConnectDotsGame.Levels
                 { "Orange", Brushes.Orange },
                 { "Pink", Brushes.Pink },
                 { "Cyan", Brushes.Cyan },
-                { "Gray", Brushes.Gray }
+                { "Gray", Brushes.Gray },
+                { "Lime", Brushes.Lime }
             };
         }
 
