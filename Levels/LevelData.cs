@@ -23,24 +23,21 @@ namespace ConnectDotsGame.Levels
         // Преобразует DTO в модель уровня
         public Level ToLevel(Dictionary<string, IBrush> colorMap)
         {
-            var scale = 0.8; // уменьшение на 20%
-            var scaledRows = (int)Math.Round(Rows * scale);
-            var scaledColumns = (int)Math.Round(Columns * scale);
             var level = new Level
             {
                 Id = Id,
                 Name = Name,
-                Rows = scaledRows,
-                Columns = scaledColumns,
+                Rows = Rows,
+                Columns = Columns,
                 Points = new List<Point>(),
                 Lines = new List<Line>()
             };
             
             // Точки на сетке
             int pointId = 1;
-            for (int row = 0; row < scaledRows; row++)
+            for (int row = 0; row < Rows; row++)
             {
-                for (int col = 0; col < scaledColumns; col++)
+                for (int col = 0; col < Columns; col++)
                 {
                     level.Points.Add(new Point(pointId++, row, col));
                 }
@@ -53,11 +50,8 @@ namespace ConnectDotsGame.Levels
                 {
                     throw new System.InvalidOperationException($"Неизвестный цвет: {colorPoint.Color}");
                 }
-                // уменьшаем координаты точки
-                int scaledRow = (int)Math.Round(colorPoint.Row * scale);
-                int scaledCol = (int)Math.Round(colorPoint.Column * scale);
-                var point = level.Points.Find(p => p.Row == scaledRow && p.Column == scaledCol)
-                    ?? throw new System.InvalidOperationException($"Точка с координатами {scaledRow},{scaledCol} не найдена");
+                var point = level.Points.Find(p => p.Row == colorPoint.Row && p.Column == colorPoint.Column)
+                    ?? throw new System.InvalidOperationException($"Точка с координатами {colorPoint.Row},{colorPoint.Column} не найдена");
                 point.Color = brush;
             }
             
