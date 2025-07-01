@@ -3,13 +3,17 @@
     {
       "id": 1,
       "name": "Уровень 1",
-      "rows": 6,
-      "columns": 6,
+      "rows": 5,
+      "columns": 5,
       "colorPoints": [
-        { "row": 1, "column": 1, "color": "Red" },
-        { "row": 4, "column": 4, "color": "Red" },
-        { "row": 1, "column": 4, "color": "Blue" },
-        { "row": 4, "column": 1, "color": "Blue" }
+        { "row": 0, "column": 0, "color": "Red" },
+        { "row": 2, "column": 3, "color": "Red" },
+        { "row": 0, "column": 4, "color": "Green" },
+        { "row": 1, "column": 2, "color": "Green" },
+        { "row": 1, "column": 0, "color": "Yellow" },
+        { "row": 1, "column": 3, "color": "Yellow" },
+        { "row": 4, "column": 0, "color": "Blue" },
+        { "row": 4, "column": 4, "color": "Blue" }
       ]
     },
     {
@@ -18,43 +22,23 @@
       "rows": 5,
       "columns": 5,
       "colorPoints": [
-        { "row": 1, "column": 0, "color": "Red" },
-        { "row": 4, "column": 4, "color": "Red" },
-        { "row": 1, "column": 3, "color": "Blue" },
-        { "row": 2, "column": 0, "color": "Blue" }
+        { "row": 0, "column": 0, "color": "Red" },
+        { "row": 3, "column": 0, "color": "Red" },
+        { "row": 4, "column": 0, "color": "Blue" },
+        { "row": 4, "column": 4, "color": "Blue" },
+        { "row": 2, "column": 2, "color": "Green" },
+        { "row": 3, "column": 3, "color": "Green" },
+        { "row": 1, "column": 2, "color": "Yellow" },
+        { "row": 0, "column": 3, "color": "Yellow" },
+        { "row": 0, "column": 2, "color": "Purple" },
+        { "row": 3, "column": 2, "color": "Purple" },
+        { "row": 0, "column": 4, "color": "Orange" },
+        { "row": 3, "column": 4, "color": "Orange" }
       ]
     },
     {
       "id": 3,
       "name": "Уровень 3",
-      "rows": 4,
-      "columns": 4,
-      "colorPoints": [
-        { "row": 0, "column": 0, "color": "Red" },
-        { "row": 1, "column": 2, "color": "Red" },
-        { "row": 1, "column": 1, "color": "Green" },
-        { "row": 2, "column": 0, "color": "Green" },
-        { "row": 2, "column": 1, "color": "Blue" },
-        { "row": 3, "column": 3, "color": "Blue" }
-      ]
-    },
-    {
-      "id": 4,
-      "name": "Уровень 4",
-      "rows": 4,
-      "columns": 4,
-      "colorPoints": [
-        { "row": 0, "column": 0, "color": "Green" },
-        { "row": 1, "column": 2, "color": "Green" },
-        { "row": 1, "column": 1, "color": "Blue" },
-        { "row": 3, "column": 0, "color": "Blue" },
-        { "row": 2, "column": 1, "color": "Red" },
-        { "row": 2, "column": 2, "color": "Red" }
-      ]
-    },
-    {
-      "id": 5,
-      "name": "Уровень 5",
       "rows": 5,
       "columns": 5,
       "colorPoints": [
@@ -71,8 +55,8 @@
       ]
     },
     {
-      "id": 6,
-      "name": "Уровень 6",
+      "id": 4,
+      "name": "Уровень 4",
       "rows": 6,
       "columns": 6,
       "colorPoints": [
@@ -87,8 +71,8 @@
       ]
     },
     {
-      "id": 7,
-      "name": "Уровень 7",
+      "id": 5,
+      "name": "Уровень 5",
       "rows": 6,
       "columns": 6,
       "colorPoints": [
@@ -103,8 +87,8 @@
       ]
     },
     {
-      "id": 8,
-      "name": "Уровень 8",
+      "id": 6,
+      "name": "Уровень 6",
       "rows": 6,
       "columns": 6,
       "colorPoints": [
@@ -119,8 +103,8 @@
       ]
     },
     {
-      "id": 9,
-      "name": "Уровень 9",
+      "id": 7,
+      "name": "Уровень 7",
       "rows": 6,
       "columns": 6,
       "colorPoints": [
@@ -137,26 +121,52 @@
       ]
     },
     {
-      "id": 10,
-      "name": "Уровень 10",
-      "rows": 6,
-      "columns": 6,
+      "id": 8,
+      "name": "Уровень 8",
+      "rows": 7,
+      "columns": 7,
       "colorPoints": [
-        { "row": 4, "column": 3, "color": "Red" },
-        { "row": 3, "column": 4, "color": "Red" },
-        { "row": 4, "column": 0, "color": "Blue" },
-        { "row": 1, "column": 1, "color": "Blue" },
+        { "row": 1, "column": 1, "color": "Purple" },
+        { "row": 5, "column": 5, "color": "Purple" },
+        { "row": 2, "column": 4, "color": "Gray" },
+        { "row": 4, "column": 2, "color": "Gray" },
+        { "row": 2, "column": 3, "color": "Orange" },
+        { "row": 3, "column": 2, "color": "Orange" },
+        { "row": 2, "column": 2, "color": "Pink" },
+        { "row": 4, "column": 5, "color": "Pink" },
+        { "row": 0, "column": 1, "color": "Red" },
+        { "row": 0, "column": 5, "color": "Red" },
+        { "row": 6, "column": 1, "color": "Blue" },
+        { "row": 6, "column": 5, "color": "Blue" },
+        { "row": 1, "column": 0, "color": "Green" },
         { "row": 5, "column": 0, "color": "Green" },
-        { "row": 2, "column": 2, "color": "Green" },
-        { "row": 5, "column": 3, "color": "Yellow" },
-        { "row": 0, "column": 5, "color": "Yellow" },
-        { "row": 0, "column": 1, "color": "Orange" },
-        { "row": 1, "column": 4, "color": "Orange" }
+        { "row": 1, "column": 6, "color": "Yellow" },
+        { "row": 5, "column": 6, "color": "Yellow" }
       ]
     },
     {
-      "id": 11,
-      "name": "Уровень 11",
+      "id": 9,
+      "name": "Уровень 9",
+      "rows": 9,
+      "columns": 9,
+      "colorPoints": [
+        { "row": 0, "column": 0, "color": "Red" },
+        { "row": 5, "column": 0, "color": "Red" },
+        { "row": 0, "column": 8, "color": "Blue" },
+        { "row": 8, "column": 0, "color": "Blue" },
+        { "row": 4, "column": 0, "color": "Green" },
+        { "row": 3, "column": 6, "color": "Green" },
+        { "row": 4, "column": 2, "color": "Pink" },
+        { "row": 4, "column": 6, "color": "Pink" },
+        { "row": 1, "column": 1, "color": "Orange" },
+        { "row": 1, "column": 7, "color": "Orange" },
+        { "row": 7, "column": 1, "color": "Cyan" },
+        { "row": 7, "column": 7, "color": "Cyan" }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Уровень 10",
       "rows": 9,
       "columns": 9,
       "colorPoints": [
@@ -176,9 +186,10 @@
         { "row": 0, "column": 4, "color": "Purple" }
       ]
     },
+    
     {
-      "id": 12,
-      "name": "Уровень 12",
+      "id": 11,
+      "name": "Уровень 11",
       "rows": 9,
       "columns": 9,
       "colorPoints": [
@@ -199,8 +210,8 @@
       ]
     },
     {
-      "id": 13,
-      "name": "Уровень 13",
+      "id": 12,
+      "name": "Уровень 12",
       "rows": 9,
       "columns": 9,
       "colorPoints": [
@@ -221,8 +232,8 @@
       ]
     },
     {
-      "id": 14,
-      "name": "Уровень 14",
+      "id": 13,
+      "name": "Уровень 13",
       "rows": 9,
       "columns": 9,
       "colorPoints": [
@@ -244,7 +255,32 @@
         { "row": 2, "column": 6, "color": "Purple" }
       ]
     },
-
+    {
+      "id": 14,
+      "name": "Уровень 14",
+      "rows": 10,
+      "columns": 10,
+      "colorPoints": [
+        { "row": 1, "column": 1, "color": "Gray" },
+        { "row": 5, "column": 4, "color": "Gray" },
+        { "row": 8, "column": 1, "color": "Blue" },
+        { "row": 8, "column": 8, "color": "Blue" },
+        { "row": 2, "column": 2, "color": "Cyan" },
+        { "row": 4, "column": 3, "color": "Cyan" },
+        { "row": 3, "column": 3, "color": "Yellow" },
+        { "row": 4, "column": 9, "color": "Yellow" },
+        { "row": 9, "column": 1, "color": "Pink" },
+        { "row": 9, "column": 9, "color": "Pink" },
+        { "row": 0, "column": 0, "color": "Orange" },
+        { "row": 5, "column": 9, "color": "Orange" },
+        { "row": 1, "column": 8, "color": "Red" },
+        { "row": 2, "column": 5, "color": "Red" },
+        { "row": 2, "column": 7, "color": "Purple" },
+        { "row": 2, "column": 4, "color": "Purple" },
+        { "row": 6, "column": 9, "color": "Green" },
+        { "row": 9, "column": 0, "color": "Green" }
+      ]
+    },
     {
       "id": 15,
       "name": "Уровень 15",
